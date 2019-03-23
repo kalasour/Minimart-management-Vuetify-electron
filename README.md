@@ -1,0 +1,1 @@
+# Minimart-management-Vuetify-electron
