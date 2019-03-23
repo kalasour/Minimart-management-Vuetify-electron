@@ -1,4 +1,4 @@
-# minimart
+# Minimart-management-Vuetify-electron
 
 ## Project setup
 ```
