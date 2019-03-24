@@ -1,11 +1,30 @@
 <template>
-    <v-autocomplete
-      v-model="model"
-      :items="Stock"
-      :label="`Search`"
-      prepend-icon="search"
-    >
-    </v-autocomplete>
+  <v-autocomplete
+    auto-select-first
+    chips
+    autofocus
+    v-model="model"
+    :items="Stock"
+    :label="`Search`"
+    prepend-icon="search"
+    item-text="Barcode_ID"
+    :filter="SearchFilter"
+    @change="updateSearchField(model)"
+  >
+    <template v-slot:item="data">
+      <template v-if="typeof data.item !== 'object'">
+        <v-list-tile-content v-text="data.item"></v-list-tile-content>
+      </template>
+      <template v-else>
+        <v-list-tile-content v-text="data.item.Detail"></v-list-tile-content>
+        <v-list-tile-content>
+          <v-list-tile-title v-text="data.item.Barcode_ID"></v-list-tile-title>
+          <v-list-tile-sub-title v-text="data.item.QT"></v-list-tile-sub-title>
+        </v-list-tile-content>
+      </template>
+      
+    </template>
+  </v-autocomplete>
 </template>
 
 <script>
@@ -15,77 +34,18 @@ export default {
   name: "App",
   data() {
     return {
-      isEditing: false,
       model: null,
-      states: [
-        "Alabama",
-        "Alaska",
-        "American Samoa",
-        "Arizona",
-        "Arkansas",
-        "California",
-        "Colorado",
-        "Connecticut",
-        "Delaware",
-        "District of Columbia",
-        "Federated States of Micronesia",
-        "Florida",
-        "Georgia",
-        "Guam",
-        "Hawaii",
-        "Idaho",
-        "Illinois",
-        "Indiana",
-        "Iowa",
-        "Kansas",
-        "Kentucky",
-        "Louisiana",
-        "Maine",
-        "Marshall Islands",
-        "Maryland",
-        "Massachusetts",
-        "Michigan",
-        "Minnesota",
-        "Mississippi",
-        "Missouri",
-        "Montana",
-        "Nebraska",
-        "Nevada",
-        "New Hampshire",
-        "New Jersey",
-        "New Mexico",
-        "New York",
-        "North Carolina",
-        "North Dakota",
-        "Northern Mariana Islands",
-        "Ohio",
-        "Oklahoma",
-        "Oregon",
-        "Palau",
-        "Pennsylvania",
-        "Puerto Rico",
-        "Rhode Island",
-        "South Carolina",
-        "South Dakota",
-        "Tennessee",
-        "Texas",
-        "Utah",
-        "Vermont",
-        "Virgin Island",
-        "Virginia",
-        "Washington",
-        "West Virginia",
-        "Wisconsin",
-        "Wyoming"
-      ],
-      JSONStock: null
-      ,Stock:[]
+      JSONStock: null,
+      Stock: []
     };
   },
   created() {
     this.initialize();
   },
   methods: {
+    updateSearchField(data) {
+     this.$store.commit("SetSF",data)
+    },
     async initialize() {
       await storage.getAll((error, data) => {
         if (error) throw error;
@@ -93,13 +53,22 @@ export default {
         if (this.JSONStock !== null)
           Object.keys(this.JSONStock).map(key => {
             this.JSONStock[key].Barcode_ID = key;
-            this.JSONStock[key].toString=()=>{
-                return this.JSONStock[key].Detail
-            }
-            console.log(this.JSONStock[key].toString())
             this.Stock.push(this.JSONStock[key]);
           });
       });
+    },
+    SearchFilter(item, queryText, itemText) {
+      const textOne = item.Detail.toLowerCase();
+      const textTwo = item.Barcode_ID.toLowerCase();
+      const text3 = item.JM_ID.toLowerCase();
+      const text4 = item.BE_ID.toLowerCase();
+      const searchText = queryText.toLowerCase();
+      return (
+        textOne.indexOf(searchText) > -1 ||
+        textTwo.indexOf(searchText) > -1 ||
+        text3.indexOf(searchText) > -1 ||
+        text4.indexOf(searchText) > -1
+      );
     }
   }
 };

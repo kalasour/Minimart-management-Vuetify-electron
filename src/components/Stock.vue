@@ -56,18 +56,20 @@
         </v-toolbar>
         <v-data-table :headers="headers" :items="Stock" class="elevation-1">
           <template v-slot:items="props">
-            <td>{{ props.item.Detail }}</td>
-            <td class="text-xs-center">{{ props.item.Barcode_ID }}</td>
-            <td class="text-xs-center">{{ props.item.BE_ID }}</td>
-            <td class="text-xs-center">{{ props.item.Discount_amount }}</td>
-            <td class="text-xs-center">{{ props.item.Discount_per }}</td>
-            <td class="text-xs-center">{{ props.item.JM_ID }}</td>
-            <td class="text-xs-center">{{ props.item.QT }}</td>
-            <td class="text-xs-center">{{ props.item.Unit_price }}</td>
-            <td class="justify-center layout px-0">
-              <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
-              <v-icon small @click="deleteItem(props.item)">delete</v-icon>
-            </td>
+            <template v-if="props.item.Barcode_ID.toLowerCase().indexOf((SearchField==null?'':SearchField).toLowerCase()) > -1">
+              <td>{{ props.item.Detail }}</td>
+              <td class="text-xs-center">{{ props.item.Barcode_ID }}</td>
+              <td class="text-xs-center">{{ props.item.BE_ID }}</td>
+              <td class="text-xs-center">{{ props.item.Discount_amount }}</td>
+              <td class="text-xs-center">{{ props.item.Discount_per }}</td>
+              <td class="text-xs-center">{{ props.item.JM_ID }}</td>
+              <td class="text-xs-center">{{ props.item.QT }}</td>
+              <td class="text-xs-center">{{ props.item.Unit_price }}</td>
+              <td class="justify-center layout px-0">
+                <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
+                <v-icon small @click="deleteItem(props.item)">delete</v-icon>
+              </td>
+            </template>
           </template>
           <template v-slot:no-data>
             <v-btn color="primary" @click="initialize">Reset</v-btn>
@@ -121,7 +123,8 @@ export default {
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
-    }
+    },
+    ...mapState(["SearchField"])
   },
 
   watch: {
@@ -178,7 +181,10 @@ export default {
     },
 
     save() {
-      if (this.editedIndex > -1) {
+      if (this.editItem.Barcode_ID == "" || this.editItem.Barcode_ID == null) {
+        alert("Please Input Barcode ID");
+        return;
+      } else if (this.editedIndex > -1) {
         Object.assign(this.Stock[this.editedIndex], this.editedItem);
       } else {
         this.Stock.push(this.editedItem);
@@ -192,7 +198,7 @@ export default {
 
   //   }
   // },
-  // computed: mapState(["SearchField"]),
+  // ,computed: mapState(["SearchField"]),
   // methods: {
   //   getPath() {
   //     // storage.set('StockIndex',1)
