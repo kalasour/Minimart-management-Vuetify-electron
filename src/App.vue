@@ -2,13 +2,11 @@
   <v-app dark>
     <v-toolbar>
       <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
-      <v-toolbar-title>Title</v-toolbar-title>
+      <v-toolbar-title>Mintmart management</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-toolbar-items class="hidden-sm-and-down">
-        <v-btn flat @click="goto('/')">Link One</v-btn>
-        <v-btn flat @click="goto('/stock')">Link Two</v-btn>
-        <v-btn flat>Link Three</v-btn>
-      </v-toolbar-items>
+      
+        <Searchbar></Searchbar>
+      
     </v-toolbar>
     <v-content>
       <v-container>
@@ -53,11 +51,11 @@
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld";
+import Searchbar from './components/searchbar';
 export default {
   name: "App",
   components: {
-    HelloWorld
+    Searchbar
   },
   data() {
     return {
