@@ -82,7 +82,7 @@
 
 <script>
 const storage = require("electron-json-storage");
-import { mapActions, mapState } from "vuex";
+import { mapMutations, mapState } from "vuex";
 export default {
   data: () => ({
     dialog: false,
@@ -101,8 +101,6 @@ export default {
       { text: "price/unit", value: "Unit_price", align: "center" },
       { text: "Action", sortable: false, align: "center" }
     ],
-    JSONStock: null,
-    Stock: [],
     editedIndex: -1,
     editedItem: {
       name: "",
@@ -124,7 +122,7 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     },
-    ...mapState(["SearchField"])
+    ...mapState(["SearchField","JSONStock",'Stock'])
   },
 
   watch: {
@@ -140,24 +138,8 @@ export default {
     look(data) {
       console.log(data);
     },
-    async UpdateStock() {
-      var _stock = {};
-      await this.Stock.map(item => {
-        _stock[item.Barcode_ID] = item;
-      });
-      storage.set("Stock", _stock);
-    },
-    async initialize() {
-      await storage.getAll((error, data) => {
-        if (error) throw error;
-        this.JSONStock = data.Stock;
-        if (this.JSONStock !== null)
-          Object.keys(this.JSONStock).map(key => {
-            this.JSONStock[key].Barcode_ID = key;
-            this.Stock.push(this.JSONStock[key]);
-          });
-      });
-    },
+    ...mapMutations(['initialize','UpdateStock']),
+
 
     editItem(item) {
       this.editedIndex = this.Stock.indexOf(item);

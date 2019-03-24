@@ -29,14 +29,12 @@
 
 <script>
 const storage = require("electron-json-storage");
-import { mapActions, mapState } from "vuex";
+import { mapMutations, mapState } from "vuex";
 export default {
   name: "App",
   data() {
     return {
       model: null,
-      JSONStock: null,
-      Stock: []
     };
   },
   created() {
@@ -45,17 +43,6 @@ export default {
   methods: {
     updateSearchField(data) {
      this.$store.commit("SetSF",data)
-    },
-    async initialize() {
-      await storage.getAll((error, data) => {
-        if (error) throw error;
-        this.JSONStock = data.Stock;
-        if (this.JSONStock !== null)
-          Object.keys(this.JSONStock).map(key => {
-            this.JSONStock[key].Barcode_ID = key;
-            this.Stock.push(this.JSONStock[key]);
-          });
-      });
     },
     SearchFilter(item, queryText, itemText) {
       const textOne = item.Detail.toLowerCase();
@@ -70,7 +57,12 @@ export default {
         text4.indexOf(searchText) > -1
       );
     }
-  }
+  },computed: {
+    formTitle() {
+      return this.editedIndex === -1 ? "New Item" : "Edit Item";
+    },
+    ...mapState(["SearchField","JSONStock",'Stock'])
+  },
 };
 </script>
 
