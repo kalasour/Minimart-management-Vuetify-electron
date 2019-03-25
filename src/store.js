@@ -8,6 +8,7 @@ export default new Vuex.Store({
     SearchField: '',
     JSONStock: null,
     Stock: [],
+    List:[]
   },
 
   actions: {
@@ -30,11 +31,11 @@ export default new Vuex.Store({
       });
     },
     async UpdateStock(state) {
-      var _stock = {};
+      state.JSONStock= {};
       await state.Stock.map(item => {
-        _stock[item.Barcode_ID] = item;
+        state.JSONStock[item.Barcode_ID] = item;
       });
-      storage.set("Stock", _stock);
+      storage.set("Stock", state.JSONStock);
     }
   },
 })
