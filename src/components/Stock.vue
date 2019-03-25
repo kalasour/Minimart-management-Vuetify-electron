@@ -54,25 +54,23 @@
             </v-card>
           </v-dialog>
         </v-toolbar>
-        <v-data-table :headers="headers" :items="Stock" class="elevation-1">
+        <v-data-table :headers="headers" :items="Stock.filter(filterTable)" class="elevation-1">
           <template v-slot:items="props">
-            <template v-if="props.item.Barcode_ID.toLowerCase().indexOf((SearchField==null?'':SearchField).toLowerCase()) > -1">
-              <td>{{ props.item.Detail }}</td>
-              <td class="text-xs-center">{{ props.item.Barcode_ID }}</td>
-              <td class="text-xs-center">{{ props.item.BE_ID }}</td>
-              <td class="text-xs-center">{{ props.item.Discount_amount }}</td>
-              <td class="text-xs-center">{{ props.item.Discount_per }}</td>
-              <td class="text-xs-center">{{ props.item.JM_ID }}</td>
-              <td class="text-xs-center">{{ props.item.QT }}</td>
-              <td class="text-xs-center">{{ props.item.Unit_price }}</td>
-              <td class="justify-center layout px-0">
-                <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
-                <v-icon small @click="deleteItem(props.item)">delete</v-icon>
-              </td>
-            </template>
+            <td>{{ props.item.Detail }}</td>
+            <td class="text-xs-center">{{ props.item.Barcode_ID }}</td>
+            <td class="text-xs-center">{{ props.item.BE_ID }}</td>
+            <td class="text-xs-center">{{ props.item.Discount_amount }}</td>
+            <td class="text-xs-center">{{ props.item.Discount_per }}</td>
+            <td class="text-xs-center">{{ props.item.JM_ID }}</td>
+            <td class="text-xs-center">{{ props.item.QT }}</td>
+            <td class="text-xs-center">{{ props.item.Unit_price }}</td>
+            <td class="justify-center layout px-0">
+              <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
+              <v-icon small @click="deleteItem(props.item)">delete</v-icon>
+            </td>
           </template>
           <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Reset</v-btn>
+            <v-btn color="primary" @click="initialize">Refresh</v-btn>
           </template>
         </v-data-table>
       </div>
@@ -122,7 +120,7 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     },
-    ...mapState(["SearchField","JSONStock",'Stock'])
+    ...mapState(["SearchField", "JSONStock", "Stock"])
   },
 
   watch: {
@@ -138,9 +136,31 @@ export default {
     look(data) {
       console.log(data);
     },
-    ...mapMutations(['initialize','UpdateStock']),
-
-
+    ...mapMutations(["initialize", "UpdateStock"]),
+    filterTable(element) {
+      return (
+        (element.Detail == null ? "" : element.Detail)
+          .toLowerCase()
+          .indexOf(
+            (this.SearchField == null ? "" : this.SearchField).toLowerCase()
+          ) > -1 ||
+        (element.Barcode_ID == null ? "" : element.Barcode_ID)
+          .toLowerCase()
+          .indexOf(
+            (this.SearchField == null ? "" : this.SearchField).toLowerCase()
+          ) > -1 ||
+        (element.JM_ID == null ? "" : element.JM_ID)
+          .toLowerCase()
+          .indexOf(
+            (this.SearchField == null ? "" : this.SearchField).toLowerCase()
+          ) > -1 ||
+        (element.BE_ID == null ? "" : element.BE_ID)
+          .toLowerCase()
+          .indexOf(
+            (this.SearchField == null ? "" : this.SearchField).toLowerCase()
+          ) > -1
+      );
+    },
     editItem(item) {
       this.editedIndex = this.Stock.indexOf(item);
       this.editedItem = Object.assign({}, item);
@@ -163,16 +183,21 @@ export default {
     },
 
     save() {
-      if (this.editItem.Barcode_ID == "" || this.editItem.Barcode_ID == null) {
+      if (
+        this.editedItem.Barcode_ID == "" ||
+        this.editedItem.Barcode_ID == null
+      ) {
         alert("Please Input Barcode ID");
         return;
-      } else if (this.editedIndex > -1) {
-        Object.assign(this.Stock[this.editedIndex], this.editedItem);
       } else {
-        this.Stock.push(this.editedItem);
+        if (this.editedIndex > -1) {
+          Object.assign(this.Stock[this.editedIndex], this.editedItem);
+        } else {
+          this.Stock.push(this.editedItem);
+        }
+        this.close();
+        this.UpdateStock();
       }
-      this.close();
-      this.UpdateStock();
     }
   }
   // data(){

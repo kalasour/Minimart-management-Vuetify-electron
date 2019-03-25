@@ -1,5 +1,5 @@
 <template>
-  <v-autocomplete
+  <v-combobox
     auto-select-first
     chips
     autofocus
@@ -22,9 +22,8 @@
           <v-list-tile-sub-title v-text="data.item.QT"></v-list-tile-sub-title>
         </v-list-tile-content>
       </template>
-      
     </template>
-  </v-autocomplete>
+  </v-combobox>
 </template>
 
 <script>
@@ -34,7 +33,7 @@ export default {
   name: "App",
   data() {
     return {
-      model: null,
+      model: null
     };
   },
   created() {
@@ -42,7 +41,11 @@ export default {
   },
   methods: {
     updateSearchField(data) {
-     this.$store.commit("SetSF",data)
+      if(typeof data === 'object'&&data!=null)
+      {
+        data=data.Barcode_ID
+      }
+      this.$store.commit("SetSF", data);
     },
     SearchFilter(item, queryText, itemText) {
       const textOne = item.Detail.toLowerCase();
@@ -56,13 +59,15 @@ export default {
         text3.indexOf(searchText) > -1 ||
         text4.indexOf(searchText) > -1
       );
-    }
-  },computed: {
+    },
+    ...mapMutations(["initialize", "UpdateStock"])
+  },
+  computed: {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     },
-    ...mapState(["SearchField","JSONStock",'Stock'])
-  },
+    ...mapState(["SearchField", "JSONStock", "Stock"])
+  }
 };
 </script>
 
