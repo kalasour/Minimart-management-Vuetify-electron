@@ -23,11 +23,11 @@
           <v-list class="pa-1">
             <v-list-tile avatar tag="div">
               <v-list-tile-avatar>
-                <img src="https://randomuser.me/api/portraits/men/85.jpg">
+                <img src="https://pngimage.net/wp-content/uploads/2018/06/minimart-png-6.png">
               </v-list-tile-avatar>
 
               <v-list-tile-content>
-                <v-list-tile-title>John Leider</v-list-tile-title>
+                <v-list-tile-title>Minimart</v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
           </v-list>
@@ -62,7 +62,7 @@ export default {
       SearchField: "",
       drawer: true,
       items: [
-        { title: "Home", icon: "home", path: "/" },
+        { title: "Home", icon: "shopping_cart", path: "/" },
         { title: "Stock", icon: "table_chart", path: "/stock" },
         { title: "About", icon: "question_answer", path: "/about" }
       ],
