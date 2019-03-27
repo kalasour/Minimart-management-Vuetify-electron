@@ -5,8 +5,8 @@
       <template v-slot:items="props">
         <td class="text-xs-left">{{ props.item.Detail }}</td>
         <td class="text-xs-center">{{ props.item.Barcode_ID }}</td>
-        <td class="text-xs-center">-{{ props.item.Discount_amount }} .-</td>
-        <td class="text-xs-center">-{{ props.item.Discount_per }}%</td>
+        <td class="text-xs-center">- {{ props.item.Discount_amount }} .-</td>
+        <td class="text-xs-center">- {{ props.item.Discount_per }}%</td>
         <td class="text-xs-center">{{ props.item.Discounted }}</td>
         <td class="text-xs-center">{{ CalPrice(props.item) }}</td>
         <td class="justify-center layout px-0">
@@ -28,24 +28,38 @@
       <v-flex xs12 sm6 py2 pt-3 offset-sm6>
         <v-card>
           <v-card-title primary-title>
-            <div>
-              <h3 class="headline mb-0 center">Payment summary</h3>
-              <div>Total Discounted : {{TotalDiscounted()}} .-</div>
-              <div>Total Ordered : {{TotalOrdered()}}</div>
-              <div>Total Piece : {{TotalPiece()}}</div>
-              <div>Paid  : {{TotalPiece()}}</div>
-              <div>Customer ID : {{TotalPiece()}}</div>
-              <h1 class="headline mb-0">Total price : {{TotalPrice()}} .-</h1>
-            </div>
-          </v-card-title>
+            <v-flex xs12>
+              <h3 class="headline mb-0 text-md-center">Payment summary</h3>
 
-          <v-card-actions>
-            <v-btn flat color="red" :disabled="List.length<=0" @click="Clear">Clear</v-btn>
-            <v-btn flat color="blue" :disabled="List.length<=0" @click="Sale">Sale</v-btn>
+              <v-layout pt-2 row wrap mb-0>
+                <v-flex xs6>
+                  <v-text-field v-model="CustomerID" label="Customer ID" required></v-text-field>
+                  <v-text-field v-model="Paid" label="Paid" required></v-text-field>
+                </v-flex>
+                <v-flex xs6>
+                  <v-flex mx-5>
+                    <div>Total Discounted : {{TotalDiscounted()}} .-</div>
+                    <div>Total Ordered : {{TotalOrdered()}}</div>
+                    <div>Total Piece : {{TotalPiece()}}</div>
+                  </v-flex>
+                </v-flex>
+              </v-layout>
+            </v-flex>
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-card-actions class="justify-end">
+            <div class="text-xs-center">
+              <v-flex xs12>
+                <h1 class="headline mb-0 text-md-right">Total price : {{TotalPrice()}} .-</h1>
+              </v-flex>
+              <v-btn flat color="red" :disabled="List.length<=0" @click="Clear">Clear</v-btn>
+              <v-btn flat color="blue" :disabled="List.length<=0" @click="Sale">Sale</v-btn>
+            </div>
           </v-card-actions>
         </v-card>
       </v-flex>
     </v-layout>
+    
   </v-app>
 </template>
 
@@ -56,6 +70,8 @@ export default {
   name: "App",
   data() {
     return {
+      CustomerID: "",
+      Paid: "",
       headers: [
         {
           text: "Detail",
@@ -104,7 +120,7 @@ export default {
   methods: {
     Sale() {},
     Clear() {
-      this.List.splice(0,this.List.length)
+      this.List.splice(0, this.List.length);
     },
     ...mapMutations(["initialize", "UpdateStock"]),
     TotalPrice: function() {
@@ -176,9 +192,20 @@ export default {
   },
   watch: {
     SearchField: function() {
+       if(this.SearchField=='')return;
+      // console.log(this.SearchField)
       if (this.JSONStock[this.SearchField] != null) {
+        var Findex=this.List.map((item)=>{return item.Barcode_ID}).indexOf(this.SearchField);
+        // alert(Findex)
+        if(Findex!=-1){
+          if(this.List[Findex].piece<this.List[Findex].QT)this.List[Findex].piece++;
+          else alert("Out of stock!");
+          this.$store.commit("SetSF", '');
+          return;
+        }
         if (this.JSONStock[this.SearchField].QT < 1) {
           alert("Out of stock!!");
+          this.$store.commit("SetSF", '');
           return;
         }
         this.JSONStock[this.SearchField].piece = 1;
@@ -187,6 +214,7 @@ export default {
       } else if (this.SearchField != null) {
         alert("Not founded in stock!!");
       }
+      this.$store.commit("SetSF", '');
     }
   }
 };

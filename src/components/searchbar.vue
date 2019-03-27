@@ -1,7 +1,6 @@
 <template>
   <v-combobox
     auto-select-first
-    chips
     autofocus
     v-model="model"
     :items="Stock"
@@ -9,8 +8,16 @@
     prepend-icon="search"
     item-text="Barcode_ID"
     :filter="SearchFilter"
-    @change="updateSearchField(model)"
+    @input="updateSearchField(model)"
   >
+    <template v-slot:selection="data" @input="look(data.parent)">
+      <v-chip
+        :selected="data.selected"
+        close
+        class="chip--select-multi"
+        
+      >{{data.item.Barcode_ID}}{{look(data.parent)}}</v-chip>
+    </template>
     <template v-slot:item="data">
       <template v-if="typeof data.item !== 'object'">
         <v-list-tile-content v-text="data.item"></v-list-tile-content>
@@ -39,11 +46,33 @@ export default {
   created() {
     this.initialize();
   },
+  // watch: {
+  //   model: function() {
+  //     this.model = null;
+  //   }
+  // },
   methods: {
+    remove(item) {
+      // console.log(this.model)
+      const index = this.model.indexOf(item);
+      console.log(index);
+      if (index >= 0) this.model.splice(index, 1);
+    },
+    look(data) {
+      // data.item = "";
+      // this.model=null
+      // data.selectedValues.splice(0,1)
+      // data.selectedItems.splice(0,1)
+      data.internalValue = "";
+      // console.log(data);
+    },
     updateSearchField(data) {
-      if(typeof data === 'object'&&data!=null)
-      {
-        data=data.Barcode_ID
+      if (data == "") {
+        return;
+      }
+      
+      if (typeof data === "object" && data != null) {
+        data = data.Barcode_ID;
       }
       this.$store.commit("SetSF", data);
     },
