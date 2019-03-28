@@ -59,7 +59,6 @@
         </v-card>
       </v-flex>
     </v-layout>
-    
   </v-app>
 </template>
 
@@ -115,7 +114,7 @@ export default {
     };
   },
   created() {
-    this.initialize();
+    // this.initialize();
   },
   methods: {
     Sale() {},
@@ -190,22 +189,28 @@ export default {
   computed: {
     ...mapState(["SearchField", "JSONStock", "Stock", "List"])
   },
+  created(){
+    this.$store.commit("SetSF", "");
+  },
   watch: {
     SearchField: function() {
-       if(this.SearchField=='')return;
+      if (this.SearchField == "" || this.SearchField == null) return;
       // console.log(this.SearchField)
       if (this.JSONStock[this.SearchField] != null) {
-        var Findex=this.List.map((item)=>{return item.Barcode_ID}).indexOf(this.SearchField);
+        var Findex = this.List.map(item => {
+          return item.Barcode_ID;
+        }).indexOf(this.SearchField);
         // alert(Findex)
-        if(Findex!=-1){
-          if(this.List[Findex].piece<this.List[Findex].QT)this.List[Findex].piece++;
+        if (Findex != -1) {
+          if (this.List[Findex].piece < this.List[Findex].QT)
+            this.List[Findex].piece++;
           else alert("Out of stock!");
-          this.$store.commit("SetSF", '');
+          this.$store.commit("SetSF", "");
           return;
         }
         if (this.JSONStock[this.SearchField].QT < 1) {
           alert("Out of stock!!");
-          this.$store.commit("SetSF", '');
+          this.$store.commit("SetSF", "");
           return;
         }
         this.JSONStock[this.SearchField].piece = 1;
@@ -214,7 +219,7 @@ export default {
       } else if (this.SearchField != null) {
         alert("Not founded in stock!!");
       }
-      this.$store.commit("SetSF", '');
+      this.$store.commit("SetSF", "");
     }
   }
 };

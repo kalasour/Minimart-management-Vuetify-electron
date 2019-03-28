@@ -15,8 +15,7 @@
         :selected="data.selected"
         close
         class="chip--select-multi"
-        
-      >{{data.item.Barcode_ID}}{{look(data.parent)}}</v-chip>
+      >{{SearchField}}{{look(data.parent)}}</v-chip>
     </template>
     <template v-slot:item="data">
       <template v-if="typeof data.item !== 'object'">
@@ -44,7 +43,7 @@ export default {
     };
   },
   created() {
-    this.initialize();
+    // this.initialize();
   },
   // watch: {
   //   model: function() {
@@ -54,9 +53,9 @@ export default {
   methods: {
     remove(item) {
       // console.log(this.model)
-      const index = this.model.indexOf(item);
-      console.log(index);
-      if (index >= 0) this.model.splice(index, 1);
+      // const index = this.model.indexOf(item);
+      // console.log(index);
+      // if (index >= 0) this.model.splice(index, 1);
     },
     look(data) {
       // data.item = "";

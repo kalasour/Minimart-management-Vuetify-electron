@@ -3,7 +3,7 @@
     <v-app id="inspire">
       <div>
         <v-toolbar flat>
-          <v-toolbar-title>Stock</v-toolbar-title>
+          <v-toolbar-title>Customers</v-toolbar-title>
           <v-divider class="mx-2" inset vertical></v-divider>
           <template v-if="SearchField!==''">
             <v-chip close color="blue" text-color="white" @input="clearSF">
@@ -27,28 +27,13 @@
                 <v-container grid-list-md>
                   <v-layout wrap>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.Detail" label="Detail"></v-text-field>
+                      <v-text-field v-model="editedItem.ID" label="ID"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.Barcode_ID" label="BARCODE ID"></v-text-field>
+                      <v-text-field v-model="editedItem.Name" label="Name"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.BE_ID" label="BE ID"></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.Discount_amount" label="Discount(amount)"></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.Discount_per" label="Discount(%)"></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.JM_ID" label="JM ID"></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.QT" label="Quantities"></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.Unit_price" label="price/unit"></v-text-field>
+                      <v-text-field v-model="editedItem.Address" label="Adress"></v-text-field>
                     </v-flex>
                   </v-layout>
                 </v-container>
@@ -62,16 +47,11 @@
             </v-card>
           </v-dialog>
         </v-toolbar>
-        <v-data-table :headers="headers" :items="Stock.filter(filterTable)" class="elevation-1">
+        <v-data-table :headers="headers" :items="Customers.filter(filterTable)" class="elevation-1">
           <template v-slot:items="props">
-            <td>{{ props.item.Detail }}</td>
-            <td class="text-xs-center">{{ props.item.Barcode_ID }}</td>
-            <td class="text-xs-center">{{ props.item.BE_ID }}</td>
-            <td class="text-xs-center">{{ props.item.Discount_amount }}</td>
-            <td class="text-xs-center">{{ props.item.Discount_per }}</td>
-            <td class="text-xs-center">{{ props.item.JM_ID }}</td>
-            <td class="text-xs-center">{{ props.item.QT }}</td>
-            <td class="text-xs-center">{{ props.item.Unit_price }}</td>
+            <td>{{ props.item.ID }}</td>
+            <td class="text-xs-center">{{ props.item.Name }}</td>
+            <td class="text-xs-center">{{ props.item.Address }}</td>
             <td class="justify-center layout px-0">
               <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
               <v-icon small @click="deleteItem(props.item)">delete</v-icon>
@@ -89,37 +69,30 @@
 <script>
 const storage = require("electron-json-storage");
 import { mapMutations, mapState } from "vuex";
+import { Promise } from "q";
 export default {
   data: () => ({
     dialog: false,
     headers: [
       {
-        text: "Detail",
+        text: "ID",
         align: "left",
-        value: "Detail"
+        value: "ID"
       },
-      { text: "BARCODE ID", value: "Barcode_ID", align: "center" },
-      { text: "BE ID", value: "BE_ID", align: "center" },
-      { text: "Discount(amount)", value: "Discount_amount", align: "center" },
-      { text: "Discount(%)", value: "Discount_per", align: "center" },
-      { text: "JM ID", value: "JM_ID", align: "center" },
-      { text: "Quantities", value: "QT", align: "center" },
-      { text: "price/unit", value: "Unit_price", align: "center" },
+      { text: "Name", value: "Name", align: "center" },
+      { text: "Address", value: "Adress", align: "center" },
       { text: "Action", sortable: false, align: "center" }
     ],
     editedIndex: -1,
-    editedItem: {
-
-    },
-    defaultItem: {
-    }
+    editedItem: {},
+    defaultItem: {}
   }),
 
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     },
-    ...mapState(["SearchField", "JSONStock", "Stock"])
+    ...mapState(["SearchField", "JSONCustomers", "Customers"])
   },
 
   watch: {
@@ -138,25 +111,20 @@ export default {
     look(data) {
       console.log(data);
     },
-    ...mapMutations(["initialize", "UpdateStock"]),
+    ...mapMutations(["initialize", "UpdateCustomers"]),
     filterTable(element) {
       return (
-        (element.Detail == null ? "" : element.Detail)
+        (element.ID == null ? "" : element.ID)
           .toLowerCase()
           .indexOf(
             (this.SearchField == null ? "" : this.SearchField).toLowerCase()
           ) > -1 ||
-        (element.Barcode_ID == null ? "" : element.Barcode_ID)
+        (element.Name == null ? "" : element.Name)
           .toLowerCase()
           .indexOf(
             (this.SearchField == null ? "" : this.SearchField).toLowerCase()
           ) > -1 ||
-        (element.JM_ID == null ? "" : element.JM_ID)
-          .toLowerCase()
-          .indexOf(
-            (this.SearchField == null ? "" : this.SearchField).toLowerCase()
-          ) > -1 ||
-        (element.BE_ID == null ? "" : element.BE_ID)
+        (element.Address == null ? "" : element.Address)
           .toLowerCase()
           .indexOf(
             (this.SearchField == null ? "" : this.SearchField).toLowerCase()
@@ -164,16 +132,16 @@ export default {
       );
     },
     editItem(item) {
-      this.editedIndex = this.Stock.indexOf(item);
+      this.editedIndex = this.Customers.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      const index = this.Stock.indexOf(item);
+      const index = this.Customers.indexOf(item);
       confirm("Are you sure you want to delete this item?") &&
-        this.Stock.splice(index, 1);
-      this.UpdateStock();
+        this.Customers.splice(index, 1);
+      this.UpdateCustomers();
     },
 
     close() {
@@ -185,17 +153,14 @@ export default {
     },
 
     async save() {
-      if (
-        this.editedItem.Barcode_ID == "" ||
-        this.editedItem.Barcode_ID == null
-      ) {
-        alert("Please Input Barcode ID");
+      if (this.editedItem.ID == "" || this.editedItem.ID == null) {
+        alert("Please Input  ID");
         return;
       } else {
         var con = true;
         await Promise.all(
-          this.Stock.map(async (item, index) => {
-            if (this.editedItem.Barcode_ID == item.Barcode_ID && this.editedIndex !== index) {
+          this.Customers.map(async (item, index) => {
+            if (this.editedItem.ID == item.ID && this.editedIndex !== index) {
               await alert("This ID is already!");
               con = false;
               return;
@@ -203,13 +168,14 @@ export default {
           })
         );
         if (con) {
-        if (this.editedIndex > -1) {
-          Object.assign(this.Stock[this.editedIndex], this.editedItem);
-        } else {
-          this.Stock.push(this.editedItem);
+          if (this.editedIndex > -1) {
+            Object.assign(this.Customers[this.editedIndex], this.editedItem);
+          } else {
+            this.Customers.push(this.editedItem);
+          }
+          this.close();
+          this.UpdateCustomers();
         }
-        this.close();
-        this.UpdateStock();}
       }
     }
   }

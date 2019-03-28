@@ -4,21 +4,14 @@
       <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
       <v-toolbar-title>Mintmart management</v-toolbar-title>
       <v-spacer></v-spacer>
-      
-        <Searchbar></Searchbar>
-      
+
+      <Searchbar></Searchbar>
     </v-toolbar>
     <v-content>
       <v-container>
         <router-view></router-view>
       </v-container>
-      <v-navigation-drawer
-        :mini-variant="mini"
-        v-model="drawer"
-        absolute
-        stateless
-        width="200"
-      >
+      <v-navigation-drawer :mini-variant="mini" v-model="drawer" absolute stateless width="250">
         <div @mouseover="mini=false" @mouseout="mini=true" absolute>
           <v-list class="pa-1">
             <v-list-tile avatar tag="div">
@@ -29,6 +22,11 @@
               <v-list-tile-content>
                 <v-list-tile-title>Minimart</v-list-tile-title>
               </v-list-tile-content>
+              <v-list-tile-action>
+                <v-btn flat icon @click="EditInformation">
+                  <v-icon color="grey lighten-1">settings</v-icon>
+                </v-btn>
+              </v-list-tile-action>
             </v-list-tile>
           </v-list>
 
@@ -51,7 +49,8 @@
 </template>
 
 <script>
-import Searchbar from './components/searchbar';
+import { mapMutations } from "vuex";
+import Searchbar from "./components/searchbar";
 export default {
   name: "App",
   components: {
@@ -64,13 +63,21 @@ export default {
       items: [
         { title: "Home", icon: "shopping_cart", path: "/" },
         { title: "Stock", icon: "table_chart", path: "/stock" },
+        { title: "Customers", icon: "supervisor_account", path: "/customers" },
         { title: "About", icon: "question_answer", path: "/about" }
       ],
       mini: true,
       right: null
     };
   },
+  created() {
+    this.initialize();
+  },
   methods: {
+    EditInformation() {
+      alert("To editing...");
+    },
+    ...mapMutations(["initialize"]),
     Changing() {
       console.log(this.SearchField);
       this.$store.commit("SetSF", this.SearchField);
