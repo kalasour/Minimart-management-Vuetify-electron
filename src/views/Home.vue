@@ -64,6 +64,7 @@
 
 <script>
 import { mapMutations, mapState } from "vuex";
+import moment from "moment";
 
 export default {
   name: "App",
@@ -117,11 +118,50 @@ export default {
     // this.initialize();
   },
   methods: {
-    Sale() {},
+    async Sale() {
+      // console.log(new_invoice)
+      // console.log(moment(now_date,DateFormat).format('D'))
+      if (this.CustomerID == "" || this.Paid == "") {
+        alert("Please input customer ID or paid money!");
+        return;
+      }
+      var IndFind = await this.Customers.findIndex(
+        customer => customer.ID === this.CustomerID
+      );
+      if (IndFind == -1) {
+        alert("Not found this customer ID!!");
+        return;
+      }
+
+      var DateFormat = "MMMM Do YYYY, h:mm:ss a";
+      var now_date = moment(new Date()).format(DateFormat);
+      var new_invoice = {};
+      new_invoice.Customer = await this.Customers.find(
+        customer => customer.ID === this.CustomerID
+      );
+      new_invoice.List = {...this.List}
+      new_invoice.date = now_date;
+      new_invoice.Paid = this.Paid;
+      new_invoice.TotalPrice = this.TotalPrice();
+      new_invoice.TotalDiscounted = this.TotalDiscounted();
+      new_invoice.TotalOrdered = this.TotalOrdered();
+      new_invoice.TotalPiece = this.TotalPiece();
+      await this.List.map((item, index) => {
+        this.Stock[
+          this.Stock.findIndex(s => s.Barcode_ID === item.Barcode_ID)
+        ].QT -= item.piece;
+      });
+      await this.CreateInvoice(new_invoice);
+      this.UpdateInvoice();
+      this.UpdateStock();
+      this.Clear();
+    },
     Clear() {
       this.List.splice(0, this.List.length);
+      this.Paid=''
+      this.CustomerID=''
     },
-    ...mapMutations(["initialize", "UpdateStock"]),
+    ...mapMutations(["initialize", "UpdateStock", "CreateInvoice","UpdateInvoice"]),
     TotalPrice: function() {
       return this.List.map(item => {
         return this.CalPrice(item);
@@ -187,9 +227,9 @@ export default {
     }
   },
   computed: {
-    ...mapState(["SearchField", "JSONStock", "Stock", "List"])
+    ...mapState(["SearchField", "JSONStock", "Stock", "List", "Customers"])
   },
-  created(){
+  created() {
     this.$store.commit("SetSF", "");
   },
   watch: {

@@ -95,6 +95,7 @@ export default {
         { title: "Home", icon: "shopping_cart", path: "/" },
         { title: "Stock", icon: "table_chart", path: "/stock" },
         { title: "Customers", icon: "supervisor_account", path: "/customers" },
+        { title: "Report", icon: "timeline", path: "/report" },
         { title: "About", icon: "question_answer", path: "/about" }
       ],
       mini: true,

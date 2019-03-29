@@ -28,6 +28,10 @@ export default new Router({
       path: '/customers',
       name: 'Customers',
       component: ()=>import('./components/Customers.vue')
+    },{
+      path: '/report',
+      name: 'Report',
+      component: ()=>import('./components/Report.vue')
     },
     {
       path: '*',
