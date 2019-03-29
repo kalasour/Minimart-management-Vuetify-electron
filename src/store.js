@@ -1,11 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { stat } from 'fs';
 const storage = require("electron-json-storage");
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
     SearchField: '',
+    JSONInformation:null,
     JSONStock: null,
     JSONCustomers:null,
     Customers:[],
@@ -28,6 +30,7 @@ export default new Vuex.Store({
         if (error) throw error;
         state.JSONStock = data.Stock;
         state.JSONCustomers = data.Customers;
+        state.JSONInformation=data.Information;
         if (state.JSONStock !== null)
           Object.keys(state.JSONStock).map(key => {
             state.JSONStock[key].Barcode_ID = key;
@@ -40,6 +43,10 @@ export default new Vuex.Store({
             state.Customers.push(state.JSONCustomers[key]);
           });
       });
+    },
+    UpdateInformation(state,NewInformation){
+      state.JSONInformation =Object.assign({},NewInformation)
+      storage.set("Information",NewInformation)
     },
     async UpdateStock(state) {
       state.JSONStock= {};
