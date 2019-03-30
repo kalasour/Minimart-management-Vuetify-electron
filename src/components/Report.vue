@@ -78,11 +78,28 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
+
+           <v-dialog v-model="dialogCustomer" max-width="500">
+            <v-card>
+              <v-list>
+                <v-list-tile v-for="subItem in Object.keys(customerSelected)" :key="subItem" >
+                    <v-list-tile-content>
+                      <v-list-tile-title v-if="subItem!=='active'">{{ subItem }} : {{customerSelected[subItem]}}</v-list-tile-title>
+                    </v-list-tile-content>
+                  </v-list-tile>
+              </v-list>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+
+                <v-btn color="green darken-1" flat="flat" @click="dialogCustomer = false">Close</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-toolbar>
         <v-data-table :headers="headers" :items="Invoice.filter(filterTable)" class="elevation-1">
           <template v-slot:items="props">
             <td>{{ props.item.ID }}</td>
-            <td class="text-xs-center">{{ props.item.Customer.ID }}</td>
+            <td class="text-xs-center"><v-btn @click="clickCustomer(props.item.Customer)">{{props.item.Customer.ID}}</v-btn></td>
             <td class="text-xs-center">{{ props.item.date }}</td>
             <td class="text-xs-center">
               <v-btn @click="clickList(props.item.List)">List of item</v-btn>
@@ -128,7 +145,8 @@ export default {
     editedIndex: -1,
     editedItem: {},
     defaultItem: {},
-    listSelected: {}
+    listSelected: {},
+    customerSelected:{}
   }),
 
   computed: {
@@ -151,6 +169,10 @@ export default {
     clickList(lastList) {
       this.listSelected = lastList;
       this.dialogList = true;
+    },
+    clickCustomer(lastCustomer) {
+      this.customerSelected = lastCustomer;
+      this.dialogCustomer = true;
     },
 
     clearSF() {
