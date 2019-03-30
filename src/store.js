@@ -73,7 +73,8 @@ export default new Vuex.Store({
       storage.set("Customers", state.JSONCustomers);
     },
     async CreateInvoice(state,new_invoice){
-      new_invoice.ID=state.Invoice.length.toString()
+      if(state.Invoice.length==0)new_invoice.ID='0'
+      else {new_invoice.ID=(parseInt(state.Invoice[state.Invoice.length-1].ID)+1).toString()}
       state.Invoice.push(new_invoice)
     }
     ,

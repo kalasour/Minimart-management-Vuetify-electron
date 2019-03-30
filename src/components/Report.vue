@@ -30,10 +30,7 @@
                       <v-text-field v-model="editedItem.ID" disabled label="ID"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.Name" label="Name"></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.Address" label="Adress"></v-text-field>
+                      <v-text-field v-model="editedItem.Paid" label="Paid"></v-text-field>
                     </v-flex>
                   </v-layout>
                 </v-container>
@@ -64,7 +61,7 @@
                     </v-list-tile>
                   </template>
 
-                  <v-list-tile v-for="subItem in Object.keys(item)" :key="subItem" >
+                  <v-list-tile v-for="subItem in Object.keys(item)" :key="subItem">
                     <v-list-tile-content>
                       <v-list-tile-title v-if="subItem!=='active'">{{ subItem }} : {{item[subItem]}}</v-list-tile-title>
                     </v-list-tile-content>
@@ -79,14 +76,16 @@
             </v-card>
           </v-dialog>
 
-           <v-dialog v-model="dialogCustomer" max-width="500">
+          <v-dialog v-model="dialogCustomer" max-width="500">
             <v-card>
               <v-list>
-                <v-list-tile v-for="subItem in Object.keys(customerSelected)" :key="subItem" >
-                    <v-list-tile-content>
-                      <v-list-tile-title v-if="subItem!=='active'">{{ subItem }} : {{customerSelected[subItem]}}</v-list-tile-title>
-                    </v-list-tile-content>
-                  </v-list-tile>
+                <v-list-tile v-for="subItem in Object.keys(customerSelected)" :key="subItem">
+                  <v-list-tile-content>
+                    <v-list-tile-title
+                      v-if="subItem!=='active'"
+                    >{{ subItem }} : {{customerSelected[subItem]}}</v-list-tile-title>
+                  </v-list-tile-content>
+                </v-list-tile>
               </v-list>
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -99,14 +98,26 @@
         <v-data-table :headers="headers" :items="Invoice.filter(filterTable)" class="elevation-1">
           <template v-slot:items="props">
             <td>{{ props.item.ID }}</td>
-            <td class="text-xs-center"><v-btn @click="clickCustomer(props.item.Customer)">{{props.item.Customer.ID}}</v-btn></td>
+            <td class="text-xs-center">
+              <v-btn @click="clickCustomer(props.item.Customer)">{{props.item.Customer.ID}}</v-btn>
+            </td>
             <td class="text-xs-center">{{ props.item.date }}</td>
             <td class="text-xs-center">
               <v-btn @click="clickList(props.item.List)">List of item</v-btn>
             </td>
             <td class="text-xs-center">{{ props.item.TotalPrice }}</td>
             <td class="text-xs-center">{{ props.item.Paid }}</td>
-            <td class="justify-center layout px-0">
+            <td class="justify-center px-0">
+              <template v-if="props.item.Paid>=props.item.TotalPrice">
+                Complete
+                <v-icon small color="green" class="mr-2">verified_user</v-icon>
+              </template>
+              <template v-else>
+                Incomplete
+                <v-icon small color="red" class="mr-2">clear</v-icon>
+              </template>
+            </td>
+            <td class="justify-center layout px-1">
               <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
               <v-icon small @click="deleteItem(props.item)">delete</v-icon>
             </td>
@@ -140,13 +151,14 @@ export default {
       { text: "List", sortable: false, align: "center" },
       { text: "Total price", value: "TotalPrice", align: "center" },
       { text: "Paid", value: "Paid", align: "center" },
+      { text: "Status", sortable: false, align: "center" },
       { text: "Action", sortable: false, align: "center" }
     ],
     editedIndex: -1,
     editedItem: {},
     defaultItem: {},
     listSelected: {},
-    customerSelected:{}
+    customerSelected: {}
   }),
 
   computed: {
@@ -181,7 +193,7 @@ export default {
     look(data) {
       console.log(data);
     },
-    ...mapMutations(["initialize", "UpdateCustomers"]),
+    ...mapMutations(["initialize", "UpdateInvoice"]),
     filterTable(element) {
       return (
         (element.ID == null ? "" : element.ID)
@@ -192,16 +204,16 @@ export default {
       );
     },
     editItem(item) {
-      this.editedIndex = this.Customers.indexOf(item);
+      this.editedIndex = this.Invoice.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      const index = this.Customers.indexOf(item);
+      const index = this.Invoice.indexOf(item);
       confirm("Are you sure you want to delete this item?") &&
-        this.Customers.splice(index, 1);
-      this.UpdateCustomers();
+        this.Invoice.splice(index, 1);
+      this.UpdateInvoice();
     },
 
     close() {
@@ -219,7 +231,7 @@ export default {
       } else {
         var con = true;
         await Promise.all(
-          this.Customers.map(async (item, index) => {
+          this.Invoice.map(async (item, index) => {
             if (this.editedItem.ID == item.ID && this.editedIndex !== index) {
               await alert("This ID is already!");
               con = false;
@@ -229,12 +241,12 @@ export default {
         );
         if (con) {
           if (this.editedIndex > -1) {
-            Object.assign(this.Customers[this.editedIndex], this.editedItem);
+            Object.assign(this.Invoice[this.editedIndex], this.editedItem);
           } else {
-            this.Customers.push(this.editedItem);
+            this.Invoice.push(this.editedItem);
           }
           this.close();
-          this.UpdateCustomers();
+          this.UpdateInvoice();
         }
       }
     }
