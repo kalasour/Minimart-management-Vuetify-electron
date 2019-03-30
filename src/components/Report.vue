@@ -27,7 +27,7 @@
                 <v-container grid-list-md>
                   <v-layout wrap>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.ID" label="ID"></v-text-field>
+                      <v-text-field v-model="editedItem.ID" disabled label="ID"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
                       <v-text-field v-model="editedItem.Name" label="Name"></v-text-field>
@@ -46,12 +46,47 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
+
+          <v-dialog v-model="dialogList" max-width="500">
+            <v-card>
+              <v-list>
+                <v-list-group
+                  v-for="item in Object.values(listSelected)"
+                  :key="item.Barcode_ID"
+                  v-model="item.active"
+                  no-action
+                >
+                  <template v-slot:activator>
+                    <v-list-tile>
+                      <v-list-tile-content>
+                        <v-list-tile-title>{{ item.Detail }}</v-list-tile-title>
+                      </v-list-tile-content>
+                    </v-list-tile>
+                  </template>
+
+                  <v-list-tile v-for="subItem in Object.keys(item)" :key="subItem" >
+                    <v-list-tile-content>
+                      <v-list-tile-title v-if="subItem!=='active'">{{ subItem }} : {{item[subItem]}}</v-list-tile-title>
+                    </v-list-tile-content>
+                  </v-list-tile>
+                </v-list-group>
+              </v-list>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+
+                <v-btn color="green darken-1" flat="flat" @click="dialogList = false">Close</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-toolbar>
         <v-data-table :headers="headers" :items="Invoice.filter(filterTable)" class="elevation-1">
           <template v-slot:items="props">
             <td>{{ props.item.ID }}</td>
             <td class="text-xs-center">{{ props.item.Customer.ID }}</td>
             <td class="text-xs-center">{{ props.item.date }}</td>
+            <td class="text-xs-center">
+              <v-btn @click="clickList(props.item.List)">List of item</v-btn>
+            </td>
             <td class="text-xs-center">{{ props.item.TotalPrice }}</td>
             <td class="text-xs-center">{{ props.item.Paid }}</td>
             <td class="justify-center layout px-0">
@@ -75,28 +110,32 @@ import { Promise } from "q";
 export default {
   data: () => ({
     dialog: false,
+    dialogCustomer: false,
+    dialogList: false,
     headers: [
       {
         text: "ID",
         align: "left",
         value: "ID"
       },
-      { text: "Customer", value: "Customer.ID", align: "center" },
+      { text: "Customer ID", value: "Customer.ID", align: "center" },
       { text: "Date", sortable: false, align: "center" },
+      { text: "List", sortable: false, align: "center" },
       { text: "Total price", value: "TotalPrice", align: "center" },
       { text: "Paid", value: "Paid", align: "center" },
       { text: "Action", sortable: false, align: "center" }
     ],
     editedIndex: -1,
     editedItem: {},
-    defaultItem: {}
+    defaultItem: {},
+    listSelected: {}
   }),
 
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     },
-    ...mapState(["SearchField", "JSONCustomers", "Customers","Invoice"])
+    ...mapState(["SearchField", "JSONCustomers", "Customers", "Invoice"])
   },
 
   watch: {
@@ -109,6 +148,11 @@ export default {
   },
 
   methods: {
+    clickList(lastList) {
+      this.listSelected = lastList;
+      this.dialogList = true;
+    },
+
     clearSF() {
       this.$store.commit("SetSF", "");
     },
@@ -122,7 +166,7 @@ export default {
           .toLowerCase()
           .indexOf(
             (this.SearchField == null ? "" : this.SearchField).toLowerCase()
-          ) > -1 
+          ) > -1
       );
     },
     editItem(item) {
