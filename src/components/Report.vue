@@ -33,11 +33,11 @@
                   v-on="on"
                 ></v-text-field>
               </template>
-              
+
               <v-date-picker v-model="dateStart" @input="menu = false"></v-date-picker>
             </v-menu>
-            
-          </v-flex><v-icon @click="dateStart = null">close</v-icon>
+          </v-flex>
+          <v-icon @click="dateStart = null">close</v-icon>
           <v-flex xs12 sm6 md4>
             <v-menu
               v-model="menu2"
@@ -184,6 +184,7 @@
 
 <script>
 const storage = require("electron-json-storage");
+import moment from "moment";
 import { mapMutations, mapState } from "vuex";
 import { ipcRenderer } from "electron";
 import { Promise } from "q";
@@ -255,12 +256,18 @@ export default {
     },
     ...mapMutations(["initialize", "UpdateInvoice"]),
     filterTable(element) {
+      const DateFormat = "MMMM Do YYYY, h:mm:ss a";
+
       return (
         (element.ID == null ? "" : element.ID)
           .toLowerCase()
           .indexOf(
             (this.SearchField == null ? "" : this.SearchField).toLowerCase()
-          ) > -1
+          ) > -1 &&
+        (this.dateStart == null ||
+          moment(element.date, DateFormat) >= moment(this.dateStart)) &&
+        (this.dateEnd == null ||
+          moment(element.date, DateFormat) <= moment(this.dateEnd))
       );
     },
     editItem(item) {
