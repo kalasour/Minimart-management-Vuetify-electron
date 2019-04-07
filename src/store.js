@@ -40,13 +40,13 @@ export default new Vuex.Store({
             state.Stock.push(state.JSONStock[key]);
           });
 
-          if (state.JSONCustomers !== null)
+        if (state.JSONCustomers !== null)
           Object.keys(state.JSONCustomers).map(key => {
             state.JSONCustomers[key].ID = key;
             state.Customers.push(state.JSONCustomers[key]);
           });
 
-          if (state.JSONInvoice !== null)
+        if (state.JSONInvoice !== null)
           Object.keys(state.JSONInvoice).map(key => {
             state.JSONInvoice[key].ID = key;
             state.Invoice.push(state.JSONInvoice[key]);
@@ -72,9 +72,10 @@ export default new Vuex.Store({
       });
       storage.set("Customers", state.JSONCustomers);
     },
-    async CreateInvoice(state,new_invoice){
-      if(state.Invoice.length==0)new_invoice.ID='0'
-      else {new_invoice.ID=(parseInt(state.Invoice[state.Invoice.length-1].ID)+1).toString()}
+    async CreateInvoice(state, new_invoice) {
+    
+      if (state.Invoice.length == 0) new_invoice.ID = '0'
+      else { new_invoice.ID = (parseInt(state.Invoice[state.Invoice.length - 1].ID) + 1).toString() }
       state.Invoice.push(new_invoice)
     }
     ,

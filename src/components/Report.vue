@@ -109,11 +109,11 @@
             <td class="text-xs-center">{{ props.item.Paid }}</td>
             <td class="justify-center px-0">
               <template v-if="parseFloat(props.item.Paid)>=props.item.TotalPrice">
-                Complete 
+                <span class="green--text">Complete </span>
                 <v-icon small color="green" class="mr-2">verified_user</v-icon>
               </template>
               <template v-else>
-                Incomplete
+                <span class="red--text">Incomplete </span>
                 <v-icon small color="red" class="mr-2">clear</v-icon>
               </template>
             </td>

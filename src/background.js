@@ -1,26 +1,29 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow,ipcMain,shell } from 'electron'
 import {
   createProtocol,
   installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
+const os = require("os");
+const fs = require("fs");
+const path = require("path");
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
-
+let workerWindow
 // Standard scheme must be registered before the app is ready
 protocol.registerStandardSchemes(['app'], { secure: true })
 function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({ width: 800, height: 600 })
-
+  win.maximize()
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
-    if (!process.env.IS_TEST) win.webContents.openDevTools()
+    // if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
     createProtocol('app')
     // Load the index.html when not in development
@@ -30,6 +33,27 @@ function createWindow () {
   win.on('closed', () => {
     win = null
   })
+
+
+
+
+  workerWindow = new BrowserWindow();
+    // workerWindow.loadURL("file://" + __dirname+ "/../src" + "/worker.html");
+    if (process.env.WEBPACK_DEV_SERVER_URL) {
+      // Load the url of the dev server if in development mode
+      workerWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL+'print')
+      // if (!process.env.IS_TEST) win.webContents.openDevTools()
+    } else {
+      createProtocol('app')
+      // Load the index.html when not in development
+      workerWindow.loadURL('app://./index.html#print')
+    }
+    // workerWindow.hide();
+    workerWindow.webContents.openDevTools();
+    workerWindow.on("closed", () => {
+        workerWindow = undefined;
+    });
+    // workerWindow.hide()
 }
 
 // Quit when all windows are closed.
@@ -78,3 +102,28 @@ if (isDevelopment) {
     })
   }
 }
+
+
+ipcMain.on("printPDF", (event, content) => {
+  console.log(content);
+  workerWindow.webContents.send("printPDF", content);
+});
+// when worker window is ready
+ipcMain.on("readyToPrintPDF", (event) => {
+  const pdfPath = path.join(os.tmpdir(), 'print.pdf');
+  // Use default printing options
+  // console.log(workerWindow.webContents.getPrinters())
+  workerWindow.webContents.print({silent: false,printBackground: false,deviceName:''},(success) =>{
+            console.log(success)
+ });
+  // workerWindow.webContents.printToPDF({}, function (error, data) {
+  //     if (error) throw error
+  //     fs.writeFile(pdfPath, data, function (error) {
+  //         if (error) {
+  //             throw error
+  //         }
+  //         shell.openItem(pdfPath)
+  //         event.sender.send('wrote-pdf', pdfPath)
+  //     })
+  // })
+});

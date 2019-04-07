@@ -1,6 +1,6 @@
 <template>
   <v-app dark>
-    <v-toolbar>
+    <v-toolbar v-if="this.$route.path!=='/print'">
       <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
       <v-toolbar-title>Mintmart management</v-toolbar-title>
       <v-spacer></v-spacer>
@@ -11,7 +11,7 @@
       <v-container>
         <router-view></router-view>
       </v-container>
-      <v-navigation-drawer :mini-variant="mini" v-model="drawer" absolute stateless width="250">
+      <v-navigation-drawer v-if="this.$route.path!=='/print'" :mini-variant="mini" v-model="drawer" absolute stateless width="250">
         <div @mouseover="mini=false" @mouseout="mini=true" absolute>
           <v-list class="pa-1">
             <v-list-tile avatar tag="div">
