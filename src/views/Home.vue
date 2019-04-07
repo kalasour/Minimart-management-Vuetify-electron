@@ -65,7 +65,7 @@
 <script>
 import { mapMutations, mapState } from "vuex";
 import moment from "moment";
-import {ipcRenderer} from 'electron'
+import { ipcRenderer } from "electron";
 export default {
   name: "App",
   data() {
@@ -122,52 +122,53 @@ export default {
       // console.log(new_invoice)
       // console.log(moment(now_date,DateFormat).format('D'))
 
-     ipcRenderer.send("printPDF", this.List);
+      if (this.CustomerID == "" || this.Paid == "") {
+        alert("Please input customer ID or paid money!");
+        return;
+      }
+      var IndFind = await this.Customers.findIndex(
+        customer => customer.ID === this.CustomerID
+      );
+      if (IndFind == -1) {
+        alert("Not found this customer ID!!");
+        return;
+      }
 
-
-
-
-      // if (this.CustomerID == "" || this.Paid == "") {
-      //   alert("Please input customer ID or paid money!");
-      //   return;
-      // }
-      // var IndFind = await this.Customers.findIndex(
-      //   customer => customer.ID === this.CustomerID
-      // );
-      // if (IndFind == -1) {
-      //   alert("Not found this customer ID!!");
-      //   return;
-      // }
-
-      // var DateFormat = "MMMM Do YYYY, h:mm:ss a";
-      // var now_date = moment(new Date()).format(DateFormat);
-      // var new_invoice = {};
-      // new_invoice.Customer = await this.Customers.find(
-      //   customer => customer.ID === this.CustomerID
-      // );
-      // new_invoice.List = {...this.List}
-      // new_invoice.date = now_date;
-      // new_invoice.Paid = this.Paid;
-      // new_invoice.TotalPrice = this.TotalPrice();
-      // new_invoice.TotalDiscounted = this.TotalDiscounted();
-      // new_invoice.TotalOrdered = this.TotalOrdered();
-      // new_invoice.TotalPiece = this.TotalPiece();
-      // await this.List.map((item, index) => {
-      //   this.Stock[
-      //     this.Stock.findIndex(s => s.Barcode_ID === item.Barcode_ID)
-      //   ].QT -= item.piece;
-      // });
-      // await this.CreateInvoice(new_invoice);
-      // this.UpdateInvoice();
-      // this.UpdateStock();
-      // this.Clear();
+      var DateFormat = "MMMM Do YYYY, h:mm:ss a";
+      var now_date = moment(new Date()).format(DateFormat);
+      var new_invoice = {};
+      new_invoice.Customer = await this.Customers.find(
+        customer => customer.ID === this.CustomerID
+      );
+      new_invoice.List = { ...this.List };
+      new_invoice.date = now_date;
+      new_invoice.Paid = this.Paid;
+      new_invoice.TotalPrice = this.TotalPrice();
+      new_invoice.TotalDiscounted = this.TotalDiscounted();
+      new_invoice.TotalOrdered = this.TotalOrdered();
+      new_invoice.TotalPiece = this.TotalPiece();
+      await this.List.map((item, index) => {
+        this.Stock[
+          this.Stock.findIndex(s => s.Barcode_ID === item.Barcode_ID)
+        ].QT -= item.piece;
+      });
+      await this.CreateInvoice(new_invoice);
+      ipcRenderer.send("printPDF", new_invoice);
+      this.UpdateInvoice();
+      this.UpdateStock();
+      this.Clear();
     },
     Clear() {
       this.List.splice(0, this.List.length);
-      this.Paid=''
-      this.CustomerID=''
+      this.Paid = "";
+      this.CustomerID = "";
     },
-    ...mapMutations(["initialize", "UpdateStock", "CreateInvoice","UpdateInvoice"]),
+    ...mapMutations([
+      "initialize",
+      "UpdateStock",
+      "CreateInvoice",
+      "UpdateInvoice"
+    ]),
     TotalPrice: function() {
       return this.List.map(item => {
         return this.CalPrice(item);
@@ -224,6 +225,10 @@ export default {
         discount_per = (discount_per / 100) * item.Unit_price;
       item.Discounted = (
         (parseFloat(discount_amount) + parseFloat(discount_per)) *
+        item.piece
+      ).toFixed(2);
+      item.Price = (
+        (item.Unit_price - discount_amount - discount_per) *
         item.piece
       ).toFixed(2);
       return (

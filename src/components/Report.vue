@@ -13,6 +13,55 @@
               {{SearchField}}
             </v-chip>
           </template>
+          <v-flex xs12 sm6 md4>
+            <v-menu
+              v-model="menu"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              lazy
+              transition="scale-transition"
+              offset-y
+              full-width
+              min-width="290px"
+            >
+              <template v-slot:activator="{ on }">
+                <v-text-field
+                  v-model="dateStart"
+                  label="Start date"
+                  prepend-icon="event"
+                  readonly
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              
+              <v-date-picker v-model="dateStart" @input="menu = false"></v-date-picker>
+            </v-menu>
+            
+          </v-flex><v-icon @click="dateStart = null">close</v-icon>
+          <v-flex xs12 sm6 md4>
+            <v-menu
+              v-model="menu2"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              lazy
+              transition="scale-transition"
+              offset-y
+              full-width
+              min-width="290px"
+            >
+              <template v-slot:activator="{ on }">
+                <v-text-field
+                  v-model="dateEnd"
+                  label="End date"
+                  prepend-icon="event"
+                  readonly
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker v-model="dateEnd" @input="menu2 = false"></v-date-picker>
+            </v-menu>
+          </v-flex>
+          <v-icon @click="dateEnd = null">close</v-icon>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on }">
@@ -109,15 +158,17 @@
             <td class="text-xs-center">{{ props.item.Paid }}</td>
             <td class="justify-center px-0">
               <template v-if="parseFloat(props.item.Paid)>=props.item.TotalPrice">
-                <span class="green--text">Complete </span>
+                <span class="green--text">Complete</span>
                 <v-icon small color="green" class="mr-2">verified_user</v-icon>
               </template>
               <template v-else>
-                <span class="red--text">Incomplete </span>
+                <span class="red--text">Incomplete</span>
                 <v-icon small color="red" class="mr-2">clear</v-icon>
               </template>
             </td>
             <td class="justify-center layout px-1">
+              <!-- <v-icon small @click="deleteItem(props.item)">local_printshop</v-icon> -->
+              <v-icon small class="mr-2" @click="print(props.item)">local_printshop</v-icon>
               <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
               <v-icon small @click="deleteItem(props.item)">delete</v-icon>
             </td>
@@ -134,9 +185,13 @@
 <script>
 const storage = require("electron-json-storage");
 import { mapMutations, mapState } from "vuex";
+import { ipcRenderer } from "electron";
 import { Promise } from "q";
 export default {
   data: () => ({
+    menu: false,
+    modal: false,
+    menu2: false,
     dialog: false,
     dialogCustomer: false,
     dialogList: false,
@@ -158,7 +213,9 @@ export default {
     editedItem: {},
     defaultItem: {},
     listSelected: {},
-    customerSelected: {}
+    customerSelected: {},
+    dateStart: null,
+    dateEnd: null
   }),
 
   computed: {
@@ -178,6 +235,9 @@ export default {
   },
 
   methods: {
+    print(invoice) {
+      ipcRenderer.send("printPDF", invoice);
+    },
     clickList(lastList) {
       this.listSelected = lastList;
       this.dialogList = true;

@@ -32,12 +32,13 @@ function createWindow () {
 
   win.on('closed', () => {
     win = null
+    // workerWindow.close()
   })
 
 
 
 
-  workerWindow = new BrowserWindow();
+  workerWindow = new BrowserWindow({ width: 350, height: 600 });
     // workerWindow.loadURL("file://" + __dirname+ "/../src" + "/worker.html");
     if (process.env.WEBPACK_DEV_SERVER_URL) {
       // Load the url of the dev server if in development mode
@@ -48,12 +49,11 @@ function createWindow () {
       // Load the index.html when not in development
       workerWindow.loadURL('app://./index.html#print')
     }
-    // workerWindow.hide();
-    workerWindow.webContents.openDevTools();
+    
+    // workerWindow.webContents.openDevTools();
     workerWindow.on("closed", () => {
         workerWindow = undefined;
     });
-    // workerWindow.hide()
 }
 
 // Quit when all windows are closed.
@@ -106,6 +106,7 @@ if (isDevelopment) {
 
 ipcMain.on("printPDF", (event, content) => {
   console.log(content);
+  workerWindow.focus()
   workerWindow.webContents.send("printPDF", content);
 });
 // when worker window is ready
@@ -113,9 +114,9 @@ ipcMain.on("readyToPrintPDF", (event) => {
   const pdfPath = path.join(os.tmpdir(), 'print.pdf');
   // Use default printing options
   // console.log(workerWindow.webContents.getPrinters())
-  workerWindow.webContents.print({silent: false,printBackground: false,deviceName:''},(success) =>{
-            console.log(success)
- });
+//   workerWindow.webContents.print({silent: false,printBackground: false,deviceName:''},(success) =>{
+//             console.log(success)
+//  });
   // workerWindow.webContents.printToPDF({}, function (error, data) {
   //     if (error) throw error
   //     fs.writeFile(pdfPath, data, function (error) {
