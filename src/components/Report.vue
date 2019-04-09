@@ -37,7 +37,7 @@
               <v-date-picker v-model="dateStart" @input="menu = false"></v-date-picker>
             </v-menu>
           </v-flex>
-          <v-icon @click="dateStart = null">close</v-icon>
+          <v-icon v-if="dateStart!==null" @click="dateStart = null">close</v-icon>
           <v-flex xs12 sm6 md4>
             <v-menu
               v-model="menu2"
@@ -61,7 +61,7 @@
               <v-date-picker v-model="dateEnd" @input="menu2 = false"></v-date-picker>
             </v-menu>
           </v-flex>
-          <v-icon @click="dateEnd = null">close</v-icon>
+          <v-icon v-if="dateEnd!==null" @click="dateEnd = null">close</v-icon>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on }">
@@ -148,24 +148,25 @@
           <template v-slot:items="props">
             <td>{{ props.item.ID }}</td>
             <td class="text-xs-center">
-              <v-btn @click="clickCustomer(props.item.Customer)">{{props.item.Customer.ID}}</v-btn>
+              <v-btn @click="clickCustomer(props.item.Customer)">{{props.item.Customer.Name}}</v-btn>
             </td>
             <td class="text-xs-center">{{ props.item.date }}</td>
-            <td class="text-xs-center">
+            <!-- <td class="text-xs-center">
               <v-btn @click="clickList(props.item.List)">List of item</v-btn>
-            </td>
-            <td class="text-xs-center">{{ props.item.TotalPrice }}</td>
-            <td class="text-xs-center">{{ props.item.Paid }}</td>
+            </td> -->
+            <td class="text-xs-center">{{ props.item.TotalPiece }}</td>
+            <!-- <td class="text-xs-center">{{ props.item.Paid }}</td> -->
             <td class="justify-center px-0">
               <template v-if="parseFloat(props.item.Paid)>=props.item.TotalPrice">
-                <span class="green--text">Complete</span>
+                <span class="green--text">Paid</span>
                 <v-icon small color="green" class="mr-2">verified_user</v-icon>
               </template>
               <template v-else>
-                <span class="red--text">Incomplete</span>
+                <span class="red--text">Due</span>
                 <v-icon small color="red" class="mr-2">clear</v-icon>
               </template>
             </td>
+            <td class="text-xs-center">{{ props.item.Note }}</td>
             <td class="justify-center layout px-1">
               <!-- <v-icon small @click="deleteItem(props.item)">local_printshop</v-icon> -->
               <v-icon small class="mr-2" @click="print(props.item)">local_printshop</v-icon>
@@ -197,17 +198,12 @@ export default {
     dialogCustomer: false,
     dialogList: false,
     headers: [
-      {
-        text: "ID",
-        align: "left",
-        value: "ID"
-      },
-      { text: "Customer ID", value: "Customer.ID", align: "center" },
+      { text: "Invoice No.", align: "left", sortable: false },
+      { text: "Customer Name", value: "Customer.Name", align: "center" },
       { text: "Date", sortable: false, align: "center" },
-      { text: "List", sortable: false, align: "center" },
-      { text: "Total price", value: "TotalPrice", align: "center" },
-      { text: "Paid", value: "Paid", align: "center" },
-      { text: "Status", sortable: false, align: "center" },
+      { text: "Total Amount", sortable: false, align: "center" },
+      { text: "Payment Status", sortable: false, align: "center" },
+      { text: "Note", sortable: false, align: "center" },
       { text: "Action", sortable: false, align: "center" }
     ],
     editedIndex: -1,

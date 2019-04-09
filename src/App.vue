@@ -46,6 +46,9 @@
                           <v-flex xs12 sm6 md4>
                             <v-text-field v-model="editedItem.Contact" label="Contact"></v-text-field>
                           </v-flex>
+                          <v-flex xs12 sm6 md4>
+                            <v-text-field type="number" v-model="editedItem.Tax" label="Tax (%)"></v-text-field>
+                          </v-flex>
                         </v-layout>
                       </v-container>
                     </v-card-text>

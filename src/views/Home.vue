@@ -3,12 +3,6 @@
   <v-app>
     <v-data-table :headers="headers" :items="List" class="elevation-1">
       <template v-slot:items="props">
-        <td class="text-xs-left">{{ props.item.Detail }}</td>
-        <td class="text-xs-center">{{ props.item.Barcode_ID }}</td>
-        <td class="text-xs-center">- {{ props.item.Discount_amount }} .-</td>
-        <td class="text-xs-center">- {{ props.item.Discount_per }}%</td>
-        <td class="text-xs-center">{{ props.item.Discounted }}</td>
-        <td class="text-xs-center">{{ CalPrice(props.item) }}</td>
         <td class="justify-center layout px-0">
           <v-icon small :disabled="props.item.piece<=1" @click="DecreasePiece(props.item)">remove</v-icon>
           <v-card-text class="text-xs-center">{{props.item.piece}}</v-card-text>
@@ -18,6 +12,14 @@
             @click="IncreasePiece(props.item)"
           >add</v-icon>
         </td>
+        <td class="text-xs-center">{{ props.item.Barcode_ID }}</td>
+        <td class="text-xs-left">{{ props.item.Detail }}</td>
+        <td class="text-xs-left">{{ props.item.Unit_price }}</td>
+        <td class="text-xs-left">{{ props.item.Tax }}</td>
+        <td class="text-xs-center">- {{ props.item.Discount_per }} %</td>
+        <td class="text-xs-center">- {{ props.item.Discount_amount }} .-</td>
+        <!-- <td class="text-xs-center">{{ props.item.Discounted }}</td> -->
+        <td class="text-xs-center">{{ CalPrice(props.item) }}</td>
         <td class="text-xs-center">
           <v-icon small @click="deleteItem(props.item)">delete</v-icon>
         </td>
@@ -38,9 +40,8 @@
                 </v-flex>
                 <v-flex xs6>
                   <v-flex mx-5>
-                    <div>Total Discounted : {{TotalDiscounted()}} .-</div>
-                    <div>Total Ordered : {{TotalOrdered()}}</div>
-                    <div>Total Piece : {{TotalPiece()}}</div>
+                    <div>Subtotal : {{TotalPrice()-TotalTaxes()}} .-</div>
+                    <div>Taxes : {{TotalTaxes()}}</div>
                   </v-flex>
                 </v-flex>
               </v-layout>
@@ -50,7 +51,7 @@
           <v-card-actions class="justify-end">
             <div class="text-xs-center">
               <v-flex xs12>
-                <h1 class="headline mb-0 text-md-right">Total price : {{TotalPrice()}} .-</h1>
+                <h1 class="headline mb-0 text-md-right">Total : {{TotalPrice()}} .-</h1>
               </v-flex>
               <v-btn flat color="red" :disabled="List.length<=0" @click="Clear">Clear</v-btn>
               <v-btn flat color="blue" :disabled="List.length<=0" @click="Sale">Sale</v-btn>
@@ -73,12 +74,7 @@ export default {
       CustomerID: "",
       Paid: "",
       headers: [
-        {
-          text: "Detail",
-          align: "left",
-          value: "Detail",
-          sortable: false
-        },
+        { text: "Piece", sortable: false, align: "center" },
         {
           text: "BARCODE ID",
           value: "Barcode_ID",
@@ -86,30 +82,47 @@ export default {
           sortable: false
         },
         {
-          text: "Discount(amount)",
+          text: "Description",
+          align: "left",
+          value: "Detail",
+          sortable: false
+        },
+        {
+          text: "Unit price",
+          align: "left",
+          value: "Unit_price",
+          sortable: false
+        },
+        {
+          text: "Tax",
+          align: "left",
+          value: "Tax",
+          sortable: false
+        },
+        {
+          text: "% Discount",
+          value: "Discount_per",
+          align: "center",
+          sortable: false
+        },
+        {
+          text: "Amount Discount",
           value: "Discount_amount",
           align: "center",
           sortable: false
         },
+        // {
+        //   text: "Discounted",
+        //   value: "Discount_per",
+        //   align: "center",
+        //   sortable: false
+        // },
         {
-          text: "Discount(%)",
-          value: "Discount_per",
-          align: "center",
-          sortable: false
-        },
-        {
-          text: "Discounted",
-          value: "Discount_per",
-          align: "center",
-          sortable: false
-        },
-        {
-          text: "Price",
+          text: "Line total",
           value: "Unit_price",
           align: "center",
           sortable: false
         },
-        { text: "Piece", sortable: false, align: "center" },
         { text: "Action", sortable: false, align: "center" }
       ]
     };
@@ -178,6 +191,15 @@ export default {
         }, 0)
         .toFixed(2);
     },
+    TotalTaxes: function() {
+      return this.List.map(item => {
+        return item.Tax;
+      })
+        .reduce((total, num) => {
+          return parseFloat(total) + parseFloat(num);
+        }, 0)
+        .toFixed(2);
+    },
     TotalDiscounted: function() {
       return this.List.map(item => {
         return item.Discounted;
@@ -227,18 +249,26 @@ export default {
         (parseFloat(discount_amount) + parseFloat(discount_per)) *
         item.piece
       ).toFixed(2);
+      item.Tax = (
+        (parseFloat(this.JSONInformation.Tax) / 100) *
+        ((item.Unit_price - discount_amount - discount_per) * item.piece)
+      ).toFixed(2);
       item.Price = (
-        (item.Unit_price - discount_amount - discount_per) *
-        item.piece
+        (item.Unit_price - discount_amount - discount_per) * item.piece +
+        parseFloat(item.Tax)
       ).toFixed(2);
-      return (
-        (item.Unit_price - discount_amount - discount_per) *
-        item.piece
-      ).toFixed(2);
+      return item.Price;
     }
   },
   computed: {
-    ...mapState(["SearchField", "JSONStock", "Stock", "List", "Customers"])
+    ...mapState([
+      "SearchField",
+      "JSONStock",
+      "Stock",
+      "List",
+      "Customers",
+      "JSONInformation"
+    ])
   },
   created() {
     this.$store.commit("SetSF", "");
