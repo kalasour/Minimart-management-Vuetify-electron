@@ -95,7 +95,12 @@
 
           <v-dialog v-model="dialogList" max-width="500">
             <v-card>
+              <v-card-text>Note : <span class="grey--text" v-if="itemSelected.Note==''||itemSelected.Note==null">Empty note!</span>
+               <span v-else>{{itemSelected.Note}}</span>
+               </v-card-text>
+
               <v-list>
+                <v-card-text class="text-xs-center"><h3>List of items </h3></v-card-text>
                 <v-list-group
                   v-for="item in Object.values(listSelected)"
                   :key="item.Barcode_ID"
@@ -146,27 +151,27 @@
         </v-toolbar>
         <v-data-table :headers="headers" :items="Invoice.filter(filterTable)" class="elevation-1">
           <template v-slot:items="props">
-            <td>{{ props.item.ID }}</td>
+            <td>{{ props.item.InvoiceNumber}}</td>
             <td class="text-xs-center">
               <v-btn @click="clickCustomer(props.item.Customer)">{{props.item.Customer.Name}}</v-btn>
             </td>
             <td class="text-xs-center">{{ props.item.date }}</td>
-            <!-- <td class="text-xs-center">
-              <v-btn @click="clickList(props.item.List)">List of item</v-btn>
-            </td> -->
             <td class="text-xs-center">{{ props.item.TotalPiece }}</td>
             <!-- <td class="text-xs-center">{{ props.item.Paid }}</td> -->
-            <td class="justify-center px-0">
-              <template v-if="parseFloat(props.item.Paid)>=props.item.TotalPrice">
+            <td class="justify-center">
+              <div class="text-xs-center" v-if="parseFloat(props.item.Paid)>=props.item.TotalPrice">
                 <span class="green--text">Paid</span>
                 <v-icon small color="green" class="mr-2">verified_user</v-icon>
-              </template>
-              <template v-else>
+              </div>
+              <div class="text-xs-center" v-else>
                 <span class="red--text">Due</span>
                 <v-icon small color="red" class="mr-2">clear</v-icon>
-              </template>
+              </div>
             </td>
-            <td class="text-xs-center">{{ props.item.Note }}</td>
+            <td class="text-xs-center">
+              <v-btn @click="clickList(props.item)">Note of Invoice</v-btn>
+            </td>
+            <!-- <td class="text-xs-center">{{ props.item.Note }}</td> -->
             <td class="justify-center layout px-1">
               <!-- <v-icon small @click="deleteItem(props.item)">local_printshop</v-icon> -->
               <v-icon small class="mr-2" @click="print(props.item)">local_printshop</v-icon>
@@ -189,6 +194,7 @@ import moment from "moment";
 import { mapMutations, mapState } from "vuex";
 import { ipcRenderer } from "electron";
 import { Promise } from "q";
+const DateFormat = "MMMM Do YYYY, h:mm:ss a";
 export default {
   data: () => ({
     menu: false,
@@ -198,7 +204,7 @@ export default {
     dialogCustomer: false,
     dialogList: false,
     headers: [
-      { text: "Invoice No.", align: "left", sortable: false },
+      { text: "Invoice No.",value: "InvoiceNumber", align: "left", sortable: true },
       { text: "Customer Name", value: "Customer.Name", align: "center" },
       { text: "Date", sortable: false, align: "center" },
       { text: "Total Amount", sortable: false, align: "center" },
@@ -209,6 +215,7 @@ export default {
     editedIndex: -1,
     editedItem: {},
     defaultItem: {},
+    itemSelected: {},
     listSelected: {},
     customerSelected: {},
     dateStart: null,
@@ -232,11 +239,16 @@ export default {
   },
 
   methods: {
+    // genInvoiceNumber(item){
+    //   item.InvoiceNumber = moment(item.date,DateFormat).format('Y')+'-'+item.ID.padStart(3, "0");
+    //   return item.InvoiceNumber
+    // },
     print(invoice) {
       ipcRenderer.send("printPDF", invoice);
     },
-    clickList(lastList) {
-      this.listSelected = lastList;
+    clickList(item) {
+      this.itemSelected = item;
+      this.listSelected=item.List
       this.dialogList = true;
     },
     clickCustomer(lastCustomer) {
@@ -252,7 +264,7 @@ export default {
     },
     ...mapMutations(["initialize", "UpdateInvoice"]),
     filterTable(element) {
-      const DateFormat = "MMMM Do YYYY, h:mm:ss a";
+      
 
       return (
         (element.ID == null ? "" : element.ID)

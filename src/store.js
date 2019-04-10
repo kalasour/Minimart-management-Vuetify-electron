@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { stat } from 'fs';
+import moment from 'moment'
 const storage = require("electron-json-storage");
 Vue.use(Vuex)
 
@@ -76,6 +77,7 @@ export default new Vuex.Store({
     
       if (state.Invoice.length == 0) new_invoice.ID = '0'
       else { new_invoice.ID = (parseInt(state.Invoice[state.Invoice.length - 1].ID) + 1).toString() }
+      new_invoice.InvoiceNumber = moment(new_invoice.date,"MMMM Do YYYY, h:mm:ss a").format('Y')+'-'+new_invoice.ID.padStart(3, "0");
       state.Invoice.push(new_invoice)
     }
     ,
@@ -83,6 +85,7 @@ export default new Vuex.Store({
       state.JSONInvoice = {};
 
       await state.Invoice.map(item => {
+        item.InvoiceNumber = moment(item.date,"MMMM Do YYYY, h:mm:ss a").format('Y')+'-'+item.ID.padStart(3, "0");
         state.JSONInvoice[item.ID] = item;
       });
       storage.set("Invoice", state.JSONInvoice);

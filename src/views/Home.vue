@@ -35,11 +35,23 @@
 
               <v-layout pt-2 row wrap mb-0>
                 <v-flex xs6>
-                  <v-text-field v-model="CustomerID" label="Customer ID" required></v-text-field>
+                  <!-- <v-text-field v-model="CustomerID" label="Customer ID" required></v-text-field> -->
+                  <v-autocomplete
+                    v-model="CustomerID"
+                    :items="Customers"
+                    :label="((CustomerID==null)?'Customer':'Customer ID : '+CustomerID)"
+                    item-text="Name"
+                    item-value="ID"
+                    clearable
+                    chips
+                    :filter="SearchFilter"
+                  >
+                  </v-autocomplete>
                   <v-text-field v-model="Paid" label="Paid" required></v-text-field>
                 </v-flex>
                 <v-flex xs6>
                   <v-flex mx-5>
+                    <v-text-field v-model="Note" label="Note" required></v-text-field>
                     <div>Subtotal : {{TotalPrice()-TotalTaxes()}} .-</div>
                     <div>Taxes : {{TotalTaxes()}}</div>
                   </v-flex>
@@ -71,6 +83,7 @@ export default {
   name: "App",
   data() {
     return {
+      Note: "",
       CustomerID: "",
       Paid: "",
       headers: [
@@ -155,6 +168,7 @@ export default {
       );
       new_invoice.List = { ...this.List };
       new_invoice.date = now_date;
+      new_invoice.Note = this.Note;
       new_invoice.Paid = this.Paid;
       new_invoice.TotalPrice = this.TotalPrice();
       new_invoice.TotalDiscounted = this.TotalDiscounted();
@@ -175,6 +189,7 @@ export default {
       this.List.splice(0, this.List.length);
       this.Paid = "";
       this.CustomerID = "";
+      this.Note = "";
     },
     ...mapMutations([
       "initialize",
@@ -237,6 +252,14 @@ export default {
     },
     DecreasePiece(item) {
       item.piece--;
+    },SearchFilter(item, queryText, itemText) {
+      const textOne = item.Name.toLowerCase();
+      const textTwo = item.ID.toLowerCase();
+      const searchText = queryText.toLowerCase();
+      return (
+        textOne.indexOf(searchText) > -1 ||
+        textTwo.indexOf(searchText) > -1 
+      )
     },
     CalPrice(item) {
       var discount_per = 0,
