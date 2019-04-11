@@ -64,9 +64,9 @@
           <v-icon v-if="dateEnd!==null" @click="dateEnd = null">close</v-icon>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
-            <template v-slot:activator="{ on }">
+            <!-- <template v-slot:activator="{ on }">
               <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
-            </template>
+            </template> -->
             <v-card>
               <v-card-title>
                 <span class="headline">{{ formTitle }}</span>

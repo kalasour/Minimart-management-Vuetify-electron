@@ -45,13 +45,15 @@
                     clearable
                     chips
                     :filter="SearchFilter"
-                  >
-                  </v-autocomplete>
+                  ></v-autocomplete>
                   <v-text-field v-model="Paid" label="Paid" required></v-text-field>
                 </v-flex>
                 <v-flex xs6>
                   <v-flex mx-5>
-                    <v-text-field v-model="Note" label="Note" required></v-text-field>
+                    <v-textarea
+                      v-model="Note"
+                      label="Note"
+                    ></v-textarea>
                     <div>Subtotal : {{TotalPrice()-TotalTaxes()}} .-</div>
                     <div>Taxes : {{TotalTaxes()}}</div>
                   </v-flex>
@@ -81,6 +83,9 @@ import moment from "moment";
 import { ipcRenderer } from "electron";
 export default {
   name: "App",
+  created() {
+    // this.initialize();
+  },
   data() {
     return {
       Note: "",
@@ -140,9 +145,6 @@ export default {
       ]
     };
   },
-  created() {
-    // this.initialize();
-  },
   methods: {
     async Sale() {
       // console.log(new_invoice)
@@ -170,6 +172,7 @@ export default {
       new_invoice.date = now_date;
       new_invoice.Note = this.Note;
       new_invoice.Paid = this.Paid;
+      new_invoice.TotalTax = this.TotalTaxes();
       new_invoice.TotalPrice = this.TotalPrice();
       new_invoice.TotalDiscounted = this.TotalDiscounted();
       new_invoice.TotalOrdered = this.TotalOrdered();
@@ -252,14 +255,14 @@ export default {
     },
     DecreasePiece(item) {
       item.piece--;
-    },SearchFilter(item, queryText, itemText) {
+    },
+    SearchFilter(item, queryText, itemText) {
       const textOne = item.Name.toLowerCase();
       const textTwo = item.ID.toLowerCase();
       const searchText = queryText.toLowerCase();
       return (
-        textOne.indexOf(searchText) > -1 ||
-        textTwo.indexOf(searchText) > -1 
-      )
+        textOne.indexOf(searchText) > -1 || textTwo.indexOf(searchText) > -1
+      );
     },
     CalPrice(item) {
       var discount_per = 0,

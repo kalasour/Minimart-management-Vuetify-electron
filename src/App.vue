@@ -85,6 +85,7 @@
 <script>
 import { mapMutations, mapState } from "vuex";
 import Searchbar from "./components/searchbar";
+import { ipcRenderer } from "electron";
 export default {
   name: "App",
   components: {
@@ -120,6 +121,11 @@ export default {
   },
   created() {
     this.initialize();
+    ipcRenderer.on("toPrint", event => {
+      console.log("toPrint ipc");
+      this.$router.push({ path: "/print" });
+    });
+    ipcRenderer.send("toPrint");
   },
   methods: {
     ...mapMutations(["initialize", "UpdateInformation"]),

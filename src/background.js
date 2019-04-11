@@ -36,28 +36,30 @@ function createWindow() {
     app.quit()
     // workerWindow.close()
   })
-  createPrinter()
-}
-
-function createPrinter() {
   workerWindow = new BrowserWindow({ width: 350, height: 600 });
   // workerWindow.loadURL("file://" + __dirname+ "/../src" + "/worker.html");
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    workerWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL + 'print')
+    workerWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL )
     // if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
     createProtocol('app')
     // Load the index.html when not in development
-    workerWindow.loadURL('app://./index.html#print')
+    workerWindow.loadURL('app://./index.html')
   }
-
+  workerWindow.hide()
   // workerWindow.webContents.openDevTools();
   workerWindow.on("close", (event) => {
     event.preventDefault();
     workerWindow.hide()
   });
+
+  // workerWindow.on("focus",(event)=>{
+  //   console.log("work")
+  //   workerWindow.webContents.send("toPrint");
+  // })
 }
+
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
@@ -105,6 +107,9 @@ if (isDevelopment) {
   }
 }
 
+ipcMain.on("toPrint", (event, ) => {
+  workerWindow.webContents.send("toPrint");
+});
 
 ipcMain.on("printPDF", (event, content) => {
   console.log(content);
@@ -112,9 +117,10 @@ ipcMain.on("printPDF", (event, content) => {
   workerWindow.focus()
   workerWindow.webContents.send("printPDF", content);
 });
+
 // when worker window is ready
 ipcMain.on("readyToPrintPDF", (event) => {
-  const pdfPath = path.join(os.tmpdir(), 'print.pdf');
+  // const pdfPath = path.join(os.tmpdir(), 'print.pdf');
   // Use default printing options
   // console.log(workerWindow.webContents.getPrinters())
     workerWindow.webContents.print({silent: false,printBackground: false,deviceName:''},(success) =>{

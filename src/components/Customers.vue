@@ -16,7 +16,7 @@
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on }">
-              <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
+              <v-btn color="primary" dark class="mb-2" v-on="on">New Customer</v-btn>
             </template>
             <v-card>
               <v-card-title>
@@ -27,7 +27,7 @@
                 <v-container grid-list-md>
                   <v-layout wrap>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.ID" label="ID"></v-text-field>
+                      <v-text-field v-model="editedItem.ID" disabled label="ID"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
                       <v-text-field v-model="editedItem.Name" label="Name"></v-text-field>
@@ -42,9 +42,15 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
-                <v-btn color="blue darken-1" flat @click="save">Save</v-btn>
               </v-card-actions>
             </v-card>
+          </v-dialog>
+
+          <v-dialog v-model="dialogCustomer" max-width="1200px">
+            <ItemList v-bind:selected="SelectedCustomer" />
+            <div class="text-xs-right" dark>
+              <v-btn  @click="closeCustomer">Close</v-btn>
+            </div>
           </v-dialog>
         </v-toolbar>
         <v-data-table :headers="headers" :items="Customers.filter(filterTable)" class="elevation-1">
@@ -53,6 +59,7 @@
             <td class="text-xs-center">{{ props.item.Name }}</td>
             <td class="text-xs-center">{{ props.item.Address }}</td>
             <td class="justify-center layout px-0">
+              <v-icon small class="mr-2" @click="handleClick(props.item)">assignment</v-icon>
               <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
               <v-icon small @click="deleteItem(props.item)">delete</v-icon>
             </td>
@@ -70,9 +77,14 @@
 const storage = require("electron-json-storage");
 import { mapMutations, mapState } from "vuex";
 import { Promise } from "q";
+import ItemList from "./Report_customer";
+import Vue from "vue";
+Vue.component("ItemList", ItemList);
 export default {
   data: () => ({
     dialog: false,
+    dialogCustomer: false,
+    SelectedCustomer:{},
     headers: [
       {
         text: "ID",
@@ -80,7 +92,7 @@ export default {
         value: "ID"
       },
       { text: "Name", value: "Name", align: "center" },
-      { text: "Address", value: "Adress", align: "center" },
+      { text: "Address", value: "Address", align: "center" },
       { text: "Action", sortable: false, align: "center" }
     ],
     editedIndex: -1,
@@ -90,7 +102,7 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "New Item" : "Edit Item";
+      return this.editedIndex === -1 ? "New Customer" : "Edit Customer";
     },
     ...mapState(["SearchField", "JSONCustomers", "Customers"])
   },
@@ -102,9 +114,14 @@ export default {
   },
   created() {
     // this.initialize();
+    this.editedItem.ID=parseInt(this.Customers[this.Customers.length-1].ID)+1
   },
 
   methods: {
+    handleClick(selected) {
+      this.SelectedCustomer=selected
+      this.dialogCustomer = true;
+    },
     clearSF() {
       this.$store.commit("SetSF", "");
     },
@@ -148,8 +165,12 @@ export default {
       this.dialog = false;
       setTimeout(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedItem.ID=parseInt(this.Customers[this.Customers.length-1].ID)+1
         this.editedIndex = -1;
       }, 300);
+    },
+    closeCustomer() {
+      this.dialogCustomer = false;
     },
 
     async save() {

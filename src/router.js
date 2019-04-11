@@ -34,7 +34,7 @@ export default new Router({
       component: ()=>import('./components/Report.vue')
     },{
       path: '/print',
-      name: 'Print',
+      name: 'print',
       component: ()=>import('./components/Print.vue')
     },
     {
