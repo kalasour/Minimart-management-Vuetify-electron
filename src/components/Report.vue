@@ -66,7 +66,7 @@
           <v-dialog v-model="dialog" max-width="500px">
             <!-- <template v-slot:activator="{ on }">
               <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
-            </template> -->
+            </template>-->
             <v-card>
               <v-card-title>
                 <span class="headline">{{ formTitle }}</span>
@@ -95,12 +95,19 @@
 
           <v-dialog v-model="dialogList" max-width="500">
             <v-card>
-              <v-card-text>Note : <span class="grey--text" v-if="itemSelected.Note==''||itemSelected.Note==null">Empty note!</span>
-               <span v-else>{{itemSelected.Note}}</span>
-               </v-card-text>
+              <v-card-text  class="text-xs-center"><h3>Note</h3></v-card-text>
+              <v-card-text>
+                <span
+                  class="grey--text"
+                  v-if="itemSelected.Note==''||itemSelected.Note==null"
+                >Empty note!</span>
+                <span v-else>{{itemSelected.Note}}</span>
+              </v-card-text>
 
-              <v-list>
-                <v-card-text class="text-xs-center"><h3>List of items </h3></v-card-text>
+              <!-- <v-list>
+                <v-card-text class="text-xs-center">
+                  <h3>List of items</h3>
+                </v-card-text>
                 <v-list-group
                   v-for="item in Object.values(listSelected)"
                   :key="item.Barcode_ID"
@@ -121,7 +128,7 @@
                     </v-list-tile-content>
                   </v-list-tile>
                 </v-list-group>
-              </v-list>
+              </v-list>-->
               <v-card-actions>
                 <v-spacer></v-spacer>
 
@@ -129,7 +136,12 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-
+          <v-dialog v-model="dialogInvoice" max-width="1200px">
+            <InvoiceDetail v-bind:selected="SelectedInvoice"/>
+            <div class="text-xs-right" dark>
+              <v-btn @click="dialogInvoice=false">Close</v-btn>
+            </div>
+          </v-dialog>
           <v-dialog v-model="dialogCustomer" max-width="500">
             <v-card>
               <v-list>
@@ -169,11 +181,15 @@
               </div>
             </td>
             <td class="text-xs-center">
-              <v-btn @click="clickList(props.item)">Note of Invoice</v-btn>
+              <v-btn
+                :disabled="(props.item.Note==''||props.item.Note==null)"
+                @click="clickList(props.item)"
+              >Note</v-btn>
             </td>
             <!-- <td class="text-xs-center">{{ props.item.Note }}</td> -->
             <td class="justify-center layout px-1">
               <!-- <v-icon small @click="deleteItem(props.item)">local_printshop</v-icon> -->
+              <v-icon small class="mr-2" @click="handleClick(props.item)">assignment</v-icon>
               <v-icon small class="mr-2" @click="print(props.item)">local_printshop</v-icon>
               <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
               <v-icon small @click="deleteItem(props.item)">delete</v-icon>
@@ -194,9 +210,14 @@ import moment from "moment";
 import { mapMutations, mapState } from "vuex";
 import { ipcRenderer } from "electron";
 import { Promise } from "q";
+import InvoiceDetail from "./Invoice";
+import Vue from "vue";
+Vue.component("InvoiceDetail", InvoiceDetail);
 const DateFormat = "MMMM Do YYYY, h:mm:ss a";
 export default {
   data: () => ({
+    SelectedInvoice: {},
+    dialogInvoice: false,
     menu: false,
     modal: false,
     menu2: false,
@@ -204,7 +225,12 @@ export default {
     dialogCustomer: false,
     dialogList: false,
     headers: [
-      { text: "Invoice No.",value: "InvoiceNumber", align: "left", sortable: true },
+      {
+        text: "Invoice No.",
+        value: "InvoiceNumber",
+        align: "left",
+        sortable: true
+      },
       { text: "Customer Name", value: "Customer.Name", align: "center" },
       { text: "Date", sortable: false, align: "center" },
       { text: "Total Amount", sortable: false, align: "center" },
@@ -243,12 +269,16 @@ export default {
     //   item.InvoiceNumber = moment(item.date,DateFormat).format('Y')+'-'+item.ID.padStart(3, "0");
     //   return item.InvoiceNumber
     // },
+    handleClick(item) {
+      this.SelectedInvoice = item;
+      this.dialogInvoice = true;
+    },
     print(invoice) {
       ipcRenderer.send("printPDF", invoice);
     },
     clickList(item) {
       this.itemSelected = item;
-      this.listSelected=item.List
+      this.listSelected = item.List;
       this.dialogList = true;
     },
     clickCustomer(lastCustomer) {
@@ -264,8 +294,6 @@ export default {
     },
     ...mapMutations(["initialize", "UpdateInvoice"]),
     filterTable(element) {
-      
-
       return (
         (element.ID == null ? "" : element.ID)
           .toLowerCase()

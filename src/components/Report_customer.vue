@@ -1,5 +1,5 @@
 <template >
-  <div id="app">
+  <v-card dark color="grey darken-4">
     <v-toolbar dark flat>
       <v-toolbar-title>Report</v-toolbar-title>
       <v-divider class="mx-2" inset vertical></v-divider>
@@ -172,7 +172,32 @@
         <v-btn color="primary" @click="initialize">Refresh</v-btn>
       </template>
     </v-data-table>
-  </div>
+     <v-layout>
+      <v-flex xs12 sm6 py2 pt-3 offset-sm9>
+        <v-card color="grey darken-3">
+          <v-card-title primary-title>
+            <v-flex xs12>
+              <!-- <h3 class="headline mb-0 text-md-center">Payment summary</h3> -->
+                  <v-flex mx-5>
+                    <!-- <div>Subtotal : {{parseFloat(TotalPrice()-TotalTaxes()).toFixed(2)}} .-</div> -->
+                    <!-- <div>Taxes : {{TotalTaxes()}}</div> -->
+                    <div>Total : {{TotalPrice()}} .-</div>
+                  </v-flex>
+                </v-flex>
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-card-actions class="justify-end">
+            <div class="text-xs-center">
+              <v-flex xs12>
+                <h1 class="headline mb-0 text-md-right">Paid : {{TotalPaid()}} .-</h1>
+                <h1 class="headline mb-0 text-md-right">Amount Due : {{(Math.max(0,parseFloat(TotalPrice())-parseFloat(TotalPaid()))).toFixed(2)}}</h1>
+              </v-flex>
+            </div>
+          </v-card-actions>
+        </v-card>
+      </v-flex>
+    </v-layout>
+  </v-card>
 </template>
 
 <script>
@@ -237,6 +262,60 @@ export default {
     //   item.InvoiceNumber = moment(item.date,DateFormat).format('Y')+'-'+item.ID.padStart(3, "0");
     //   return item.InvoiceNumber
     // },
+    TotalPrice: function() {
+      return this.Invoice.filter(this.filterTable).map(item => {
+        return item.TotalPrice;
+      })
+        .reduce((total, num) => {
+          return parseFloat(total) + parseFloat(num);
+        }, 0)
+        .toFixed(2);
+    },
+    TotalTaxes: function() {
+      return this.Invoice.filter(this.filterTable).map(item => {
+        return item.TotalTax;
+      })
+        .reduce((total, num) => {
+          return parseFloat(total) + parseFloat(num);
+        }, 0)
+        .toFixed(2);
+    },
+    TotalPaid: function() {
+      return this.Invoice.filter(this.filterTable).map(item => {
+        return item.Paid;
+      })
+        .reduce((total, num) => {
+          return parseFloat(total) + parseFloat(num);
+        }, 0)
+        .toFixed(2);
+    },
+    TotalDiscounted: function() {
+      return this.Invoice.filter(this.filterTable).map(item => {
+        return item.TotalDiscounted;
+      })
+        .reduce((total, num) => {
+          return parseFloat(total) + parseFloat(num);
+        }, 0)
+        .toFixed(2);
+    },
+    TotalOrdered: function() {
+      return this.Invoice.filter(this.filterTable).map(item => {
+        return item.TotalOrdered;
+      })
+        .reduce((total, num) => {
+          return parseFloat(total) + num;
+        }, 0)
+        .toFixed(0);
+    },
+    TotalPiece: function() {
+      return this.Invoice.filter(this.filterTable).map(item => {
+        return item.TotalPiece;
+      })
+        .reduce((total, num) => {
+          return parseFloat(total) + parseFloat(num);
+        }, 0)
+        .toFixed(0);
+    },
     print(invoice) {
       ipcRenderer.send("printPDF", invoice);
     },
@@ -268,7 +347,7 @@ export default {
           moment(element.date, DateFormat) >= moment(this.dateStart)) &&
         (this.dateEnd == null ||
           moment(element.date, DateFormat) <= moment(this.dateEnd)) &&
-        this.selected.ID == element.Customer.ID
+        ((this.selected==null)?true:(this.selected.ID == element.Customer.ID))
       );
     },
     editItem(item) {

@@ -16,7 +16,13 @@
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on }">
-              <v-btn color="primary" dark class="mb-2" v-on="on">New Customer</v-btn>
+              <v-btn
+                color="primary"
+                dark
+                class="mb-2"
+                @click="editedItem.ID=(parseInt(Customers[Customers.length-1].ID)+1).toString()"
+                v-on="on"
+              >New Customer</v-btn>
             </template>
             <v-card>
               <v-card-title>
@@ -42,14 +48,15 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
+                <v-btn color="blue darken-1" flat @click="save">Save</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
 
           <v-dialog v-model="dialogCustomer" max-width="1200px">
-            <ItemList v-bind:selected="SelectedCustomer" />
+            <ItemList v-bind:selected="SelectedCustomer"/>
             <div class="text-xs-right" dark>
-              <v-btn  @click="closeCustomer">Close</v-btn>
+              <v-btn @click="closeCustomer">Close</v-btn>
             </div>
           </v-dialog>
         </v-toolbar>
@@ -84,7 +91,7 @@ export default {
   data: () => ({
     dialog: false,
     dialogCustomer: false,
-    SelectedCustomer:{},
+    SelectedCustomer: {},
     headers: [
       {
         text: "ID",
@@ -114,12 +121,11 @@ export default {
   },
   created() {
     // this.initialize();
-    this.editedItem.ID=parseInt(this.Customers[this.Customers.length-1].ID)+1
   },
 
   methods: {
     handleClick(selected) {
-      this.SelectedCustomer=selected
+      this.SelectedCustomer = selected;
       this.dialogCustomer = true;
     },
     clearSF() {
@@ -165,7 +171,6 @@ export default {
       this.dialog = false;
       setTimeout(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedItem.ID=parseInt(this.Customers[this.Customers.length-1].ID)+1
         this.editedIndex = -1;
       }, 300);
     },
@@ -174,30 +179,31 @@ export default {
     },
 
     async save() {
-      if (this.editedItem.ID == "" || this.editedItem.ID == null) {
-        alert("Please Input  ID");
-        return;
+      // if (this.editedItem.ID == "" || this.editedItem.ID == null) {
+      //   alert("Please Input  ID");
+      //   return;
+      // } else {
+      //   var con = true;
+      //   await Promise.all(
+      //     this.Customers.map(async (item, index) => {
+      //       if (this.editedItem.ID == item.ID && this.editedIndex !== index) {
+      //         await alert("This ID is already!");
+      //         con = false;
+      //         return;
+      //       }
+      //     })
+      //   );
+      //   if (con) {
+
+      //     }
+      // }
+      if (this.editedIndex > -1) {
+        Object.assign(this.Customers[this.editedIndex], this.editedItem);
       } else {
-        var con = true;
-        await Promise.all(
-          this.Customers.map(async (item, index) => {
-            if (this.editedItem.ID == item.ID && this.editedIndex !== index) {
-              await alert("This ID is already!");
-              con = false;
-              return;
-            }
-          })
-        );
-        if (con) {
-          if (this.editedIndex > -1) {
-            Object.assign(this.Customers[this.editedIndex], this.editedItem);
-          } else {
-            this.Customers.push(this.editedItem);
-          }
-          this.close();
-          this.UpdateCustomers();
-        }
+        this.Customers.push(this.editedItem);
       }
+      this.close();
+      this.UpdateCustomers();
     }
   }
 };

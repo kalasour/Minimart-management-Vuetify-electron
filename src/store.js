@@ -86,6 +86,7 @@ export default new Vuex.Store({
 
       await state.Invoice.map(item => {
         item.InvoiceNumber = moment(item.date,"MMMM Do YYYY, h:mm:ss a").format('Y')+'-'+item.ID.padStart(3, "0");
+        item.Credit=(Math.max(0,parseFloat(item.Paid)-parseFloat(item.TotalPrice))).toFixed(2);
         state.JSONInvoice[item.ID] = item;
       });
       storage.set("Invoice", state.JSONInvoice);

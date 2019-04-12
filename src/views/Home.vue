@@ -92,7 +92,7 @@ export default {
       CustomerID: "",
       Paid: "",
       headers: [
-        { text: "Piece", sortable: false, align: "center" },
+        { text: "Qty.", sortable: false, align: "center" },
         {
           text: "BARCODE ID",
           value: "Barcode_ID",
