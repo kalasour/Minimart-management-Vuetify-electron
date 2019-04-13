@@ -295,11 +295,15 @@ export default {
     ...mapMutations(["initialize", "UpdateInvoice"]),
     filterTable(element) {
       return (
-        (element.ID == null ? "" : element.ID)
+        ((element.InvoiceNumber == null ? "" : element.InvoiceNumber)
           .toLowerCase()
           .indexOf(
             (this.SearchField == null ? "" : this.SearchField).toLowerCase()
-          ) > -1 &&
+          ) > -1||(element.Customer.Name == null ? "" : element.Customer.Name)
+          .toLowerCase()
+          .indexOf(
+            (this.SearchField == null ? "" : this.SearchField).toLowerCase()
+          ) > -1) &&
         (this.dateStart == null ||
           moment(element.date, DateFormat) >= moment(this.dateStart)) &&
         (this.dateEnd == null ||

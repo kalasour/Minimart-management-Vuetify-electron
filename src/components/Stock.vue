@@ -36,19 +36,19 @@
                       <v-text-field v-model="editedItem.BE_ID" label="BE ID"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.Discount_amount" label="Discount(amount)"></v-text-field>
+                      <v-text-field v-model="editedItem.Discount_amount" type="number" label="Discount(amount)"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.Discount_per" label="Discount(%)"></v-text-field>
+                      <v-text-field v-model="editedItem.Discount_per" type="number" label="Discount(%)"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
                       <v-text-field v-model="editedItem.JM_ID" label="JM ID"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.QT" label="Quantities"></v-text-field>
+                      <v-text-field v-model="editedItem.QT" type="number" label="Quantities"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.Unit_price" label="price/unit"></v-text-field>
+                      <v-text-field v-model="editedItem.Unit_price" type="number" label="price/unit"></v-text-field>
                     </v-flex>
                   </v-layout>
                 </v-container>

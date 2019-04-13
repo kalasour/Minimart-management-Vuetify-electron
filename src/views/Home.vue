@@ -1,6 +1,46 @@
 
   <template>
   <v-app>
+    <v-card>
+      <v-toolbar>
+        <v-combobox
+          auto-select-first
+          autofocus
+          v-model="model"
+          :items="Stock"
+          :label="`Enter Barcode ID`"
+          prepend-icon="toc"
+          item-text="Barcode_ID"
+          :filter="ItemFilter"
+          @input="updateSearchField(model)"
+        >
+          <template v-slot:selection="data" @input="look(data.parent)">
+            <v-chip
+              :selected="data.selected"
+              close
+              class="chip--select-multi"
+            >{{SearchField}}{{look(data.parent)}}</v-chip>
+          </template>
+          <template v-slot:item="data">
+            <template v-if="typeof data.item !== 'object'">
+              <v-list-tile-content v-text="data.item"></v-list-tile-content>
+            </template>
+            <template v-else>
+              <v-layout dark>
+                <v-flex xs12 sm6 py2 pt-6>{{data.item.Detail}}</v-flex>
+                <v-flex xs12 sm6 py2 pt-6>Left : {{data.item.QT}} pcs.</v-flex>
+              </v-layout>
+              <!-- <v-list-tile-content v-text="data.item.Detail"></v-list-tile-content>
+        <v-list-tile-content>
+          <v-list-tile-title v-text="data.item.Barcode_ID"></v-list-tile-title>
+          <v-list-tile-sub-title v-text="data.item.QT"></v-list-tile-sub-title>
+              </v-list-tile-content>-->
+            </template>
+          </template>
+        </v-combobox>
+      </v-toolbar>
+    </v-card>
+
     <v-data-table :headers="headers" :items="List" class="elevation-1">
       <template v-slot:items="props">
         <td class="justify-center layout px-0">
@@ -46,14 +86,11 @@
                     chips
                     :filter="SearchFilter"
                   ></v-autocomplete>
-                  <v-text-field v-model="Paid" label="Paid" required></v-text-field>
+                  <v-text-field v-model="Paid" type="number" label="Paid" required></v-text-field>
                 </v-flex>
                 <v-flex xs6>
                   <v-flex mx-5>
-                    <v-textarea
-                      v-model="Note"
-                      label="Note"
-                    ></v-textarea>
+                    <v-textarea v-model="Note" label="Note"></v-textarea>
                     <div>Subtotal : {{TotalPrice()-TotalTaxes()}} .-</div>
                     <div>Taxes : {{TotalTaxes()}}</div>
                   </v-flex>
@@ -88,6 +125,8 @@ export default {
   },
   data() {
     return {
+      Enter: "",
+      model: null,
       Note: "",
       CustomerID: "",
       Paid: "",
@@ -146,6 +185,38 @@ export default {
     };
   },
   methods: {
+    look(data) {
+      // data.item = "";
+      // this.model=null
+      // data.selectedValues.splice(0,1)
+      // data.selectedItems.splice(0,1)
+      data.internalValue = "";
+      // console.log(data);
+    },
+    updateSearchField(data) {
+      if (data == "") {
+        return;
+      }
+
+      if (typeof data === "object" && data != null) {
+        data = data.Barcode_ID;
+      }
+      // this.$store.commit("SetSF", data);
+      this.Enter = data;
+    },
+    ItemFilter(item, queryText, itemText) {
+      const textOne = item.Detail.toLowerCase();
+      const textTwo = item.Barcode_ID.toLowerCase();
+      const text3 = item.JM_ID.toLowerCase();
+      const text4 = item.BE_ID.toLowerCase();
+      const searchText = queryText.toLowerCase();
+      return (
+        textOne.indexOf(searchText) > -1 ||
+        textTwo.indexOf(searchText) > -1 ||
+        text3.indexOf(searchText) > -1 ||
+        text4.indexOf(searchText) > -1
+      );
+    },
     async Sale() {
       // console.log(new_invoice)
       // console.log(moment(now_date,DateFormat).format('D'))
@@ -276,7 +347,7 @@ export default {
         item.piece
       ).toFixed(2);
       item.Tax = (
-        (parseFloat(this.JSONInformation.Tax) / 100) *
+        (parseFloat((this.JSONInformation==null||this.JSONInformation.Tax==null)?'0':this.JSONInformation.Tax) / 100) *
         ((item.Unit_price - discount_amount - discount_per) * item.piece)
       ).toFixed(2);
       item.Price = (
@@ -300,33 +371,34 @@ export default {
     this.$store.commit("SetSF", "");
   },
   watch: {
-    SearchField: function() {
-      if (this.SearchField == "" || this.SearchField == null) return;
+    Enter: function() {
+      if (this.Enter == "" || this.Enter == null) return;
       // console.log(this.SearchField)
-      if (this.JSONStock[this.SearchField] != null) {
+      if (this.JSONStock[this.Enter] != null) {
         var Findex = this.List.map(item => {
           return item.Barcode_ID;
-        }).indexOf(this.SearchField);
+        }).indexOf(this.Enter);
         // alert(Findex)
         if (Findex != -1) {
           if (this.List[Findex].piece < this.List[Findex].QT)
             this.List[Findex].piece++;
           else alert("Out of stock!");
-          this.$store.commit("SetSF", "");
+          // this.$store.commit("SetSF", "");
+          this.Enter = "";
           return;
         }
-        if (this.JSONStock[this.SearchField].QT < 1) {
+        if (this.JSONStock[this.Enter].QT < 1) {
           alert("Out of stock!!");
-          this.$store.commit("SetSF", "");
+          this.Enter = "";
           return;
         }
-        this.JSONStock[this.SearchField].piece = 1;
-        this.JSONStock[this.SearchField].Discounted = 0;
-        this.List.push(Object.assign({}, this.JSONStock[this.SearchField]));
-      } else if (this.SearchField != null) {
+        this.JSONStock[this.Enter].piece = 1;
+        this.JSONStock[this.Enter].Discounted = 0;
+        this.List.push(Object.assign({}, this.JSONStock[this.Enter]));
+      } else if (this.Enter != null) {
         alert("Not founded in stock!!");
       }
-      this.$store.commit("SetSF", "");
+      this.Enter = "";
     }
   }
 };

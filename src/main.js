@@ -3,14 +3,14 @@ import './plugins/vuetify'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-
+const homedir = require('os').homedir()+'\\.MinimartData';
 const storage = require('electron-json-storage');
-storage.setDataPath(process.cwd() + '/Mini-mart-electron-vue-data-json');
+storage.setDataPath(homedir + '\\Mini-mart-electron-vue-data-json');
 
 var fs = require("fs-extra");
  
-var source = process.cwd() + '/Mini-mart-electron-vue-data-json'
-var destination = process.cwd() + '/Backup/' +new Date().toDateString()
+var source =homedir + '\\Mini-mart-electron-vue-data-json'
+var destination = homedir + '\\Backup\\' +new Date().toDateString()
  
 // copy source folder to destination
 fs.copy(source, destination, function (err) {

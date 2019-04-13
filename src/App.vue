@@ -146,6 +146,7 @@ export default {
     },
 
     async save() {
+       ipcRenderer.send("Refresh");
       this.UpdateInformation(this.editedItem);
       this.close();
     }

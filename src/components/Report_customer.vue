@@ -1,7 +1,7 @@
 <template >
   <v-card dark color="grey darken-4">
     <v-toolbar dark flat>
-      <v-toolbar-title>Report</v-toolbar-title>
+      <v-toolbar-title>Customer statement</v-toolbar-title>
       <v-divider class="mx-2" inset vertical></v-divider>
       <template v-if="SearchField!==''">
         <v-chip close color="blue" text-color="white" @input="clearSF">
@@ -167,6 +167,10 @@
         <td class="text-xs-center">{{ props.item.TotalTax }}</td>
         <td class="text-xs-center">{{ props.item.Credit }}</td>
         <td class="text-xs-center">{{ props.item.TotalPrice }}</td>
+        <td class="justify-center layout px-1">
+              <!-- <v-icon small @click="deleteItem(props.item)">local_printshop</v-icon> -->
+              <v-icon small class="mr-2" @click="find">search</v-icon>
+            </td>
       </template>
       <template v-slot:no-data>
         <v-btn color="primary" @click="initialize">Refresh</v-btn>
@@ -179,8 +183,8 @@
             <v-flex xs12>
               <!-- <h3 class="headline mb-0 text-md-center">Payment summary</h3> -->
                   <v-flex mx-5>
-                    <!-- <div>Subtotal : {{parseFloat(TotalPrice()-TotalTaxes()).toFixed(2)}} .-</div> -->
-                    <!-- <div>Taxes : {{TotalTaxes()}}</div> -->
+                    <div>Subtotal : {{parseFloat(TotalPrice()-TotalTaxes()).toFixed(2)}} .-</div>
+                    <div>Taxes : {{TotalTaxes()}}</div>
                     <div>Total : {{TotalPrice()}} .-</div>
                   </v-flex>
                 </v-flex>
@@ -230,6 +234,7 @@ export default {
       { text: "Tax", sortable: false, align: "center" },
       { text: "Credit", sortable: false, align: "center" },
       { text: "Total", sortable: false, align: "center" },
+      { text: "Action", sortable: false, align: "center" },
     ],
     editedIndex: -1,
     editedItem: {},
@@ -262,6 +267,9 @@ export default {
     //   item.InvoiceNumber = moment(item.date,DateFormat).format('Y')+'-'+item.ID.padStart(3, "0");
     //   return item.InvoiceNumber
     // },
+    find:function(){
+
+    },
     TotalPrice: function() {
       return this.Invoice.filter(this.filterTable).map(item => {
         return item.TotalPrice;

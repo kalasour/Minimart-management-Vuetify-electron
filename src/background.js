@@ -110,6 +110,9 @@ if (isDevelopment) {
 ipcMain.on("toPrint", (event, ) => {
   workerWindow.webContents.send("toPrint");
 });
+ipcMain.on("Refresh", (event, ) => {
+  workerWindow.reload();
+});
 
 ipcMain.on("printPDF", (event, content) => {
   console.log(content);

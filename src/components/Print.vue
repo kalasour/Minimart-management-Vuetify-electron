@@ -1,5 +1,8 @@
 <template  >
-  <div class="text-xs-center light">
+  <div v-if="JSONInformation==null" class="text-xs-center light">
+    Please setting store information
+  </div>
+  <div v-else class="text-xs-center light">
     <v-layout column wrap xs12>
       <h3>{{this.JSONInformation.Name}},{{this.JSONInformation.Address}}</h3>
       <h3>Contact:{{this.JSONInformation.Contact}}</h3>
@@ -39,6 +42,7 @@ export default {
       this.List = Object.values(this.Invoice.List);
       ipcRenderer.send("readyToPrintPDF");
     });
+
   },
   data: () => ({
     Invoice: [],

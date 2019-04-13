@@ -38,7 +38,7 @@
         <td class="text-xs-center">- {{ props.item.Discount_per }} %</td>
         <td class="text-xs-center">- {{ props.item.Discount_amount }} .-</td>
         <!-- <td class="text-xs-center">{{ props.item.Discounted }}</td> -->
-        <td class="text-xs-center">{{ CalPrice(props.item) }}</td>
+        <td class="text-xs-center">{{ props.item.Price }}</td>
       </template>
     </v-data-table>
 
@@ -151,7 +151,7 @@ export default {
 
     TotalPrice: function() {
       return this.currentList().map(item => {
-        return this.CalPrice(item);
+        return item.Price;
       })
         .reduce((total, num) => {
           return parseFloat(total) + parseFloat(num);
@@ -203,27 +203,27 @@ export default {
         textOne.indexOf(searchText) > -1 || textTwo.indexOf(searchText) > -1
       );
     },
-    CalPrice(item) {
-      var discount_per = 0,
-        discount_amount = 0;
-      if (item.Discount_amount != null) discount_amount = item.Discount_amount;
-      if (item.Discount_per != null) discount_per = item.Discount_per;
-      if (discount_per != 0)
-        discount_per = (discount_per / 100) * item.Unit_price;
-      item.Discounted = (
-        (parseFloat(discount_amount) + parseFloat(discount_per)) *
-        item.piece
-      ).toFixed(2);
-      item.Tax = (
-        (parseFloat(this.JSONInformation.Tax) / 100) *
-        ((item.Unit_price - discount_amount - discount_per) * item.piece)
-      ).toFixed(2);
-      item.Price = (
-        (item.Unit_price - discount_amount - discount_per) * item.piece +
-        parseFloat(item.Tax)
-      ).toFixed(2);
-      return item.Price;
-    }
+    // CalPrice(item) {
+    //   var discount_per = 0,
+    //     discount_amount = 0;
+    //   if (item.Discount_amount != null) discount_amount = item.Discount_amount;
+    //   if (item.Discount_per != null) discount_per = item.Discount_per;
+    //   if (discount_per != 0)
+    //     discount_per = (discount_per / 100) * item.Unit_price;
+    //   item.Discounted = (
+    //     (parseFloat(discount_amount) + parseFloat(discount_per)) *
+    //     item.piece
+    //   ).toFixed(2);
+    //    item.Tax = (
+    //     (parseFloat((this.JSONInformation==null||this.JSONInformation.Tax==null)?'0':this.JSONInformation.Tax) / 100) *
+    //     ((item.Unit_price - discount_amount - discount_per) * item.piece)
+    //   ).toFixed(2);
+    //   item.Price = (
+    //     (item.Unit_price - discount_amount - discount_per) * item.piece +
+    //     parseFloat(item.Tax)
+    //   ).toFixed(2);
+    //   return item.Price;
+    // }
   },
   computed: {
     ...mapState([

@@ -1,35 +1,12 @@
 <template>
-  <v-combobox
-    auto-select-first
-    autofocus
+  <v-text-field
     v-model="model"
-    :items="Stock"
     :label="`Search`"
     prepend-icon="search"
-    item-text="Barcode_ID"
     :filter="SearchFilter"
     @input="updateSearchField(model)"
   >
-    <template v-slot:selection="data" @input="look(data.parent)">
-      <v-chip
-        :selected="data.selected"
-        close
-        class="chip--select-multi"
-      >{{SearchField}}{{look(data.parent)}}</v-chip>
-    </template>
-    <template v-slot:item="data">
-      <template v-if="typeof data.item !== 'object'">
-        <v-list-tile-content v-text="data.item"></v-list-tile-content>
-      </template>
-      <template v-else>
-        <v-list-tile-content v-text="data.item.Detail"></v-list-tile-content>
-        <v-list-tile-content>
-          <v-list-tile-title v-text="data.item.Barcode_ID"></v-list-tile-title>
-          <v-list-tile-sub-title v-text="data.item.QT"></v-list-tile-sub-title>
-        </v-list-tile-content>
-      </template>
-    </template>
-  </v-combobox>
+  </v-text-field>
 </template>
 
 <script>
@@ -66,9 +43,6 @@ export default {
       // console.log(data);
     },
     updateSearchField(data) {
-      if (data == "") {
-        return;
-      }
       
       if (typeof data === "object" && data != null) {
         data = data.Barcode_ID;
@@ -92,6 +66,11 @@ export default {
   },
   computed: {
     ...mapState(["SearchField", "JSONStock", "Stock"])
+  },
+  watch:{
+    SearchField:function(){
+      this.model=this.SearchField
+    }
   }
 };
 </script>

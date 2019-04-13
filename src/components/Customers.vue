@@ -20,7 +20,7 @@
                 color="primary"
                 dark
                 class="mb-2"
-                @click="editedItem.ID=(parseInt(Customers[Customers.length-1].ID)+1).toString()"
+                @click="editedItem.ID=(parseInt((Customers.length==0)?0:(Customers[Customers.length-1].ID)+1)).toString()"
                 v-on="on"
               >New Customer</v-btn>
             </template>
