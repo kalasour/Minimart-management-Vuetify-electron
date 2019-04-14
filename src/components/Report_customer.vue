@@ -3,14 +3,6 @@
     <v-toolbar dark flat>
       <v-toolbar-title>Customer statement</v-toolbar-title>
       <v-divider class="mx-2" inset vertical></v-divider>
-      <template v-if="SearchField!==''">
-        <v-chip close color="blue" text-color="white" @input="clearSF">
-          <v-avatar>
-            <v-icon>search</v-icon>
-          </v-avatar>
-          {{SearchField}}
-        </v-chip>
-      </template>
       <v-flex xs12 sm6 md4>
         <v-menu
           v-model="menu"
@@ -167,9 +159,9 @@
         <td class="text-xs-center">{{ props.item.TotalTax }}</td>
         <td class="text-xs-center">{{ props.item.Credit }}</td>
         <td class="text-xs-center">{{ props.item.TotalPrice }}</td>
-        <td class="justify-center layout px-1">
+        <td class="justify-center align-center layout px-1">
               <!-- <v-icon small @click="deleteItem(props.item)">local_printshop</v-icon> -->
-              <v-icon small class="mr-2" @click="find">search</v-icon>
+              <v-icon small class="mr-2 " @click="find(props.item.InvoiceNumber)">search</v-icon>
             </td>
       </template>
       <template v-slot:no-data>
@@ -267,8 +259,9 @@ export default {
     //   item.InvoiceNumber = moment(item.date,DateFormat).format('Y')+'-'+item.ID.padStart(3, "0");
     //   return item.InvoiceNumber
     // },
-    find:function(){
-
+    find:function(No){
+      this.$router.push({ path: "/report" });
+      this.$store.commit("SetSF", No);
     },
     TotalPrice: function() {
       return this.Invoice.filter(this.filterTable).map(item => {
@@ -346,11 +339,6 @@ export default {
     ...mapMutations(["initialize", "UpdateInvoice"]),
     filterTable(element) {
       return (
-        (element.ID == null ? "" : element.ID)
-          .toLowerCase()
-          .indexOf(
-            (this.SearchField == null ? "" : this.SearchField).toLowerCase()
-          ) > -1 &&
         (this.dateStart == null ||
           moment(element.date, DateFormat) >= moment(this.dateStart)) &&
         (this.dateEnd == null ||

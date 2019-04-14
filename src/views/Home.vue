@@ -43,7 +43,7 @@
 
     <v-data-table :headers="headers" :items="List" class="elevation-1">
       <template v-slot:items="props">
-        <td class="justify-center layout px-0">
+        <td class="justify-center align-center layout">
           <v-icon small :disabled="props.item.piece<=1" @click="DecreasePiece(props.item)">remove</v-icon>
           <v-card-text class="text-xs-center">{{props.item.piece}}</v-card-text>
           <v-icon

@@ -111,7 +111,15 @@ ipcMain.on("toPrint", (event, ) => {
   workerWindow.webContents.send("toPrint");
 });
 ipcMain.on("Refresh", (event, ) => {
-  workerWindow.reload();
+  // workerWindow.reload()
+
+  if (process.env.WEBPACK_DEV_SERVER_URL) {
+    // Load the url of the dev server if in development mode
+    workerWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL )
+    // if (!process.env.IS_TEST) win.webContents.openDevTools()
+  } else {
+    workerWindow.loadURL('app://./index.html')
+  }
 });
 
 ipcMain.on("printPDF", (event, content) => {

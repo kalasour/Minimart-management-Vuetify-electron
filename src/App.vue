@@ -121,8 +121,7 @@ export default {
   },
   created() {
     this.initialize();
-    ipcRenderer.on("toPrint", event => {
-      console.log("toPrint ipc");
+    ipcRenderer.on("toPrint",async event => {
       this.$router.push({ path: "/print" });
     });
     ipcRenderer.send("toPrint");

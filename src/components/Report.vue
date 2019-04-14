@@ -187,7 +187,7 @@
               >Note</v-btn>
             </td>
             <!-- <td class="text-xs-center">{{ props.item.Note }}</td> -->
-            <td class="justify-center layout px-1">
+            <td class="justify-center align-center layout px-1">
               <!-- <v-icon small @click="deleteItem(props.item)">local_printshop</v-icon> -->
               <v-icon small class="mr-2" @click="handleClick(props.item)">assignment</v-icon>
               <v-icon small class="mr-2" @click="print(props.item)">local_printshop</v-icon>
@@ -209,7 +209,6 @@ const storage = require("electron-json-storage");
 import moment from "moment";
 import { mapMutations, mapState } from "vuex";
 import { ipcRenderer } from "electron";
-import { Promise } from "q";
 import InvoiceDetail from "./Invoice";
 import Vue from "vue";
 Vue.component("InvoiceDetail", InvoiceDetail);

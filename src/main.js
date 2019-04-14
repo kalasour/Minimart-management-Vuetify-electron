@@ -3,6 +3,12 @@ import './plugins/vuetify'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import 'material-design-icons-iconfont/dist/material-design-icons.css'
+import Vuetify from 'vuetify'
+
+Vue.use(Vuetify, {
+  iconfont: 'md'
+})
 const homedir = require('os').homedir()+'\\.MinimartData';
 const storage = require('electron-json-storage');
 storage.setDataPath(homedir + '\\Mini-mart-electron-vue-data-json');

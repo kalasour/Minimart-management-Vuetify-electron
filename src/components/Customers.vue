@@ -65,7 +65,7 @@
             <td>{{ props.item.ID }}</td>
             <td class="text-xs-center">{{ props.item.Name }}</td>
             <td class="text-xs-center">{{ props.item.Address }}</td>
-            <td class="justify-center layout px-0">
+            <td class="justify-center align-center layout px-0">
               <v-icon small class="mr-2" @click="handleClick(props.item)">assignment</v-icon>
               <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
               <v-icon small @click="deleteItem(props.item)">delete</v-icon>

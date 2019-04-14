@@ -72,7 +72,7 @@
             <td class="text-xs-center">{{ props.item.JM_ID }}</td>
             <td class="text-xs-center">{{ props.item.QT }}</td>
             <td class="text-xs-center">{{ props.item.Unit_price }}</td>
-            <td class="justify-center layout px-0">
+            <td class="justify-center align-center layout px-0">
               <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
               <v-icon small @click="deleteItem(props.item)">delete</v-icon>
             </td>

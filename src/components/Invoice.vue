@@ -4,14 +4,6 @@
     <v-toolbar dark flat>
       <v-toolbar-title>Sale by customer</v-toolbar-title>
       <v-divider class="mx-2" inset vertical></v-divider>
-       <template v-if="SearchField!==''">
-        <v-chip close color="blue" text-color="white" @input="clearSF">
-          <v-avatar>
-            <v-icon>search</v-icon>
-          </v-avatar>
-          {{SearchField}}
-        </v-chip>
-      </template>
       
        <v-layout column align-end>
         <v-flex>
@@ -196,7 +188,7 @@ export default {
     },
 
     SearchFilter(item, queryText, itemText) {
-      const textOne = item.Name.toLowerCase();
+      const textOne = item.Detail.toLowerCase();
       const textTwo = item.ID.toLowerCase();
       const searchText = queryText.toLowerCase();
       return (
@@ -236,7 +228,6 @@ export default {
     ])
   },
   created() {
-    this.$store.commit("SetSF", "");
   },
   
 };
