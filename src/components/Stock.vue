@@ -36,10 +36,18 @@
                       <v-text-field v-model="editedItem.BE_ID" label="BE ID"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.Discount_amount" type="number" label="Discount(amount)"></v-text-field>
+                      <v-text-field
+                        v-model="editedItem.Discount_amount"
+                        type="number"
+                        label="Discount(amount)"
+                      ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.Discount_per" type="number" label="Discount(%)"></v-text-field>
+                      <v-text-field
+                        v-model="editedItem.Discount_per"
+                        type="number"
+                        label="Discount(%)"
+                      ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
                       <v-text-field v-model="editedItem.JM_ID" label="JM ID"></v-text-field>
@@ -48,7 +56,14 @@
                       <v-text-field v-model="editedItem.QT" type="number" label="Quantities"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.Unit_price" type="number" label="price/unit"></v-text-field>
+                      <v-text-field
+                        v-model="editedItem.Unit_price"
+                        type="number"
+                        label="price/unit"
+                      ></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm6 md4>
+                      <v-checkbox v-model="editedItem.TaxActive" color="#880E4F" label="Tax active"></v-checkbox>
                     </v-flex>
                   </v-layout>
                 </v-container>
@@ -72,6 +87,11 @@
             <td class="text-xs-center">{{ props.item.JM_ID }}</td>
             <td class="text-xs-center">{{ props.item.QT }}</td>
             <td class="text-xs-center">{{ props.item.Unit_price }}</td>
+            <td class="justify-center align-center text-xs-center px-0">
+                <!-- <v-checkbox v-model="props.item.TaxActive" disabled></v-checkbox> -->
+                <v-icon small  v-if="props.item.TaxActive">check_box</v-icon>
+                <v-icon small  v-else>check_box_outline_blank</v-icon>
+            </td>
             <td class="justify-center align-center layout px-0">
               <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
               <v-icon small @click="deleteItem(props.item)">delete</v-icon>
@@ -105,14 +125,12 @@ export default {
       { text: "JM ID", value: "JM_ID", align: "center" },
       { text: "Quantities", value: "QT", align: "center" },
       { text: "price/unit", value: "Unit_price", align: "center" },
+      { text: "Tax active?", value: "TaxActive", align: "center" },
       { text: "Action", sortable: false, align: "center" }
     ],
     editedIndex: -1,
-    editedItem: {
-
-    },
-    defaultItem: {
-    }
+    editedItem: {},
+    defaultItem: {}
   }),
 
   computed: {
@@ -195,7 +213,10 @@ export default {
         var con = true;
         await Promise.all(
           this.Stock.map(async (item, index) => {
-            if (this.editedItem.Barcode_ID == item.Barcode_ID && this.editedIndex !== index) {
+            if (
+              this.editedItem.Barcode_ID == item.Barcode_ID &&
+              this.editedIndex !== index
+            ) {
               await alert("This ID is already!");
               con = false;
               return;
@@ -203,13 +224,14 @@ export default {
           })
         );
         if (con) {
-        if (this.editedIndex > -1) {
-          Object.assign(this.Stock[this.editedIndex], this.editedItem);
-        } else {
-          this.Stock.push(this.editedItem);
+          if (this.editedIndex > -1) {
+            Object.assign(this.Stock[this.editedIndex], this.editedItem);
+          } else {
+            this.Stock.push(this.editedItem);
+          }
+          this.close();
+          this.UpdateStock();
         }
-        this.close();
-        this.UpdateStock();}
       }
     }
   }

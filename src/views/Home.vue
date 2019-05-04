@@ -48,18 +48,18 @@
           <v-card-text class="text-xs-center">{{props.item.piece}}</v-card-text>
           <v-icon
             small
-            :disabled="props.item.piece>=props.item.QT"
+            :disabled="props.item.piece>=props.item.QT&&false"
             @click="IncreasePiece(props.item)"
           >add</v-icon>
         </td>
         <td class="text-xs-center">{{ props.item.Barcode_ID }}</td>
         <td class="text-xs-left">{{ props.item.Detail }}</td>
         <td class="text-xs-left">{{ props.item.Unit_price }}</td>
-        <td class="text-xs-left">{{ props.item.Tax }}</td>
         <td class="text-xs-center">- {{ props.item.Discount_per }} %</td>
         <td class="text-xs-center">- {{ props.item.Discount_amount }} .-</td>
         <!-- <td class="text-xs-center">{{ props.item.Discounted }}</td> -->
-        <td class="text-xs-center">{{ CalPrice(props.item) }}</td>
+        <td class="text-xs-center">{{ CalPrice(props.item) - props.item.Tax }}</td>
+        <td class="text-xs-left">{{ props.item.Tax }}</td>
         <td class="text-xs-center">
           <v-icon small @click="deleteItem(props.item)">delete</v-icon>
         </td>
@@ -76,6 +76,7 @@
               <v-layout pt-2 row wrap mb-0>
                 <v-flex xs6>
                   <!-- <v-text-field v-model="CustomerID" label="Customer ID" required></v-text-field> -->
+                  Invoice number : {{new Date().getFullYear()}} - {{(parseInt(Invoice[Invoice.length-1].ID)+1).toString().padStart(3, "0")}}
                   <v-autocomplete
                     v-model="CustomerID"
                     :items="Customers"
@@ -105,7 +106,7 @@
                 <h1 class="headline mb-0 text-md-right">Total : {{TotalPrice()}} .-</h1>
               </v-flex>
               <v-btn flat color="red" :disabled="List.length<=0" @click="Clear">Clear</v-btn>
-              <v-btn flat color="blue" :disabled="List.length<=0" @click="Sale">Sale</v-btn>
+              <v-btn flat color="blue" :disabled="List.length<=0" @click="Sale">placeorder</v-btn>
             </div>
           </v-card-actions>
         </v-card>
@@ -151,12 +152,6 @@ export default {
           sortable: false
         },
         {
-          text: "Tax",
-          align: "left",
-          value: "Tax",
-          sortable: false
-        },
-        {
           text: "% Discount",
           value: "Discount_per",
           align: "center",
@@ -178,6 +173,12 @@ export default {
           text: "Line total",
           value: "Unit_price",
           align: "center",
+          sortable: false
+        },
+        {
+          text: "Tax",
+          align: "left",
+          value: "Tax",
           sortable: false
         },
         { text: "Action", sortable: false, align: "center" }
@@ -346,9 +347,15 @@ export default {
         (parseFloat(discount_amount) + parseFloat(discount_per)) *
         item.piece
       ).toFixed(2);
-      item.Tax = (
-        (parseFloat((this.JSONInformation==null||this.JSONInformation.Tax==null)?'0':this.JSONInformation.Tax) / 100) *
-        ((item.Unit_price - discount_amount - discount_per) * item.piece)
+      item.Tax = (item.TaxActive
+        ? (parseFloat(
+            this.JSONInformation == null || this.JSONInformation.Tax == null
+              ? "0"
+              : this.JSONInformation.Tax
+          ) /
+            100) *
+          ((item.Unit_price - discount_amount - discount_per) * item.piece)
+        : 0
       ).toFixed(2);
       item.Price = (
         (item.Unit_price - discount_amount - discount_per) * item.piece +
@@ -359,6 +366,7 @@ export default {
   },
   computed: {
     ...mapState([
+      "Invoice",
       "SearchField",
       "JSONStock",
       "Stock",
@@ -380,18 +388,17 @@ export default {
         }).indexOf(this.Enter);
         // alert(Findex)
         if (Findex != -1) {
-          if (this.List[Findex].piece < this.List[Findex].QT)
+          // if (this.List[Findex].piece < this.List[Findex].QT)
             this.List[Findex].piece++;
-          else alert("Out of stock!");
-          // this.$store.commit("SetSF", "");
+          // else alert("Out of stock!");
           this.Enter = "";
           return;
         }
-        if (this.JSONStock[this.Enter].QT < 1) {
-          alert("Out of stock!!");
-          this.Enter = "";
-          return;
-        }
+        // if (this.JSONStock[this.Enter].QT < 1) {
+        //   alert("Out of stock!!");
+        //   this.Enter = "";
+        //   return;
+        // }
         this.JSONStock[this.Enter].piece = 1;
         this.JSONStock[this.Enter].Discounted = 0;
         this.List.push(Object.assign({}, this.JSONStock[this.Enter]));

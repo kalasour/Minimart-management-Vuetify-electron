@@ -20,7 +20,6 @@
                 color="primary"
                 dark
                 class="mb-2"
-                @click="editedItem.ID=(parseInt((Customers.length==0)?0:(Customers[Customers.length-1].ID)+1)).toString()"
                 v-on="on"
               >New Customer</v-btn>
             </template>
@@ -33,7 +32,7 @@
                 <v-container grid-list-md>
                   <v-layout wrap>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.ID" disabled label="ID"></v-text-field>
+                      <v-text-field v-model="editedItem.ID" label="ID"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
                       <v-text-field v-model="editedItem.Name" label="Name"></v-text-field>
@@ -179,24 +178,24 @@ export default {
     },
 
     async save() {
-      // if (this.editedItem.ID == "" || this.editedItem.ID == null) {
-      //   alert("Please Input  ID");
-      //   return;
-      // } else {
-      //   var con = true;
-      //   await Promise.all(
-      //     this.Customers.map(async (item, index) => {
-      //       if (this.editedItem.ID == item.ID && this.editedIndex !== index) {
-      //         await alert("This ID is already!");
-      //         con = false;
-      //         return;
-      //       }
-      //     })
-      //   );
-      //   if (con) {
+      if (this.editedItem.ID == "" || this.editedItem.ID == null) {
+        alert("Please Input  ID");
+        return;
+      } else {
+        var con = true;
+        await Promise.all(
+          this.Customers.map(async (item, index) => {
+            if (this.editedItem.ID == item.ID && this.editedIndex !== index) {
+              await alert("This ID is already!");
+              con = false;
+              return;
+            }
+          })
+        );
+        if (con) {
 
-      //     }
-      // }
+          }
+      }
       if (this.editedIndex > -1) {
         Object.assign(this.Customers[this.editedIndex], this.editedItem);
       } else {
