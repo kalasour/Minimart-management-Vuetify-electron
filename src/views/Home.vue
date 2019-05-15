@@ -119,6 +119,7 @@
 import { mapMutations, mapState } from "vuex";
 import moment from "moment";
 import { ipcRenderer } from "electron";
+import { constants } from "crypto";
 export default {
   name: "App",
   created() {
@@ -382,14 +383,17 @@ export default {
     Enter: function() {
       if (this.Enter == "" || this.Enter == null) return;
       // console.log(this.SearchField)
-      if (this.JSONStock[this.Enter] != null) {
+      var Sindex = this.Stock.map(item => {
+        return item.Barcode_ID;
+      }).indexOf(this.Enter);
+      if (Sindex != -1) {
         var Findex = this.List.map(item => {
           return item.Barcode_ID;
         }).indexOf(this.Enter);
         // alert(Findex)
         if (Findex != -1) {
           // if (this.List[Findex].piece < this.List[Findex].QT)
-            this.List[Findex].piece++;
+          this.List[Findex].piece++;
           // else alert("Out of stock!");
           this.Enter = "";
           return;
@@ -399,9 +403,10 @@ export default {
         //   this.Enter = "";
         //   return;
         // }
-        this.JSONStock[this.Enter].piece = 1;
-        this.JSONStock[this.Enter].Discounted = 0;
-        this.List.push(Object.assign({}, this.JSONStock[this.Enter]));
+
+        this.JSONStock[Sindex].piece = 1;
+        this.JSONStock[Sindex].Discounted = 0;
+        this.List.push(Object.assign({}, this.JSONStock[Sindex]));
       } else if (this.Enter != null) {
         alert("Not founded in stock!!");
       }

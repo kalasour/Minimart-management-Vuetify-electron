@@ -20,7 +20,7 @@
               </v-list-tile-avatar>
 
               <v-list-tile-content>
-                <v-list-tile-title>BIM-TECH</v-list-tile-title>
+                <v-list-tile-title>BIM TECH</v-list-tile-title>
               </v-list-tile-content>
               <v-list-tile-action>
                 <v-dialog v-model="dialog" max-width="500px">

@@ -37,7 +37,6 @@ export default new Vuex.Store({
         state.JSONInvoice = data.Invoice;
         if (state.JSONStock !== null)
           Object.keys(state.JSONStock).map(key => {
-            state.JSONStock[key].Barcode_ID = key;
             state.Stock.push(state.JSONStock[key]);
           });
 
@@ -60,8 +59,8 @@ export default new Vuex.Store({
     },
     async UpdateStock(state) {
       state.JSONStock = {};
-      await state.Stock.map(item => {
-        state.JSONStock[item.Barcode_ID] = item;
+      await state.Stock.map((item,index) => {
+        state.JSONStock[index] = item;
       });
       storage.set("Stock", state.JSONStock);
     },

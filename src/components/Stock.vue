@@ -88,9 +88,9 @@
             <td class="text-xs-center">{{ props.item.QT }}</td>
             <td class="text-xs-center">{{ props.item.Unit_price }}</td>
             <td class="justify-center align-center text-xs-center px-0">
-                <!-- <v-checkbox v-model="props.item.TaxActive" disabled></v-checkbox> -->
-                <v-icon small  v-if="props.item.TaxActive">check_box</v-icon>
-                <v-icon small  v-else>check_box_outline_blank</v-icon>
+              <!-- <v-checkbox v-model="props.item.TaxActive" disabled></v-checkbox> -->
+              <v-icon small v-if="props.item.TaxActive">check_box</v-icon>
+              <v-icon small v-else>check_box_outline_blank</v-icon>
             </td>
             <td class="justify-center align-center layout px-0">
               <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
@@ -203,36 +203,36 @@ export default {
     },
 
     async save() {
-      if (
-        this.editedItem.Barcode_ID == "" ||
-        this.editedItem.Barcode_ID == null
-      ) {
-        alert("Please Input Barcode ID");
-        return;
-      } else {
-        var con = true;
-        await Promise.all(
-          this.Stock.map(async (item, index) => {
-            if (
-              this.editedItem.Barcode_ID == item.Barcode_ID &&
-              this.editedIndex !== index
-            ) {
-              await alert("This ID is already!");
-              con = false;
-              return;
-            }
-          })
-        );
-        if (con) {
-          if (this.editedIndex > -1) {
-            Object.assign(this.Stock[this.editedIndex], this.editedItem);
-          } else {
-            this.Stock.push(this.editedItem);
-          }
-          this.close();
-          this.UpdateStock();
+      // if (
+      //   this.editedItem.Barcode_ID == "" ||
+      //   this.editedItem.Barcode_ID == null
+      // ) {
+      //   alert("Please Input Barcode ID");
+      //   return;
+      // } else {
+      var con = true;
+      // await Promise.all(
+      //   this.Stock.map(async (item, index) => {
+      //     if (
+      //       this.editedItem.Barcode_ID == item.Barcode_ID &&
+      //       this.editedIndex !== index
+      //     ) {
+      //       await alert("This ID is already!");
+      //       con = false;
+      //       return;
+      //     }
+      //   })
+      // );
+      if (con) {
+        if (this.editedIndex > -1) {
+          Object.assign(this.Stock[this.editedIndex], this.editedItem);
+        } else {
+          this.Stock.push(this.editedItem);
         }
+        this.close();
+        this.UpdateStock();
       }
+      // }
     }
   }
 };

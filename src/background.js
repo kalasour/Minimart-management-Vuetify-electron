@@ -36,7 +36,7 @@ function createWindow() {
     app.quit()
     // workerWindow.close()
   })
-  workerWindow = new BrowserWindow({ width: 350, height: 600 });
+  workerWindow = new BrowserWindow({ width: 800, height: 600 });
   // workerWindow.loadURL("file://" + __dirname+ "/../src" + "/worker.html");
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode

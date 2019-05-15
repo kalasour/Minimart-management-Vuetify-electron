@@ -1,6 +1,6 @@
 to Fix:
 #		ID customer not AI
-!		Fix not required barcode ID in stock
+#		Fix not required barcode ID in stock
 ?		Search in Sale by more Attr
 #		Add tax in stock active and deactive
 #		line total without TAX and Tax after line total
