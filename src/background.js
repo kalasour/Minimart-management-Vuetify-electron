@@ -134,7 +134,7 @@ ipcMain.on("readyToPrintPDF", (event) => {
   // const pdfPath = path.join(os.tmpdir(), 'print.pdf');
   // Use default printing options
   // console.log(workerWindow.webContents.getPrinters())
-    workerWindow.webContents.print({silent: false,printBackground: false,deviceName:''},(success) =>{
+    workerWindow.webContents.print({silent: false,printBackground: true,deviceName:''},(success) =>{
               console.log(success)
    });
   // workerWindow.webContents.printToPDF({}, function (error, data) {

@@ -6,7 +6,7 @@ to Fix:
 #		line total without TAX and Tax after line total
 #		change word sale to placeorder
 ?		fix paid cant delete and change word to pay
-		change invoice view
+#		change invoice view
 #		change minimart to BIM TECH
 #		show invoice number in pay sum
 #		can change count qty. func
