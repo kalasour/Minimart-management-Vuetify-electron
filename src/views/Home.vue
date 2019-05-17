@@ -30,11 +30,6 @@
                 <v-flex xs12 sm6 py2 pt-6>{{data.item.Detail}}</v-flex>
                 <v-flex xs12 sm6 py2 pt-6>Left : {{data.item.QT}} pcs.</v-flex>
               </v-layout>
-              <!-- <v-list-tile-content v-text="data.item.Detail"></v-list-tile-content>
-        <v-list-tile-content>
-          <v-list-tile-title v-text="data.item.Barcode_ID"></v-list-tile-title>
-          <v-list-tile-sub-title v-text="data.item.QT"></v-list-tile-sub-title>
-              </v-list-tile-content>-->
             </template>
           </template>
         </v-combobox>
@@ -57,7 +52,6 @@
         <td class="text-xs-left">{{ props.item.Unit_price }}</td>
         <td class="text-xs-center">- {{ props.item.Discount_per }} %</td>
         <td class="text-xs-center">- {{ props.item.Discount_amount }} .-</td>
-        <!-- <td class="text-xs-center">{{ props.item.Discounted }}</td> -->
         <td class="text-xs-center">{{ CalPrice(props.item) - props.item.Tax }}</td>
         <td class="text-xs-left">{{ props.item.Tax }}</td>
         <td class="text-xs-center">
@@ -75,8 +69,7 @@
 
               <v-layout pt-2 row wrap mb-0>
                 <v-flex xs6>
-                  <!-- <v-text-field v-model="CustomerID" label="Customer ID" required></v-text-field> -->
-                  Invoice number : {{new Date().getFullYear()}} - {{(parseInt(Invoice[Invoice.length-1].ID)+1).toString().padStart(3, "0")}}
+                  Invoice number : {{new Date().getFullYear()}} - {{(parseInt((Invoice[Invoice.length-1]==null)?0:Invoice[Invoice.length-1].ID)+1).toString().padStart(3, "0")}}
                   <v-autocomplete
                     v-model="CustomerID"
                     :items="Customers"
@@ -123,7 +116,6 @@ import { constants } from "crypto";
 export default {
   name: "App",
   created() {
-    // this.initialize();
   },
   data() {
     return {
@@ -207,10 +199,10 @@ export default {
       this.Enter = data;
     },
     ItemFilter(item, queryText, itemText) {
-      const textOne = item.Detail.toLowerCase();
-      const textTwo = item.Barcode_ID.toLowerCase();
-      const text3 = item.JM_ID.toLowerCase();
-      const text4 = item.BE_ID.toLowerCase();
+      const textOne = (item.Detail==null)?'':item.Detail.toLowerCase();
+      const textTwo =(item.Barcode_ID==null)?'':item.Barcode_ID.toLowerCase();
+      const text3 = (item.JM_ID==null)?'':item.JM_ID.toLowerCase();
+      const text4 = (item.BE_ID==null)?'':item.BE_ID.toLowerCase();
       const searchText = queryText.toLowerCase();
       return (
         textOne.indexOf(searchText) > -1 ||
