@@ -8,8 +8,8 @@
           autofocus
           v-model="model"
           :items="Stock"
-          :label="`Enter Barcode ID`"
-          prepend-icon="toc"
+          :label="`Search`"
+          prepend-icon="search"
           :filter="ItemFilter"
           @input="updateSearchField(model)"
         >

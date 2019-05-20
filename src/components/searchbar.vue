@@ -1,5 +1,6 @@
 <template>
   <v-text-field
+  v-if="this.$route.path!=='/'"
     v-model="model"
     :label="`Search`"
     prepend-icon="search"
