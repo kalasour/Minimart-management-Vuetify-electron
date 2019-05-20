@@ -227,6 +227,12 @@ export default {
         if (this.editedIndex > -1) {
           Object.assign(this.Stock[this.editedIndex], this.editedItem);
         } else {
+          if (this.Stock.length == 0) this.editedItem.index = "0";
+          else {
+            this.editedItem.index = (
+              parseInt(this.Stock[this.Stock.length - 1].index) + 1
+            ).toString();
+          }
           this.Stock.push(this.editedItem);
         }
         this.close();

@@ -1,12 +1,21 @@
 to Fix:
 #		ID customer not AI
 #		Fix not required barcode ID in stock
-?		Search in Sale by more Attr
+#		Search in Sale by more Attr
 #		Add tax in stock active and deactive
 #		line total without TAX and Tax after line total
 #		change word sale to placeorder
-?		fix paid cant delete and change word to pay
+#		fix paid cant delete and change word to pay
 #		change invoice view
 #		change minimart to BIM TECH
 #		show invoice number in pay sum
 #		can change count qty. func
+
+
+
+
+to Fix 2:
+#   search
+#   discount in purchase
+#   change invoice -logo - no time can select day -taxes after subtotal -jm_id in item
+#   edit in report

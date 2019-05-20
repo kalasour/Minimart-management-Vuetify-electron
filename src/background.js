@@ -40,7 +40,7 @@ function createWindow() {
   // workerWindow.loadURL("file://" + __dirname+ "/../src" + "/worker.html");
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    workerWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL )
+    workerWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
     // if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
     createProtocol('app')
@@ -115,7 +115,7 @@ ipcMain.on("Refresh", (event, ) => {
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    workerWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL )
+    workerWindow.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
     // if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
     workerWindow.loadURL('app://./index.html')
@@ -123,7 +123,7 @@ ipcMain.on("Refresh", (event, ) => {
 });
 
 ipcMain.on("printPDF", (event, content) => {
-  console.log(content);
+  // console.log(content);
   workerWindow.show()
   workerWindow.focus()
   workerWindow.webContents.send("printPDF", content);
@@ -131,20 +131,14 @@ ipcMain.on("printPDF", (event, content) => {
 
 // when worker window is ready
 ipcMain.on("readyToPrintPDF", (event) => {
-  // const pdfPath = path.join(os.tmpdir(), 'print.pdf');
-  // Use default printing options
-  // console.log(workerWindow.webContents.getPrinters())
-    workerWindow.webContents.print({silent: false,printBackground: true,deviceName:''},(success) =>{
-              console.log(success)
-   });
-  // workerWindow.webContents.printToPDF({}, function (error, data) {
+  // workerWindow.webContents.printToPDF({}, (error, data) => {
+  //   if (error) throw error
+  //   fs.writeFile('./tmp/print.pdf', data, (error) => {
   //     if (error) throw error
-  //     fs.writeFile(pdfPath, data, function (error) {
-  //         if (error) {
-  //             throw error
-  //         }
-  //         shell.openItem(pdfPath)
-  //         event.sender.send('wrote-pdf', pdfPath)
-  //     })
+  //     console.log('Write PDF successfully.')
+  //   })
   // })
+  workerWindow.webContents.print({ silent: false, printBackground: false, deviceName: '', }, (success) => {
+    // console.log(success)
+  });
 });

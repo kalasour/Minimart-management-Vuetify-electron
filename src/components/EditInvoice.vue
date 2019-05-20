@@ -1,6 +1,6 @@
 
   <template>
-  <v-app>
+  <v-app dark>
     <v-card>
       <v-toolbar>
         <v-combobox
@@ -74,7 +74,7 @@
 
               <v-layout pt-2 row wrap mb-0>
                 <v-flex xs6>
-                  Invoice number : {{new Date().getFullYear()}} - {{(parseInt((Invoice[Invoice.length-1]==null)?0:Invoice[Invoice.length-1].ID)+1).toString().padStart(3, "0")}}
+                  Invoice number : {{InvoiceNumber}}
                   <v-autocomplete
                     v-model="CustomerID"
                     :items="Customers"
@@ -141,17 +141,33 @@ import moment from "moment";
 import { ipcRenderer } from "electron";
 import { constants } from "crypto";
 export default {
+  props: {
+    selected: Object
+  },
   name: "App",
   created() {},
+  computed: {
+    ...mapState([
+      "Invoice",
+      "SearchField",
+      "JSONStock",
+      "Stock",
+      "Customers",
+      "JSONInformation"
+    ])
+  },
   data() {
     return {
+      List: [],
+      OldList: [],
+      date: "",
+      Paid: "",
       menu: false,
-      date: moment(new Date()).format("YYYY-MM-DD"),
       Enter: "",
       model: null,
       Note: "",
       CustomerID: "",
-      Paid: "",
+      InvoiceNumber: "",
       headers: [
         { text: "Qty.", sortable: false, align: "center" },
         {
@@ -269,27 +285,39 @@ export default {
       new_invoice.date = now_date;
       new_invoice.Note = this.Note;
       new_invoice.Paid = this.Paid;
+      new_invoice.InvoiceNumber = this.InvoiceNumber;
       new_invoice.TotalTax = this.TotalTaxes();
       new_invoice.TotalPrice = this.TotalPrice();
       new_invoice.TotalDiscounted = this.TotalDiscounted();
       new_invoice.TotalOrdered = this.TotalOrdered();
       new_invoice.TotalPiece = this.TotalPiece();
-      await this.List.map((item, index) => {
-        this.Stock[this.Stock.findIndex(s => s.index === item.index)].QT -=
-          item.piece;
+      await this.OldList.map(async (item, index) => {
+        var indexT = await this.Stock.findIndex(s => s.index === item.index);
+        // console.log(indexT, this.Stock[indexT].QT, "+", item.piece);
+        if (indexT != -1) this.Stock[indexT].QT += item.piece;
       });
-      await this.CreateInvoice(new_invoice);
+      await this.List.map(async (item, index) => {
+        var indexT = await this.Stock.findIndex(s => s.index === item.index);
+        // console.log(indexT, this.Stock[indexT].QT, "-", item.piece);
+        if (indexT != -1) this.Stock[indexT].QT -= item.piece;
+      });
+      Object.assign(
+        this.Invoice[
+          this.Invoice.findIndex(s => s.InvoiceNumber === this.InvoiceNumber)
+        ],
+        new_invoice
+      );
       ipcRenderer.send("printPDF", new_invoice);
+      this.OldList = JSON.parse(JSON.stringify(this.List));
       this.UpdateInvoice();
       this.UpdateStock();
-      this.Clear();
+    //   console.log("updated");
     },
     Clear() {
       this.List.splice(0, this.List.length);
       this.Paid = "";
       this.CustomerID = "";
       this.Note = "";
-      this.date = moment(new Date()).format("YYYY-MM-DD");
     },
     ...mapMutations([
       "initialize",
@@ -389,21 +417,22 @@ export default {
       return item.Price;
     }
   },
-  computed: {
-    ...mapState([
-      "Invoice",
-      "SearchField",
-      "JSONStock",
-      "Stock",
-      "List",
-      "Customers",
-      "JSONInformation"
-    ])
-  },
+
   created() {
     this.$store.commit("SetSF", "");
   },
   watch: {
+    selected: function() {
+      this.Paid = this.selected.Paid;
+      this.date = moment(this.selected.date, "MMMM Do YYYY, h:mm:ss a").format(
+        "YYYY-MM-DD"
+      );
+      this.CustomerID = this.selected.Customer.ID;
+      this.Note = this.selected.Note;
+      this.InvoiceNumber = this.selected.InvoiceNumber;
+      this.List = Object.values(this.selected.List);
+      this.OldList = JSON.parse(JSON.stringify(this.List));
+    },
     Enter: function() {
       if (this.Enter == "" || this.Enter == null) return;
       // console.log(this.SearchField)
