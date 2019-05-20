@@ -129,6 +129,14 @@ ipcMain.on("printPDF", (event, content) => {
   workerWindow.webContents.send("printPDF", content);
 });
 
+ipcMain.on("printStatement", (event, content) => {
+  // console.log(content);
+  
+  workerWindow.show()
+  workerWindow.focus()
+  workerWindow.webContents.send("printStatement", content);
+});
+
 // when worker window is ready
 ipcMain.on("readyToPrintPDF", (event) => {
   // workerWindow.webContents.printToPDF({}, (error, data) => {

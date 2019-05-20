@@ -155,7 +155,6 @@
       <template v-slot:items="props">
         <td>{{ props.item.InvoiceNumber}}</td>
         <td class="text-xs-center">{{ props.item.date }}</td>
-        <td class="text-xs-center">{{ props.item.TotalPiece }}</td>
         <td class="text-xs-center">{{ props.item.TotalTax }}</td>
         <td class="text-xs-center">{{ props.item.Credit }}</td>
         <td class="text-xs-center">{{ props.item.TotalPrice }}</td>
@@ -187,6 +186,7 @@
               <v-flex xs12>
                 <h1 class="headline mb-0 text-md-right">Paid : {{TotalPaid()}} .-</h1>
                 <h1 class="headline mb-0 text-md-right">Amount Due : {{(Math.max(0,parseFloat(TotalPrice())-parseFloat(TotalPaid()))).toFixed(2)}}</h1>
+                <v-btn @click="print()" class="right"><v-icon class="mr-2" >local_printshop</v-icon></v-btn>
               </v-flex>
             </div>
           </v-card-actions>
@@ -222,7 +222,6 @@ export default {
         sortable: true
       },
       { text: "Delivery Date", sortable: false, align: "center" },
-      { text: "Amount", sortable: false, align: "center" },
       { text: "Tax", sortable: false, align: "center" },
       { text: "Credit", sortable: false, align: "center" },
       { text: "Total", sortable: false, align: "center" },
@@ -251,7 +250,7 @@ export default {
     }
   },
   created() {
-    // this.initialize();
+    
   },
 
   methods: {
@@ -259,6 +258,17 @@ export default {
     //   item.InvoiceNumber = moment(item.date,DateFormat).format('Y')+'-'+item.ID.padStart(3, "0");
     //   return item.InvoiceNumber
     // },
+    print() {
+      var statement={}
+      statement.List=this.Invoice.filter(this.filterTable)
+      statement.Customer=this.selected
+      statement.Subtotal=parseFloat(this.TotalPrice()-this.TotalTaxes()).toFixed(2)
+      statement.Taxes=this.TotalTaxes()
+      statement.Total=this.TotalPrice()
+      statement.Paid=this.TotalPaid()
+      statement.Due=(Math.max(0,parseFloat(this.TotalPrice())-parseFloat(this.TotalPaid()))).toFixed(2)
+      ipcRenderer.send("printStatement", statement);
+    },
     find:function(No){
       this.$router.push({ path: "/report" });
       this.$store.commit("SetSF", No);
@@ -316,9 +326,6 @@ export default {
           return parseFloat(total) + parseFloat(num);
         }, 0)
         .toFixed(0);
-    },
-    print(invoice) {
-      ipcRenderer.send("printPDF", invoice);
     },
     clickList(item) {
       this.itemSelected = item;
