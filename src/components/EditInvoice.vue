@@ -8,8 +8,8 @@
           autofocus
           v-model="model"
           :items="Stock"
-          :label="`Enter Barcode ID`"
-          prepend-icon="toc"
+          :label="`Search`"
+          prepend-icon="search"
           :filter="ItemFilter"
           @input="updateSearchField(model)"
         >
@@ -85,7 +85,7 @@
                     chips
                     :filter="SearchFilter"
                   ></v-autocomplete>
-                  <v-text-field v-model="Paid" type="number" label="Paid" required></v-text-field>
+                  <v-text-field v-model="Paid" type="number" label="Payment" required></v-text-field>
                   <v-menu
                     v-model="menu"
                     :close-on-content-click="false"
@@ -126,7 +126,7 @@
                 <h1 class="headline mb-0 text-md-right">Total : {{TotalPrice()}} .-</h1>
               </v-flex>
               <v-btn flat color="red" :disabled="List.length<=0" @click="Clear">Clear</v-btn>
-              <v-btn flat color="blue" :disabled="List.length<=0" @click="Sale">placeorder</v-btn>
+              <v-btn flat color="blue" :disabled="List.length<=0" @click="Sale">place order</v-btn>
             </div>
           </v-card-actions>
         </v-card>
@@ -264,7 +264,7 @@ export default {
       // console.log(moment(now_date,DateFormat).format('D'))
 
       if (this.CustomerID == "" || this.Paid == "") {
-        alert("Please input customer ID or paid money!");
+        alert("Please put amount to pay.");
         return;
       }
       var IndFind = await this.Customers.findIndex(
