@@ -151,7 +151,7 @@
         </v-card>
       </v-dialog>
     </v-toolbar>
-    <v-data-table dark :headers="headers" :items="Invoice.filter(filterTable)" class="elevation-1">
+    <v-data-table :rows-per-page-items="[{text:'All',value:-1}]" dark :headers="headers" :items="Invoice.filter(filterTable)" class="elevation-1">
       <template v-slot:items="props">
         <td>{{ props.item.InvoiceNumber}}</td>
         <td class="text-xs-center">{{ props.item.date }}</td>
@@ -186,6 +186,7 @@
               <v-flex xs12>
                 <h1 class="headline mb-0 text-md-right">Paid : {{TotalPaid()}} .-</h1>
                 <h1 class="headline mb-0 text-md-right">Amount Due : {{(Math.max(0,parseFloat(TotalPrice())-parseFloat(TotalPaid()))).toFixed(2)}}</h1>
+                <v-btn @click="rec()" class="left"><v-icon  >save</v-icon></v-btn>
                 <v-btn @click="print()" class="right"><v-icon class="mr-2" >local_printshop</v-icon></v-btn>
               </v-flex>
             </div>
@@ -268,6 +269,17 @@ export default {
       statement.Paid=this.TotalPaid()
       statement.Due=(Math.max(0,parseFloat(this.TotalPrice())-parseFloat(this.TotalPaid()))).toFixed(2)
       ipcRenderer.send("printStatement", statement);
+    },
+    rec() {
+      var statement={}
+      statement.List=this.Invoice.filter(this.filterTable)
+      statement.Customer=this.selected
+      statement.Subtotal=parseFloat(this.TotalPrice()-this.TotalTaxes()).toFixed(2)
+      statement.Taxes=this.TotalTaxes()
+      statement.Total=this.TotalPrice()
+      statement.Paid=this.TotalPaid()
+      statement.Due=(Math.max(0,parseFloat(this.TotalPrice())-parseFloat(this.TotalPaid()))).toFixed(2)
+      ipcRenderer.send("saveStatement", statement);
     },
     find:function(No){
       this.$router.push({ path: "/report" });

@@ -17,7 +17,7 @@
         </v-flex>
       </v-layout>
     </v-toolbar>
-    <v-data-table  :headers="headers" :items="currentList()" class="elevation-1">
+    <v-data-table :rows-per-page-items="[{text:'All',value:-1}]"  :headers="headers" :items="currentList()" class="elevation-1">
       <template v-slot:items="props">
         <td class="justify-center layout px-0">
           <v-card-text class="text-xs-center">{{props.item.piece}}</v-card-text>

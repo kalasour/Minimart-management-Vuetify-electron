@@ -260,6 +260,15 @@ export default {
         ipcRenderer.send("readyToPrintPDF");
       }, 500);
     });
+    ipcRenderer.on("saveStatement", (event, statement) => {
+      this.Invoice=[]
+      this.List=[]
+      this.Statement=statement
+      this.List = Object.values(this.Statement.List);
+      setTimeout(() => {
+        ipcRenderer.send("readyToSave");
+      }, 500);
+    });
     ipcRenderer.on("printPDF", (event, Invoice) => {
       //   document.body.innerHTML = content;
       this.Statement=[]
@@ -268,6 +277,16 @@ export default {
       this.List = Object.values(this.Invoice.List);
       setTimeout(() => {
         ipcRenderer.send("readyToPrintPDF");
+      }, 500);
+    });
+    ipcRenderer.on("savePDF", (event, Invoice) => {
+      //   document.body.innerHTML = content;
+      this.Statement=[]
+      this.List=[]
+      this.Invoice = Invoice;
+      this.List = Object.values(this.Invoice.List);
+      setTimeout(() => {
+        ipcRenderer.send("readyToSave");
       }, 500);
     });
   },

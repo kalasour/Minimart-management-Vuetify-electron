@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, ipcMain, shell } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain, shell, dialog } from 'electron'
 import {
   createProtocol,
   installVueDevtools
@@ -129,12 +129,41 @@ ipcMain.on("printPDF", (event, content) => {
   workerWindow.webContents.send("printPDF", content);
 });
 
+ipcMain.on("savePDF", (event, content) => {
+  workerWindow.show()
+  workerWindow.webContents.send("savePDF", content);
+});
+
+
+
+ipcMain.on("readyToSave", (event) => {
+  const savePath = dialog.showSaveDialog({
+    filters: [{
+      name: 'Adobe PDF',
+      extensions: ['pdf']
+    }]
+  });
+  if (savePath != null)
+    workerWindow.webContents.printToPDF({}, (error, data) => {
+      if (error) throw error
+      fs.writeFile(savePath, data, (error) => {
+        if (error) throw error
+        console.log('Write PDF successfully.')
+      })
+    })
+  workerWindow.hide()
+});
 ipcMain.on("printStatement", (event, content) => {
   // console.log(content);
-  
+
   workerWindow.show()
   workerWindow.focus()
   workerWindow.webContents.send("printStatement", content);
+});
+
+ipcMain.on("saveStatement", (event, content) => {
+  workerWindow.show()
+  workerWindow.webContents.send("saveStatement", content);
 });
 
 // when worker window is ready

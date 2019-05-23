@@ -59,7 +59,7 @@
             </div>
           </v-dialog>
         </v-toolbar>
-        <v-data-table :headers="headers" :items="Customers.filter(filterTable)" class="elevation-1">
+        <v-data-table :rows-per-page-items="[{text:'All',value:-1}]" :headers="headers" :items="Customers.filter(filterTable)" class="elevation-1">
           <template v-slot:items="props">
             <td>{{ props.item.ID }}</td>
             <td class="text-xs-center">{{ props.item.Name }}</td>

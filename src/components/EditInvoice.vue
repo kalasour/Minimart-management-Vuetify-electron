@@ -31,7 +31,7 @@
       </v-toolbar>
     </v-card>
 
-    <v-data-table :headers="headers" :items="List" class="elevation-1">
+    <v-data-table :rows-per-page-items="[{text:'All',value:-1}]" :headers="headers" :items="List" class="elevation-1">
       <template v-slot:items="props">
         <td class="justify-center align-center layout">
           <v-icon small :disabled="props.item.piece<=1" @click="DecreasePiece(props.item)">remove</v-icon>
@@ -457,7 +457,7 @@ export default {
 
         this.JSONStock[Sindex].piece = 1;
         this.JSONStock[Sindex].Discounted = 0;
-        this.List.push(Object.assign({}, this.JSONStock[Sindex]));
+        this.List.unshift(Object.assign({}, this.JSONStock[Sindex]));
       } else if (this.Enter != null) {
         // alert("Not founded in stock!!");
       }

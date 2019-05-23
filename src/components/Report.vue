@@ -138,7 +138,7 @@
             </v-card>
           </v-dialog>
         </v-toolbar>
-        <v-data-table :headers="headers" :items="Invoice.filter(filterTable)" class="elevation-1">
+        <v-data-table :rows-per-page-items="[{text:'All',value:-1}]" :headers="headers" :items="Invoice.filter(filterTable)" class="elevation-1">
           <template v-slot:items="props">
             <td>{{ props.item.InvoiceNumber}}</td>
             <td class="text-xs-center">
@@ -167,6 +167,7 @@
             <td class="justify-center align-center layout px-1">
               <!-- <v-icon small @click="deleteItem(props.item)">local_printshop</v-icon> -->
               <v-icon small class="mr-2" @click="handleClick(props.item)">assignment</v-icon>
+              <v-icon small class="mr-2" @click="rec(props.item)">save</v-icon>
               <v-icon small class="mr-2" @click="print(props.item)">local_printshop</v-icon>
               <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
               <v-icon small @click="deleteItem(props.item)">delete</v-icon>
@@ -253,6 +254,9 @@ export default {
     },
     print(invoice) {
       ipcRenderer.send("printPDF", invoice);
+    },
+    rec(invoice) {
+      ipcRenderer.send("savePDF", invoice);
     },
     clickList(item) {
       this.itemSelected = item;

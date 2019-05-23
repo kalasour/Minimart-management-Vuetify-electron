@@ -77,7 +77,12 @@
             </v-card>
           </v-dialog>
         </v-toolbar>
-        <v-data-table :headers="headers" :items="Stock.filter(filterTable)" class="elevation-1">
+        <v-data-table
+          :rows-per-page-items="[{text:'All',value:-1}]"
+          :headers="headers"
+          :items="Stock.filter(filterTable)"
+          class="elevation-1"
+        >
           <template v-slot:items="props">
             <td>{{ props.item.Detail }}</td>
             <td class="text-xs-center">{{ props.item.Barcode_ID }}</td>
@@ -120,7 +125,11 @@ export default {
       },
       { text: "BARCODE ID", value: "Barcode_ID", align: "center" },
       { text: "BE ID", value: "BE_ID", align: "center" },
-      { text: "Discount(amount)", value: "Discount_amount", align: "center" },
+      {
+        text: "Discount(amount)",
+        value: "Discount_amount",
+        align: "center"
+      },
       { text: "Discount(%)", value: "Discount_per", align: "center" },
       { text: "JM ID", value: "JM_ID", align: "center" },
       { text: "Quantities", value: "QT", align: "center" },
