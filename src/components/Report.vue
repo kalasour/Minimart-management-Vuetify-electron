@@ -119,23 +119,11 @@
               <v-btn @click="dialogInvoice=false">Close</v-btn>
             </div>
           </v-dialog>
-          <v-dialog v-model="dialogCustomer" max-width="500">
-            <v-card>
-              <v-list>
-                <v-list-tile v-for="subItem in Object.keys(customerSelected)" :key="subItem">
-                  <v-list-tile-content>
-                    <v-list-tile-title
-                      v-if="subItem!=='active'"
-                    >{{ subItem }} : {{customerSelected[subItem]}}</v-list-tile-title>
-                  </v-list-tile-content>
-                </v-list-tile>
-              </v-list>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-
-                <v-btn color="green darken-1" flat="flat" @click="dialogCustomer = false">Close</v-btn>
-              </v-card-actions>
-            </v-card>
+          <v-dialog v-model="dialogCustomer" max-width="1200px">
+            <ItemList v-bind:selected="SelectedCustomer"/>
+            <div class="text-xs-right" dark>
+              <v-btn @click="dialogCustomer = false">Close</v-btn>
+            </div>
           </v-dialog>
         </v-toolbar>
         <v-data-table :rows-per-page-items="[{text:'All',value:-1}]" :headers="headers" :items="Invoice.filter(filterTable)" class="elevation-1">
@@ -166,7 +154,7 @@
             <!-- <td class="text-xs-center">{{ props.item.Note }}</td> -->
             <td class="justify-center align-center layout px-1">
               <!-- <v-icon small @click="deleteItem(props.item)">local_printshop</v-icon> -->
-              <v-icon small class="mr-2" @click="handleClick(props.item)">assignment</v-icon>
+              <!-- <v-icon small class="mr-2" @click="handleClick(props.item)">assignment</v-icon> -->
               <v-icon small class="mr-2" @click="rec(props.item)">save</v-icon>
               <v-icon small class="mr-2" @click="print(props.item)">local_printshop</v-icon>
               <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
@@ -189,9 +177,11 @@ import { mapMutations, mapState } from "vuex";
 import { ipcRenderer } from "electron";
 import InvoiceDetail from "./Invoice";
 import EditInvoice from './EditInvoice';
+import ItemList from "./Report_customer";
 import Vue from "vue";
 Vue.component("InvoiceDetail", InvoiceDetail);
 Vue.component("EditInvoice", EditInvoice);
+Vue.component("ItemList", ItemList);
 const DateFormat = "MMMM Do YYYY";
 export default {
   data: () => ({
@@ -218,6 +208,7 @@ export default {
       { text: "Action", sortable: false, align: "center" }
     ],
     editedIndex: -1,
+    SelectedCustomer: {},
     editedItem: {},
     defaultItem: {},
     itemSelected: {},
@@ -264,6 +255,7 @@ export default {
       this.dialogList = true;
     },
     clickCustomer(lastCustomer) {
+      this.SelectedCustomer=lastCustomer
       this.customerSelected = lastCustomer;
       this.dialogCustomer = true;
     },

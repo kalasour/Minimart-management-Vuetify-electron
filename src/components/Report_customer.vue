@@ -174,7 +174,7 @@
             <v-flex xs12>
               <!-- <h3 class="headline mb-0 text-md-center">Payment summary</h3> -->
                   <v-flex mx-5>
-                    <div>Subtotal : {{parseFloat(TotalPrice()-TotalTaxes()).toFixed(2)}} .-</div>
+                    <div>Subtotal : {{(parseFloat(TotalPrice()-TotalTaxes())+parseFloat(TotalDiscounted())).toFixed(2)}} .-</div>
                     <div>Taxes : {{TotalTaxes()}}</div>
                     <div>Total : {{TotalPrice()}} .-</div>
                   </v-flex>
@@ -263,10 +263,11 @@ export default {
       var statement={}
       statement.List=this.Invoice.filter(this.filterTable)
       statement.Customer=this.selected
-      statement.Subtotal=parseFloat(this.TotalPrice()-this.TotalTaxes()).toFixed(2)
+      statement.Subtotal=(parseFloat(this.TotalPrice()-this.TotalTaxes())+parseFloat(this.TotalDiscounted())).toFixed(2)
       statement.Taxes=this.TotalTaxes()
       statement.Total=this.TotalPrice()
       statement.Paid=this.TotalPaid()
+      statement.TotalDiscounted=this.TotalDiscounted()
       statement.Due=(Math.max(0,parseFloat(this.TotalPrice())-parseFloat(this.TotalPaid()))).toFixed(2)
       ipcRenderer.send("printStatement", statement);
     },
@@ -274,10 +275,11 @@ export default {
       var statement={}
       statement.List=this.Invoice.filter(this.filterTable)
       statement.Customer=this.selected
-      statement.Subtotal=parseFloat(this.TotalPrice()-this.TotalTaxes()).toFixed(2)
+      statement.Subtotal=(parseFloat(this.TotalPrice()-this.TotalTaxes())+parseFloat(this.TotalDiscounted())).toFixed(2)
       statement.Taxes=this.TotalTaxes()
       statement.Total=this.TotalPrice()
       statement.Paid=this.TotalPaid()
+      statement.TotalDiscounted=this.TotalDiscounted()
       statement.Due=(Math.max(0,parseFloat(this.TotalPrice())-parseFloat(this.TotalPaid()))).toFixed(2)
       ipcRenderer.send("saveStatement", statement);
     },

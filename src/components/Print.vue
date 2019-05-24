@@ -5,13 +5,8 @@
     pa-0
     ma-0
   >Please setting store information</v-container>
-  <v-container
-    pa-0
-    ma-0
-    v-else-if="this.List.length==0"
-    class="text-xs-center light"
-  >Error</v-container>
-  <v-container pa-0 ma-0 v-else-if='this.Statement.length!=0' class="text-xs-center light" px-1>
+  <v-container pa-0 ma-0 v-else-if="this.List.length==0" class="text-xs-center light">Error (Empty List!)</v-container>
+  <v-container pa-0 ma-0 v-else-if="this.Statement.length!=0" class="text-xs-center light" px-1>
     <v-layout row wrap xs12>
       <!-- <v-flex xs6>
         <h5
@@ -46,10 +41,7 @@
             </tr>
             <tr>
               <th align="left" style="padding:0 10px;">Balance Due :</th>
-              <td
-                align="right"
-                style="padding:0 10px;"
-              >${{Statement.Due}}</td>
+              <td align="right" style="padding:0 10px;">${{Statement.Due}}</td>
             </tr>
           </table>
         </v-img>
@@ -81,11 +73,15 @@
           <br>
           <table align="right" width="auto" border="1" cellspacing="0">
             <tr>
-              <th align="left" style="padding:0 10px;">Subtotal :</th>
+              <th align="left" style="padding:0 10px;">Discounted :</th>
               <td
                 align="right"
                 style="padding:0 10px;"
-              >{{(this.Statement.Subtotal)}}</td>
+              >- {{this.Statement.TotalDiscounted}}</td>
+            </tr>
+            <tr>
+              <th align="left" style="padding:0 10px;">Subtotal :</th>
+              <td align="right" style="padding:0 10px;">{{(this.Statement.Subtotal)}}</td>
             </tr>
             <tr>
               <th align="left" style="padding:0 10px;">Taxes :</th>
@@ -101,10 +97,7 @@
             </tr>
             <tr>
               <th align="left" style="padding:0 10px;">Balance Due :</th>
-              <th
-                align="right"
-                style="padding:0 10px;"
-              >${{this.Statement.Due}}</th>
+              <th align="right" style="padding:0 10px;">${{this.Statement.Due}}</th>
             </tr>
           </table>
           <br>
@@ -116,7 +109,7 @@
       </v-flex>
     </v-layout>
   </v-container>
-  <v-container pa-0 ma-0 v-else-if='this.Invoice.length!=0' class="text-xs-center light" px-1>
+  <v-container pa-0 ma-0 v-else-if="this.Invoice.length!=0" class="text-xs-center light" px-1>
     <v-layout row wrap xs12>
       <!-- <v-flex xs6>
         <h5
@@ -188,11 +181,18 @@
           <br>
           <table align="right" width="auto" border="1" cellspacing="0">
             <tr>
+              <th align="left" style="padding:0 10px;">Discounted :</th>
+              <td
+                align="right"
+                style="padding:0 10px;"
+              >- {{(parseFloat(this.Invoice.TotalDiscounted)).toFixed(2)}}</td>
+            </tr>
+            <tr>
               <th align="left" style="padding:0 10px;">Subtotal :</th>
               <td
                 align="right"
                 style="padding:0 10px;"
-              >{{(this.Invoice.TotalPrice-this.Invoice.TotalTax).toFixed(2)}}</td>
+              >{{(this.Invoice.TotalPrice-this.Invoice.TotalTax+parseFloat(this.Invoice.TotalDiscounted)).toFixed(2)}}</td>
             </tr>
             <tr>
               <th align="left" style="padding:0 10px;">Taxes :</th>
@@ -252,18 +252,18 @@ export default {
   },
   created() {
     ipcRenderer.on("printStatement", (event, statement) => {
-      this.Invoice=[]
-      this.List=[]
-      this.Statement=statement
+      this.Invoice = [];
+      this.List = [];
+      this.Statement = statement;
       this.List = Object.values(this.Statement.List);
       setTimeout(() => {
         ipcRenderer.send("readyToPrintPDF");
       }, 500);
     });
     ipcRenderer.on("saveStatement", (event, statement) => {
-      this.Invoice=[]
-      this.List=[]
-      this.Statement=statement
+      this.Invoice = [];
+      this.List = [];
+      this.Statement = statement;
       this.List = Object.values(this.Statement.List);
       setTimeout(() => {
         ipcRenderer.send("readyToSave");
@@ -271,8 +271,8 @@ export default {
     });
     ipcRenderer.on("printPDF", (event, Invoice) => {
       //   document.body.innerHTML = content;
-      this.Statement=[]
-      this.List=[]
+      this.Statement = [];
+      this.List = [];
       this.Invoice = Invoice;
       this.List = Object.values(this.Invoice.List);
       setTimeout(() => {
@@ -281,8 +281,8 @@ export default {
     });
     ipcRenderer.on("savePDF", (event, Invoice) => {
       //   document.body.innerHTML = content;
-      this.Statement=[]
-      this.List=[]
+      this.Statement = [];
+      this.List = [];
       this.Invoice = Invoice;
       this.List = Object.values(this.Invoice.List);
       setTimeout(() => {
@@ -293,7 +293,7 @@ export default {
   data: () => ({
     Invoice: [],
     List: [],
-    Statement:[],
+    Statement: []
   }),
   computed: {
     // JSONInformation:{},
