@@ -130,7 +130,7 @@
           <template v-slot:items="props">
             <td>{{ props.item.InvoiceNumber}}</td>
             <td class="text-xs-center">
-              <v-btn @click="clickCustomer(props.item.Customer)">{{props.item.Customer.Name}}</v-btn>
+              <v-btn @click="show(props.item)">{{props.item.Customer.Name}}</v-btn>
             </td>
             <td class="text-xs-center">{{ props.item.date }}</td>
             <td class="text-xs-center">{{ props.item.TotalPiece }}</td>
@@ -245,6 +245,9 @@ export default {
     },
     print(invoice) {
       ipcRenderer.send("printPDF", invoice);
+    },
+    show(invoice) {
+      ipcRenderer.send("showPDF", invoice);
     },
     rec(invoice) {
       ipcRenderer.send("savePDF", invoice);

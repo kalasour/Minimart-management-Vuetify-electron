@@ -279,6 +279,15 @@ export default {
         ipcRenderer.send("readyToPrintPDF");
       }, 500);
     });
+
+    ipcRenderer.on("showPDF", (event, Invoice) => {
+      //   document.body.innerHTML = content;
+      this.Statement = [];
+      this.List = [];
+      this.Invoice = Invoice;
+      this.List = Object.values(this.Invoice.List);
+    
+    });
     ipcRenderer.on("savePDF", (event, Invoice) => {
       //   document.body.innerHTML = content;
       this.Statement = [];
