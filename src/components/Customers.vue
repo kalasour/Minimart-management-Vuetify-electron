@@ -119,6 +119,7 @@ export default {
     }
   },
   created() {
+    this.clearSF()
     // this.initialize();
   },
 
