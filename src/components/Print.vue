@@ -5,7 +5,12 @@
     pa-0
     ma-0
   >Please setting store information</v-container>
-  <v-container pa-0 ma-0 v-else-if="this.List.length==0" class="text-xs-center light">Error (Empty List!)</v-container>
+  <v-container
+    pa-0
+    ma-0
+    v-else-if="this.List.length==0"
+    class="text-xs-center light"
+  >Error (Empty List!)</v-container>
   <v-container pa-0 ma-0 v-else-if="this.Statement.length!=0" class="text-xs-center light" px-1>
     <v-layout row wrap xs12>
       <!-- <v-flex xs6>
@@ -74,10 +79,7 @@
           <table align="right" width="auto" border="1" cellspacing="0">
             <tr>
               <th align="left" style="padding:0 10px;">Discounted :</th>
-              <td
-                align="right"
-                style="padding:0 10px;"
-              >- {{this.Statement.TotalDiscounted}}</td>
+              <td align="right" style="padding:0 10px;">- {{this.Statement.TotalDiscounted}}</td>
             </tr>
             <tr>
               <th align="left" style="padding:0 10px;">Subtotal :</th>
@@ -162,16 +164,18 @@
           <tr>
             <th style="border: 1px solid black;" align="center">Item</th>
             <th style="border: 1px solid black;" align="center">Description</th>
-            <th style="border: 1px solid black;" align="center">Unit Cost ($)</th>
-            <th style="border: 1px solid black;" align="center">Quantity</th>
-            <th style="border: 1px solid black;" align="center">Price ($)</th>
+            <th style="border: 1px solid black;" align="center">Price</th>
+            <th style="border: 1px solid black;" align="center">Qt</th>
+            <th style="border: 1px solid black;" align="center">Line Price</th>
+            <th style="border: 1px solid black;" align="center">Tax</th>
           </tr>
           <tr v-for="(n,index) in List" :key="index">
             <td align="left" style="padding-left:10px;">{{n.JM_ID}}</td>
             <td align="left" style="padding-left:10px;">{{n.Detail}}</td>
             <td align="right" style="padding-right:10px;">{{n.Unit_price}}</td>
             <td align="center">{{n.piece}}</td>
-            <td align="right" style="padding-right:10px;">{{n.Price}}</td>
+            <td align="right" style="padding-right:10px;">{{n.Unit_price*n.piece}}</td>
+            <td align="right" style="padding-right:10px;">{{n.Tax}}</td>
           </tr>
         </table>
       </v-flex>
@@ -181,18 +185,18 @@
           <br>
           <table align="right" width="auto" border="1" cellspacing="0">
             <tr>
-              <th align="left" style="padding:0 10px;">Discounted :</th>
-              <td
-                align="right"
-                style="padding:0 10px;"
-              >- {{(parseFloat(this.Invoice.TotalDiscounted)).toFixed(2)}}</td>
-            </tr>
-            <tr>
               <th align="left" style="padding:0 10px;">Subtotal :</th>
               <td
                 align="right"
                 style="padding:0 10px;"
               >{{(this.Invoice.TotalPrice-this.Invoice.TotalTax+parseFloat(this.Invoice.TotalDiscounted)).toFixed(2)}}</td>
+            </tr>
+            <tr>
+              <th align="left" style="padding:0 10px;">Discounted :</th>
+              <td
+                align="right"
+                style="padding:0 10px;"
+              >- {{(parseFloat(this.Invoice.TotalDiscounted)).toFixed(2)}}</td>
             </tr>
             <tr>
               <th align="left" style="padding:0 10px;">Taxes :</th>
@@ -286,7 +290,6 @@ export default {
       this.List = [];
       this.Invoice = Invoice;
       this.List = Object.values(this.Invoice.List);
-    
     });
     ipcRenderer.on("savePDF", (event, Invoice) => {
       //   document.body.innerHTML = content;
