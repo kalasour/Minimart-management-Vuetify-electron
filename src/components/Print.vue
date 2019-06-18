@@ -33,8 +33,7 @@
         >
           <h1>SUMMARY SALE</h1>
 
-          <table align="right" width="auto" border="1" cellspacing="0">
-          </table>
+          <table align="right" width="auto" border="1" cellspacing="0"></table>
         </v-img>
       </v-flex>
       <v-flex xs12>
@@ -65,15 +64,14 @@
               <th align="left" style="padding:0 10px;">Subtotal :</th>
               <td align="right" style="padding:0 10px;">{{this.Summarry.TotalSalenet}}</td>
             </tr>
-             <tr>
+            <tr>
               <th align="left" style="padding:0 10px;">Taxes :</th>
               <td align="right" style="padding:0 10px;">{{this.Summarry.TotalTax}}</td>
             </tr>
-             <tr>
+            <tr>
               <th align="left" style="padding:0 10px;">Total :</th>
               <td align="right" style="padding:0 10px;">{{this.Summarry.TotalPrice}}</td>
             </tr>
-           
           </table>
           <br>
         </v-flex>
@@ -236,16 +234,16 @@
           <tr>
             <th style="border: 1px solid black;" align="center">Item</th>
             <th style="border: 1px solid black;" align="center">Description</th>
-            <th style="border: 1px solid black;" align="center">Price</th>
-            <th style="border: 1px solid black;" align="center">Qt</th>
-            <th style="border: 1px solid black;" align="center">Line Price</th>
+            <th style="border: 1px solid black;" align="center">Unit price</th>
+            <th style="border: 1px solid black;" class="mx-3" align="center">{{' '}}Qt{{' '}}</th>
+            <th style="border: 1px solid black;" align="center">Amount</th>
             <th style="border: 1px solid black;" align="center">Tax</th>
           </tr>
           <tr v-for="(n,index) in List" :key="index">
             <td align="left" style="padding-left:10px;">{{n.JM_ID}}</td>
             <td align="left" style="padding-left:10px;">{{n.Detail}}</td>
             <td align="right" style="padding-right:10px;">{{n.Unit_price}}</td>
-            <td align="center">{{n.piece}}</td>
+            <td align="center"  style="padding-left:20px;">{{n.piece}}</td>
             <td align="right" style="padding-right:10px;">{{n.Unit_price*n.piece}}</td>
             <td align="right" style="padding-right:10px;">{{n.Tax}}</td>
           </tr>
@@ -340,7 +338,7 @@ export default {
     ipcRenderer.on("saveStatement", (event, statement) => {
       this.Invoice = [];
       this.List = [];
-       this.Summarry = [];
+      this.Summarry = [];
       this.Statement = statement;
       this.List = Object.values(this.Statement.List);
       setTimeout(() => {
@@ -351,7 +349,7 @@ export default {
       //   document.body.innerHTML = content;
       this.Statement = [];
       this.List = [];
-       this.Summarry = [];
+      this.Summarry = [];
       this.Invoice = Invoice;
       this.List = Object.values(this.Invoice.List);
       setTimeout(() => {
@@ -363,7 +361,7 @@ export default {
       //   document.body.innerHTML = content;
       this.Statement = [];
       this.List = [];
-       this.Summarry = [];
+      this.Summarry = [];
       this.Invoice = Invoice;
       this.List = Object.values(this.Invoice.List);
     });
@@ -371,7 +369,7 @@ export default {
       //   document.body.innerHTML = content;
       this.Statement = [];
       this.List = [];
-       this.Summarry = [];
+      this.Summarry = [];
       this.Invoice = Invoice;
       this.List = Object.values(this.Invoice.List);
       setTimeout(() => {
@@ -382,7 +380,7 @@ export default {
       //   document.body.innerHTML = content;
       this.Statement = [];
       this.List = [];
-       this.Summarry = [];
+      this.Summarry = [];
       this.Summarry = Summarry;
       this.List = Object.values(this.Summarry.List);
       setTimeout(() => {
@@ -394,7 +392,7 @@ export default {
       //   document.body.innerHTML = content;
       this.Statement = [];
       this.List = [];
-       this.Summarry = [];
+      this.Summarry = [];
       this.Summarry = Summarry;
       this.List = Object.values(this.Summarry.List);
     });
@@ -402,7 +400,7 @@ export default {
       //   document.body.innerHTML = content;
       this.Statement = [];
       this.List = [];
-       this.Summarry = [];
+      this.Summarry = [];
       this.Summarry = Summarry;
       this.List = Object.values(this.Summarry.List);
       setTimeout(() => {
@@ -414,7 +412,7 @@ export default {
     Invoice: [],
     List: [],
     Statement: [],
-    Summarry:[]
+    Summarry: []
   }),
   computed: {
     // JSONInformation:{},
