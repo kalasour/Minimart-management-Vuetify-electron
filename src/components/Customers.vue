@@ -70,9 +70,7 @@
               <v-icon small @click="deleteItem(props.item)">delete</v-icon>
             </td>
           </template>
-          <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Refresh</v-btn>
-          </template>
+           
         </v-data-table>
       </div>
     </v-app>

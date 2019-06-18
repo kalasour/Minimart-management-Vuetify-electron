@@ -100,6 +100,7 @@ export default {
         { title: "Stock", icon: "table_chart", path: "/stock" },
         { title: "Customers", icon: "supervisor_account", path: "/customers" },
         { title: "Report", icon: "timeline", path: "/report" },
+        { title: "Summary Sale", icon: "attach_money", path: "/sum_sale" },
         { title: "About", icon: "question_answer", path: "/about" }
       ],
       mini: true,

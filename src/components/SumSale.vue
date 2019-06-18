@@ -3,7 +3,7 @@
     <v-app id="inspire">
       <div>
         <v-toolbar flat>
-          <v-toolbar-title>Report</v-toolbar-title>
+          <v-toolbar-title>Summary Sale</v-toolbar-title>
           <v-divider class="mx-2" inset vertical></v-divider>
           <template v-if="SearchField!==''">
             <v-chip close color="blue" text-color="white" @input="clearSF">
@@ -72,7 +72,9 @@
 
           <v-dialog v-model="dialogList" max-width="500">
             <v-card>
-              <v-card-text  class="text-xs-center"><h3>Note</h3></v-card-text>
+              <v-card-text class="text-xs-center">
+                <h3>Note</h3>
+              </v-card-text>
               <v-card-text>
                 <span
                   class="grey--text"
@@ -126,42 +128,95 @@
             </div>
           </v-dialog>
         </v-toolbar>
-        <v-data-table :rows-per-page-items="[{text:'All',value:-1}]" :headers="headers" :items="Invoice.filter(filterTable)" class="elevation-1">
+        <v-data-table
+          :rows-per-page-items="[{text:'All',value:-1}]"
+          :headers="headers"
+          :items="Invoice.filter(filterTable)"
+          class="elevation-1"
+        >
           <template v-slot:items="props">
-            <td>{{ props.item.InvoiceNumber}}</td>
-            <td class="text-xs-center">
-              <v-btn @click="show(props.item)">{{props.item.Customer.Name}}</v-btn>
+            <td>
+              <v-btn @click="show(props.item)">{{ props.item.InvoiceNumber}}</v-btn>
             </td>
-            <td class="text-xs-center">{{ props.item.date }}</td>
-            <td class="text-xs-center">{{ props.item.TotalPiece }}</td>
-            <!-- <td class="text-xs-center">{{ props.item.Paid }}</td> -->
-            <td class="justify-center">
-              <div class="text-xs-center" v-if="parseFloat(props.item.Paid)>=props.item.TotalPrice">
-                <span class="green--text">Paid</span>
-                <v-icon small color="green" class="mr-2">verified_user</v-icon>
-              </div>
-              <div class="text-xs-center" v-else>
-                <span class="red--text">Due</span>
-                <v-icon small color="red" class="mr-2">clear</v-icon>
-              </div>
+            <td class="text-xs-center">{{props.item.Customer.Name}}</td>
+            <td class="text-xs-center">{{ props.item.TotalPrice-props.item.TotalTax }}</td>
+            <td class="text-xs-center">{{ props.item.TotalTax }}</td>
+            <td class="text-xs-center">{{ props.item.TotalPrice }}</td>
+          </template>
+        </v-data-table>
+        <v-data-table
+          :rows-per-page-items="[{text:'All',value:-1}]"
+          :headers="headers"
+          :items="[Invoice.filter(filterTable)]"
+          class="elevation-1 mt-0"
+          hide-actions
+          hide-headers
+        >
+          <template v-slot:items="props">
+            <td class="px-0 mx-0 grey darken-1">
+              <v-layout row justify-space-around align-center>
+                <v-flex xs4 class="text-xs-center">
+                  <v-hover>
+                    <v-card
+                      @click="ipc('ViewSum')"
+                      style="cursor: pointer"
+                      class="grey darken-1 ma-0 pa-0"
+                      flat
+                      slot-scope="{ hover }"
+                    >
+                      <v-icon :large="hover" class="text-xs-center mx-3">search</v-icon>
+                    </v-card>
+                  </v-hover>
+                </v-flex>
+                <v-flex xs4 class="text-xs-center">
+                  <v-hover>
+                    <v-card
+                      @click="ipc('SaveSum')"
+                      style="cursor: pointer"
+                      class="grey darken-1 ma-0 pa-0"
+                      flat
+                      slot-scope="{ hover }"
+                    >
+                      <v-icon :large="hover" class="mx-3">save</v-icon>
+                    </v-card>
+                  </v-hover>
+                </v-flex>
+                <v-flex xs4 class="text-xs-center">
+                  <v-hover>
+                    <v-card
+                      @click="ipc('PrintSum')"
+                      style="cursor: pointer"
+                      class="grey darken-1 ma-0 pa-0"
+                      flat
+                      slot-scope="{ hover }"
+                    >
+                      <v-icon :large="hover" class="mx-3">local_printshop</v-icon>
+                    </v-card>
+                  </v-hover>
+                </v-flex>
+              </v-layout>
             </td>
-            <td class="text-xs-center">
-              <v-btn
-                :disabled="(props.item.Note==''||props.item.Note==null)"
-                @click="clickList(props.item)"
-              >Note</v-btn>
+            <td class="justify-center align-center grey darken-4 mx-0 px-0">
+              <v-layout row class="justify-center align-center">
+                <v-spacer></v-spacer>
+                <v-btn large block class="text-xs-center" flat>Total</v-btn>
+                <v-spacer></v-spacer>
+                <v-divider vertical></v-divider>
+              </v-layout>
             </td>
-            <!-- <td class="text-xs-center">{{ props.item.Note }}</td> -->
-            <td class="justify-center align-center layout px-1">
-              <!-- <v-icon small @click="deleteItem(props.item)">local_printshop</v-icon> -->
-              <!-- <v-icon small class="mr-2" @click="handleClick(props.item)">assignment</v-icon> -->
-              <v-icon small class="mr-2" @click="rec(props.item)">save</v-icon>
-              <v-icon small class="mr-2" @click="print(props.item)">local_printshop</v-icon>
-              <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
-              <v-icon small @click="deleteItem(props.item)">delete</v-icon>
+            <td
+              class="text-xs-right grey darken-4"
+            >{{ props.item.map(a=>a.TotalPrice-a.TotalTax).reduce((a,b)=>a+b,0).toFixed(2) }}</td>
+            <td
+              class="text-xs-right grey darken-4"
+            >{{ props.item.map(a=>parseFloat(a.TotalTax)).reduce((a,b)=>a+b,0).toFixed(2) }}</td>
+            <td class="text-xs-center grey darken-4">
+              {{ props.item .map(item => item.TotalPrice)
+              .reduce((a, b) => {
+              return parseFloat(a) + parseFloat(b);
+              }, 0).toFixed(2) }}
             </td>
           </template>
-           
         </v-data-table>
       </div>
     </v-app>
@@ -174,7 +229,7 @@ import moment from "moment";
 import { mapMutations, mapState } from "vuex";
 import { ipcRenderer } from "electron";
 import InvoiceDetail from "./Invoice";
-import EditInvoice from './EditInvoice';
+import EditInvoice from "./EditInvoice";
 import ItemList from "./Report_customer";
 import Vue from "vue";
 Vue.component("InvoiceDetail", InvoiceDetail);
@@ -196,14 +251,23 @@ export default {
         text: "Invoice No.",
         value: "InvoiceNumber",
         align: "left",
-        sortable: true
+        sortable: true,
+        width: "30%"
       },
-      { text: "Customer Name", value: "Customer.Name", align: "center" },
-      { text: "Date", sortable: false, align: "center" },
-      { text: "Total Amount", sortable: false, align: "center" },
-      { text: "Payment Status", sortable: false, align: "center" },
-      { text: "Note", sortable: false, align: "center" },
-      { text: "Action", sortable: false, align: "center" }
+      {
+        text: "Customer Name",
+        value: "Customer.Name",
+        align: "center",
+        width: "25%"
+      },
+      {
+        text: "Netsale",
+        value: "(TotalPrice-TotalTax)",
+        align: "center",
+        width: "15%"
+      },
+      { text: "Taxes", value: "TotalTax", align: "center", width: "15%" },
+      { text: "Total", value: "TotalPrice", align: "center", width: "15%" }
     ],
     editedIndex: -1,
     SelectedCustomer: {},
@@ -250,13 +314,32 @@ export default {
     rec(invoice) {
       ipcRenderer.send("savePDF", invoice);
     },
+    ipc(command) {
+      var sum = {};
+      sum.List = this.Invoice.filter(this.filterTable);
+      sum.TotalSalenet = this.Invoice.filter(this.filterTable)
+        .map(a => a.TotalPrice - a.TotalTax)
+        .reduce((a, b) => a + b, 0)
+        .toFixed(2);
+      sum.TotalTax = this.Invoice.filter(this.filterTable)
+        .map(a => parseFloat(a.TotalTax))
+        .reduce((a, b) => a + b, 0)
+        .toFixed(2);
+      sum.TotalPrice = this.Invoice.filter(this.filterTable)
+        .map(item => item.TotalPrice)
+        .reduce((a, b) => {
+          return parseFloat(a) + parseFloat(b);
+        }, 0)
+        .toFixed(2);
+      ipcRenderer.send(command, sum);
+    },
     clickList(item) {
       this.itemSelected = item;
       this.listSelected = item.List;
       this.dialogList = true;
     },
     clickCustomer(lastCustomer) {
-      this.SelectedCustomer=lastCustomer
+      this.SelectedCustomer = lastCustomer;
       this.customerSelected = lastCustomer;
       this.dialogCustomer = true;
     },
@@ -265,7 +348,7 @@ export default {
       this.$store.commit("SetSF", "");
     },
     look(data) {
-      console.log(data);
+      alert(data);
     },
     ...mapMutations(["initialize", "UpdateInvoice"]),
     filterTable(element) {
@@ -274,11 +357,12 @@ export default {
           .toLowerCase()
           .indexOf(
             (this.SearchField == null ? "" : this.SearchField).toLowerCase()
-          ) > -1||(element.Customer.Name == null ? "" : element.Customer.Name)
-          .toLowerCase()
-          .indexOf(
-            (this.SearchField == null ? "" : this.SearchField).toLowerCase()
-          ) > -1) &&
+          ) > -1 ||
+          (element.Customer.Name == null ? "" : element.Customer.Name)
+            .toLowerCase()
+            .indexOf(
+              (this.SearchField == null ? "" : this.SearchField).toLowerCase()
+            ) > -1) &&
         (this.dateStart == null ||
           moment(element.date, DateFormat) >= moment(this.dateStart)) &&
         (this.dateEnd == null ||
@@ -286,7 +370,7 @@ export default {
       );
     },
     editItem(item) {
-      this.SelectedInvoice =  Object.assign({}, item);
+      this.SelectedInvoice = Object.assign({}, item);
       this.editedIndex = this.Invoice.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;

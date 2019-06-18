@@ -173,6 +173,26 @@ ipcMain.on("saveStatement", (event, content) => {
   workerWindow.webContents.send("saveStatement", content);
 });
 
+ipcMain.on("PrintSum", (event, content) => {
+  // console.log(content);
+
+  workerWindow.show()
+  workerWindow.focus()
+  workerWindow.webContents.send("PrintSum", content);
+});
+ipcMain.on("ViewSum", (event, content) => {
+  // console.log(content);
+
+  workerWindow.show()
+  workerWindow.focus()
+  workerWindow.webContents.send("ViewSum", content);
+});
+
+ipcMain.on("SaveSum", (event, content) => {
+  workerWindow.show()
+  workerWindow.webContents.send("SaveSum", content);
+});
+
 // when worker window is ready
 ipcMain.on("readyToPrintPDF", (event) => {
   // workerWindow.webContents.printToPDF({}, (error, data) => {

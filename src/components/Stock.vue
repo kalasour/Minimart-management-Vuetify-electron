@@ -65,6 +65,13 @@
                     <v-flex xs12 sm6 md4>
                       <v-checkbox v-model="editedItem.TaxActive" color="#880E4F" label="Tax active"></v-checkbox>
                     </v-flex>
+                     <v-flex xs12 sm6 md4>
+                      <v-text-field
+                        v-model="editedItem.Cost"
+                        type="number"
+                        label="Cost"
+                      ></v-text-field>
+                    </v-flex>
                   </v-layout>
                 </v-container>
               </v-card-text>
@@ -102,9 +109,7 @@
               <v-icon small @click="deleteItem(props.item)">delete</v-icon>
             </td>
           </template>
-          <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Refresh</v-btn>
-          </template>
+           
         </v-data-table>
       </div>
     </v-app>

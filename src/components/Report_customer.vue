@@ -152,9 +152,6 @@
           <v-icon small class="mr-2" @click="ipc('printPDF', props.item)">local_printshop</v-icon>
         </td>
       </template>
-      <template v-slot:no-data>
-        <v-btn color="primary" @click="initialize">Refresh</v-btn>
-      </template>
     </v-data-table>
     <v-layout>
       <v-flex xs12 sm6 py2 pt-3 offset-sm9>

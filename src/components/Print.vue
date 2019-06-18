@@ -10,7 +10,83 @@
     ma-0
     v-else-if="this.List.length==0"
     class="text-xs-center light"
+    {{Summarry}}
   >Error (Empty List!)</v-container>
+  <v-container pa-0 ma-0 v-else-if="this.Summarry.length!=0" class="text-xs-center light" px-1>
+    <v-layout row wrap xs12>
+      <!-- <v-flex xs6>
+        <h5
+          style="color:gray;"
+          class="text-xs-left"
+        >{{new Date().getMonth()+1}}/{{new Date().getDate()}}/{{new Date().getFullYear()}}</h5>
+      </v-flex>
+      <v-flex xs6>
+        <h5 style="color:gray;" class="text-xs-left">Invoice: {{this.Invoice.Customer.Name}}</h5>
+      </v-flex>-->
+      <v-flex xs12>
+        <v-img
+          class="img"
+          :src="require('./../assets/Logo.jpg')"
+          max-height="180"
+          position="left center"
+          contain
+        >
+          <h1>SUMMARY SALE</h1>
+          <h1 class="text-xs-center">
+            <h5 style="display: inline;">Please pay check able to</h5>
+            {{' '}}BIM TECH
+          </h1>
+          <table align="right" width="auto" border="1" cellspacing="0">
+          </table>
+        </v-img>
+      </v-flex>
+      <v-flex xs12>
+        <br>
+        <table width="100%" style="border: 1px solid black;" cellspacing="0">
+          <tr>
+            <th style="border: 1px solid black;" align="center">Invoice No.</th>
+            <th style="border: 1px solid black;" align="center">Customer Name</th>
+            <th style="border: 1px solid black;" align="center">Netsale</th>
+            <th style="border: 1px solid black;" align="center">Taxes</th>
+            <th style="border: 1px solid black;" align="center">Total</th>
+          </tr>
+          <tr v-for="(n,index) in List" :key="index">
+            <td align="center" style="padding-left:10px;">{{n.InvoiceNumber}}</td>
+            <td align="center" style="padding-left:10px;">{{n.Customer.Name}}</td>
+            <td align="right" style="padding-left:10px;">{{n.TotalPrice-n.TotalTax}}</td>
+            <td align="right" style="padding-right:10px;">{{n.TotalTax}}</td>
+            <td align="right" style="padding-right:10px;">{{n.TotalPrice}}</td>
+          </tr>
+        </table>
+      </v-flex>
+      <v-flex d-flex xs12>
+        <v-flex xs6></v-flex>
+        <v-flex xs6>
+          <br>
+          <table align="right" width="auto" border="1" cellspacing="0">
+            <tr>
+              <th align="left" style="padding:0 10px;">Total Netsale :</th>
+              <td align="right" style="padding:0 10px;">{{this.Summarry.TotalSalenet}}</td>
+            </tr>
+             <tr>
+              <th align="left" style="padding:0 10px;">Total Tax :</th>
+              <td align="right" style="padding:0 10px;">{{this.Summarry.TotalTax}}</td>
+            </tr>
+             <tr>
+              <th align="left" style="padding:0 10px;">Total :</th>
+              <td align="right" style="padding:0 10px;">{{this.Summarry.TotalPrice}}</td>
+            </tr>
+           
+          </table>
+          <br>
+        </v-flex>
+      </v-flex>
+      <v-flex xs12>
+        <br>
+        <h1>Thank you for your business !!!!!!</h1>
+      </v-flex>
+    </v-layout>
+  </v-container>
   <v-container pa-0 ma-0 v-else-if="this.Statement.length!=0" class="text-xs-center light" px-1>
     <v-layout row wrap xs12>
       <!-- <v-flex xs6>
@@ -258,6 +334,7 @@ export default {
     ipcRenderer.on("printStatement", (event, statement) => {
       this.Invoice = [];
       this.List = [];
+      this.Summarry = [];
       this.Statement = statement;
       this.List = Object.values(this.Statement.List);
       setTimeout(() => {
@@ -267,6 +344,7 @@ export default {
     ipcRenderer.on("saveStatement", (event, statement) => {
       this.Invoice = [];
       this.List = [];
+       this.Summarry = [];
       this.Statement = statement;
       this.List = Object.values(this.Statement.List);
       setTimeout(() => {
@@ -277,6 +355,7 @@ export default {
       //   document.body.innerHTML = content;
       this.Statement = [];
       this.List = [];
+       this.Summarry = [];
       this.Invoice = Invoice;
       this.List = Object.values(this.Invoice.List);
       setTimeout(() => {
@@ -288,6 +367,7 @@ export default {
       //   document.body.innerHTML = content;
       this.Statement = [];
       this.List = [];
+       this.Summarry = [];
       this.Invoice = Invoice;
       this.List = Object.values(this.Invoice.List);
     });
@@ -295,8 +375,40 @@ export default {
       //   document.body.innerHTML = content;
       this.Statement = [];
       this.List = [];
+       this.Summarry = [];
       this.Invoice = Invoice;
       this.List = Object.values(this.Invoice.List);
+      setTimeout(() => {
+        ipcRenderer.send("readyToSave");
+      }, 500);
+    });
+    ipcRenderer.on("PrintSum", (event, Summarry) => {
+      //   document.body.innerHTML = content;
+      this.Statement = [];
+      this.List = [];
+       this.Summarry = [];
+      this.Summarry = Summarry;
+      this.List = Object.values(this.Summarry.List);
+      setTimeout(() => {
+        ipcRenderer.send("readyToPrintPDF");
+      }, 500);
+    });
+
+    ipcRenderer.on("ViewSum", (event, Summarry) => {
+      //   document.body.innerHTML = content;
+      this.Statement = [];
+      this.List = [];
+       this.Summarry = [];
+      this.Summarry = Summarry;
+      this.List = Object.values(this.Summarry.List);
+    });
+    ipcRenderer.on("SaveSum", (event, Summarry) => {
+      //   document.body.innerHTML = content;
+      this.Statement = [];
+      this.List = [];
+       this.Summarry = [];
+      this.Summarry = Summarry;
+      this.List = Object.values(this.Summarry.List);
       setTimeout(() => {
         ipcRenderer.send("readyToSave");
       }, 500);
@@ -305,7 +417,8 @@ export default {
   data: () => ({
     Invoice: [],
     List: [],
-    Statement: []
+    Statement: [],
+    Summarry:[]
   }),
   computed: {
     // JSONInformation:{},

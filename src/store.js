@@ -29,6 +29,7 @@ export default new Vuex.Store({
     async initialize(state) {
       state.Stock = []
       state.Customers = []
+
       await storage.getAll((error, data) => {
         if (error) throw error;
         state.JSONStock = data.Stock;

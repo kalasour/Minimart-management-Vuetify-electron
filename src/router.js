@@ -32,6 +32,11 @@ export default new Router({
       path: '/report',
       name: 'Report',
       component: ()=>import('./components/Report.vue')
+    }
+    ,{
+      path: '/sum_sale',
+      name: 'SumSale',
+      component: ()=>import('./components/SumSale.vue')
     },{
       path: '/print',
       name: 'print',
