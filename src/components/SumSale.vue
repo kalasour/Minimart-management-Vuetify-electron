@@ -261,7 +261,7 @@ export default {
         width: "25%"
       },
       {
-        text: "Netsale",
+        text: "Net Sale",
         value: "(TotalPrice-TotalTax)",
         align: "center",
         width: "15%"

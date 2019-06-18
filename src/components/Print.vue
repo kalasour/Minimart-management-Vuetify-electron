@@ -32,10 +32,7 @@
           contain
         >
           <h1>SUMMARY SALE</h1>
-          <h1 class="text-xs-center">
-            <h5 style="display: inline;">Please pay check able to</h5>
-            {{' '}}BIM TECH
-          </h1>
+
           <table align="right" width="auto" border="1" cellspacing="0">
           </table>
         </v-img>
@@ -46,7 +43,7 @@
           <tr>
             <th style="border: 1px solid black;" align="center">Invoice No.</th>
             <th style="border: 1px solid black;" align="center">Customer Name</th>
-            <th style="border: 1px solid black;" align="center">Netsale</th>
+            <th style="border: 1px solid black;" align="center">Net Sale</th>
             <th style="border: 1px solid black;" align="center">Taxes</th>
             <th style="border: 1px solid black;" align="center">Total</th>
           </tr>
@@ -65,11 +62,11 @@
           <br>
           <table align="right" width="auto" border="1" cellspacing="0">
             <tr>
-              <th align="left" style="padding:0 10px;">Total Netsale :</th>
+              <th align="left" style="padding:0 10px;">Subtotal :</th>
               <td align="right" style="padding:0 10px;">{{this.Summarry.TotalSalenet}}</td>
             </tr>
              <tr>
-              <th align="left" style="padding:0 10px;">Total Tax :</th>
+              <th align="left" style="padding:0 10px;">Taxes :</th>
               <td align="right" style="padding:0 10px;">{{this.Summarry.TotalTax}}</td>
             </tr>
              <tr>
@@ -83,7 +80,6 @@
       </v-flex>
       <v-flex xs12>
         <br>
-        <h1>Thank you for your business !!!!!!</h1>
       </v-flex>
     </v-layout>
   </v-container>
