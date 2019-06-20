@@ -3,35 +3,51 @@
   <v-app>
     <v-card>
       <v-toolbar>
-        <v-combobox
-          auto-select-first
-          autofocus
-          v-model="model"
-          :items="Stock"
-          :label="`Search`"
-          prepend-icon="search"
-          :filter="ItemFilter"
-          @input="updateSearchField(model)"
-        >
-          <template v-slot:selection="data">
-            <v-chip :selected="data.selected" close class="chip--select-multi">{{look(data.parent)}}</v-chip>
-          </template>
-          <template v-slot:item="data">
-            <template v-if="typeof data.item !== 'object'">
-              <v-list-tile-content v-text="data.item"></v-list-tile-content>
-            </template>
-            <template v-else>
-              <v-layout dark>
-                <v-flex xs12 sm6 py2 pt-6>{{data.item.Detail}}</v-flex>
-                <v-flex xs12 sm6 py2 pt-6>Left : {{data.item.QT}} pcs.</v-flex>
-              </v-layout>
-            </template>
-          </template>
-        </v-combobox>
+        <v-layout class="align-center justify-center">
+          <v-flex xs10>
+            <v-combobox
+              auto-select-first
+              autofocus
+              v-model="model"
+              :items="Stock"
+              :label="`Search`"
+              prepend-icon="search"
+              :filter="ItemFilter"
+              @input="updateSearchField(model)"
+            >
+              <template v-slot:selection="data">
+                <v-chip
+                  :selected="data.selected"
+                  close
+                  class="chip--select-multi"
+                >{{look(data.parent)}}</v-chip>
+              </template>
+              <template v-slot:item="data">
+                <template v-if="typeof data.item !== 'object'">
+                  <v-list-tile-content v-text="data.item"></v-list-tile-content>
+                </template>
+                <template v-else>
+                  <v-layout dark>
+                    <v-flex xs12 sm6 py2 pt-6>{{data.item.Detail}}</v-flex>
+                    <v-flex xs12 sm6 py2 pt-6>Left : {{data.item.QT}} pcs.</v-flex>
+                  </v-layout>
+                </template>
+              </template>
+            </v-combobox>
+          </v-flex>
+          <v-flex xs2 align-center justify-center>
+            <v-switch v-model="ActiveDis" label="Active Discounts"></v-switch>
+          </v-flex>
+        </v-layout>
       </v-toolbar>
     </v-card>
 
-    <v-data-table :rows-per-page-items="[{text:'All',value:-1}]" :headers="headers" :items="List" class="elevation-1">
+    <v-data-table
+      :rows-per-page-items="[{text:'All',value:-1}]"
+      :headers="head"
+      :items="List"
+      class="elevation-1"
+    >
       <template v-slot:items="props">
         <td class="justify-center align-center layout">
           <v-icon small :disabled="props.item.piece<=1" @click="DecreasePiece(props.item)">remove</v-icon>
@@ -45,13 +61,13 @@
         <td class="text-xs-center">{{ props.item.Barcode_ID }}</td>
         <td class="text-xs-left">{{ props.item.Detail }}</td>
         <td class="text-xs-left">{{ props.item.Unit_price }}</td>
-        <td>
+        <td :v-if="ActiveDis">
           <div class="text-xs-center justify-center align-center layout">
             -
             <v-text-field type="number" class="px-2" v-model="props.item.Discount_per"></v-text-field>%
           </div>
         </td>
-        <td>
+        <td :v-if="ActiveDis">
           <div class="text-xs-center justify-center align-center layout">
             -
             <v-text-field type="number" class="px-2" v-model=" props.item.Discount_amount"></v-text-field>.-
@@ -152,6 +168,7 @@ export default {
       Note: "",
       CustomerID: "",
       Paid: "",
+      ActiveDis: false,
       headers: [
         { text: "Qty.", sortable: false, align: "center" },
         {
@@ -243,7 +260,7 @@ export default {
         text4.indexOf(searchText) > -1
       );
     },
-    
+
     async Sale() {
       // console.log(new_invoice)
       // console.log(moment(now_date,DateFormat).format('D'))
@@ -267,6 +284,7 @@ export default {
         customer => customer.ID === this.CustomerID
       );
       new_invoice.List = { ...this.List };
+      new_invoice.ActiveDis = this.ActiveDis;
       new_invoice.date = now_date;
       new_invoice.Note = this.Note;
       new_invoice.Paid = this.Paid;
@@ -391,6 +409,20 @@ export default {
     }
   },
   computed: {
+    head() {
+      if (this.ActiveDis) return this.headers;
+      else
+        return this.headers
+          .map(item => {
+            if (
+              item.value != "Discount_per" &&
+              item.value != "Discount_amount"
+            ) {
+              return item;
+            }
+          })
+          .filter(item => item != null);
+    },
     ...mapState([
       "Invoice",
       "SearchField",
