@@ -61,13 +61,13 @@
         <td class="text-xs-center">{{ props.item.Barcode_ID }}</td>
         <td class="text-xs-left">{{ props.item.Detail }}</td>
         <td class="text-xs-left">{{ props.item.Unit_price }}</td>
-        <td :v-if="ActiveDis">
+        <td v-if="ActiveDis">
           <div class="text-xs-center justify-center align-center layout">
             -
             <v-text-field type="number" class="px-2" v-model="props.item.Discount_per"></v-text-field>%
           </div>
         </td>
-        <td :v-if="ActiveDis">
+        <td v-if="ActiveDis">
           <div class="text-xs-center justify-center align-center layout">
             -
             <v-text-field type="number" class="px-2" v-model=" props.item.Discount_amount"></v-text-field>.-
