@@ -232,7 +232,7 @@
         <br>
         <table width="100%" style="border: 1px solid black;" cellspacing="0">
           <tr>
-            <th style="border: 1px solid black;" align="center">Item</th>
+            <th v-if="!Invoice.isOpTicket" style="border: 1px solid black;" align="center">Item</th>
             <th style="border: 1px solid black;" align="center">Description</th>
             <th style="border: 1px solid black;" align="center">Unit price</th>
             <th style="border: 1px solid black;" class="mx-3" align="center">{{' '}}Qt{{' '}}</th>
@@ -240,10 +240,10 @@
             <th style="border: 1px solid black;" align="center">Tax</th>
           </tr>
           <tr v-for="(n,index) in List" :key="index">
-            <td align="left" style="padding-left:10px;">{{n.JM_ID}}</td>
+            <td v-if="!Invoice.isOpTicket" align="left" style="padding-left:10px;">{{n.JM_ID}}</td>
             <td align="left" style="padding-left:10px;">{{n.Detail}}</td>
             <td align="right" style="padding-right:10px;">{{n.Unit_price}}</td>
-            <td align="center"  style="padding-left:20px;">{{n.piece}}</td>
+            <td align="center" style="padding-left:20px;">{{n.piece}}</td>
             <td align="right" style="padding-right:10px;">{{n.Unit_price*n.piece}}</td>
             <td align="right" style="padding-right:10px;">{{n.Tax}}</td>
           </tr>
@@ -261,9 +261,10 @@
                 style="padding:0 10px;"
               >{{(this.Invoice.TotalPrice-this.Invoice.TotalTax+parseFloat(this.Invoice.TotalDiscounted)).toFixed(2)}}</td>
             </tr>
-            <tr>
-              <th align="left" style="padding:0 10px;">Discounted :</th>
+            <tr v-if="!Invoice.isOpTicket">
+              <th v-if="!Invoice.isOpTicket" align="left" style="padding:0 10px;">Discounted :</th>
               <td
+                v-if="!Invoice.isOpTicket"
                 align="right"
                 style="padding:0 10px;"
               >- {{(parseFloat(this.Invoice.TotalDiscounted)).toFixed(2)}}</td>

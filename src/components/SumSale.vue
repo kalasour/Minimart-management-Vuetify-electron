@@ -362,7 +362,7 @@ export default {
             .toLowerCase()
             .indexOf(
               (this.SearchField == null ? "" : this.SearchField).toLowerCase()
-            ) > -1) &&
+            ) > -1) &&!element.isOpTicket&&
         (this.dateStart == null ||
           moment(element.date, DateFormat) >= moment(this.dateStart)) &&
         (this.dateEnd == null ||

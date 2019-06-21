@@ -41,6 +41,10 @@ export default new Router({
       path: '/print',
       name: 'print',
       component: ()=>import('./components/Print.vue')
+    },{
+      path: '/openTicket',
+      name: 'openTicket',
+      component: ()=>import('./views/OpenTicket.vue')
     },
     {
       path: '*',

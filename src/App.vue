@@ -2,7 +2,7 @@
   <v-app dark>
     <v-toolbar v-if="this.$route.path!=='/print'">
       <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
-      <v-toolbar-title>Mintmart management</v-toolbar-title>
+      <v-toolbar-title>Minimart management</v-toolbar-title>
       <v-spacer></v-spacer>
 
       <Searchbar></Searchbar>
@@ -11,7 +11,14 @@
       <v-container>
         <router-view></router-view>
       </v-container>
-      <v-navigation-drawer v-if="this.$route.path!=='/print'" :mini-variant="mini" v-model="drawer" absolute stateless width="250">
+      <v-navigation-drawer
+        v-if="this.$route.path!=='/print'"
+        :mini-variant="mini"
+        v-model="drawer"
+        absolute
+        stateless
+        width="250"
+      >
         <div @mouseover="mini=false" @mouseout="mini=true" absolute>
           <v-list class="pa-1">
             <v-list-tile avatar tag="div">
@@ -101,6 +108,7 @@ export default {
         { title: "Customers", icon: "supervisor_account", path: "/customers" },
         { title: "Report", icon: "timeline", path: "/report" },
         { title: "Summary Sale", icon: "attach_money", path: "/sum_sale" },
+        { title: "Open Ticket", icon: "receipt", path: "/openTicket" },
         { title: "About", icon: "question_answer", path: "/about" }
       ],
       mini: true,
@@ -122,7 +130,7 @@ export default {
   },
   created() {
     this.initialize();
-    ipcRenderer.on("toPrint",async event => {
+    ipcRenderer.on("toPrint", async event => {
       this.$router.push({ path: "/print" });
     });
     ipcRenderer.send("toPrint");
@@ -146,7 +154,7 @@ export default {
     },
 
     async save() {
-       ipcRenderer.send("Refresh");
+      ipcRenderer.send("Refresh");
       this.UpdateInformation(this.editedItem);
       this.close();
     }

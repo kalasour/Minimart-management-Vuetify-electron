@@ -1,6 +1,6 @@
 <template>
   <v-text-field
-  v-if="this.$route.path!=='/'"
+  v-if="this.$route.path!=='/'&&this.$route.path!=='/openTicket'"
     v-model="model"
     :label="`Search`"
     prepend-icon="search"

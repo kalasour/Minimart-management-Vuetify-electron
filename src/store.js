@@ -15,7 +15,8 @@ export default new Vuex.Store({
     Invoice: [],
     Customers: [],
     Stock: [],
-    List: []
+    List: [],
+    TicketList: []
   },
 
   actions: {
