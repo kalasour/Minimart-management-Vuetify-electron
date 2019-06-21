@@ -3,42 +3,31 @@
   <v-app dark>
     <v-card>
       <v-toolbar>
-        <v-layout class="align-center justify-center">
-          <v-flex xs10>
-            <v-combobox
-              auto-select-first
-              autofocus
-              v-model="model"
-              :items="Stock"
-              :label="`Search`"
-              prepend-icon="search"
-              :filter="ItemFilter"
-              @input="updateSearchField(model)"
-            >
-              <template v-slot:selection="data">
-                <v-chip
-                  :selected="data.selected"
-                  close
-                  class="chip--select-multi"
-                >{{look(data.parent)}}</v-chip>
-              </template>
-              <template v-slot:item="data">
-                <template v-if="typeof data.item !== 'object'">
-                  <v-list-tile-content v-text="data.item"></v-list-tile-content>
-                </template>
-                <template v-else>
-                  <v-layout dark>
-                    <v-flex xs12 sm6 py2 pt-6>{{data.item.Detail}}</v-flex>
-                    <v-flex xs12 sm6 py2 pt-6>Left : {{data.item.QT}} pcs.</v-flex>
-                  </v-layout>
-                </template>
-              </template>
-            </v-combobox>
-          </v-flex>
-          <v-flex xs2 align-center justify-center>
-            <v-switch v-model="ActiveDis" label="Active Discounts"></v-switch>
-          </v-flex>
-        </v-layout>
+        <v-combobox
+          auto-select-first
+          autofocus
+          v-model="model"
+          :items="Stock"
+          :label="`Search`"
+          prepend-icon="search"
+          :filter="ItemFilter"
+          @input="updateSearchField(model)"
+        >
+          <template v-slot:selection="data">
+            <v-chip :selected="data.selected" close class="chip--select-multi">{{look(data.parent)}}</v-chip>
+          </template>
+          <template v-slot:item="data">
+            <template v-if="typeof data.item !== 'object'">
+              <v-list-tile-content v-text="data.item"></v-list-tile-content>
+            </template>
+            <template v-else>
+              <v-layout dark>
+                <v-flex xs12 sm6 py2 pt-6>{{data.item.Detail}}</v-flex>
+                <v-flex xs12 sm6 py2 pt-6>Left : {{data.item.QT}} pcs.</v-flex>
+              </v-layout>
+            </template>
+          </template>
+        </v-combobox>
       </v-toolbar>
     </v-card>
 
@@ -46,8 +35,24 @@
       :rows-per-page-items="[{text:'All',value:-1}]"
       :headers="head"
       :items="List"
+      hide-actions
       class="elevation-1"
     >
+      <template v-slot:footer>
+        <td></td>
+        <td>
+          <v-switch v-model="ActiveDis" hide-details label="Show Discounts"></v-switch>
+        </td>
+        <td></td>
+        <td></td>
+        <td v-if="ActiveDis"></td>
+        <td v-if="ActiveDis"></td>
+        <td></td>
+        <td>
+          <p class="text-xs-center justify-center my-0">{{List.length}} items</p>
+        </td>
+        <td></td>
+      </template>
       <template v-slot:items="props">
         <td class="justify-center align-center layout">
           <v-icon small :disabled="props.item.piece<=1" @click="DecreasePiece(props.item)">remove</v-icon>
@@ -64,13 +69,27 @@
         <td v-if="ActiveDis">
           <div class="text-xs-center justify-center align-center layout">
             -
-            <v-text-field type="number" class="px-2" v-model="props.item.Discount_per"></v-text-field>%
+            <v-edit-dialog :return-value.sync="props.item.Discount_per" lazy class="text-xs-center">
+              {{ props.item.Discount_per?props.item.Discount_per:0 }}
+              <template v-slot:input>
+                <v-text-field v-model="props.item.Discount_per" single-line type="number"></v-text-field>
+              </template>
+            </v-edit-dialog>%
           </div>
         </td>
         <td v-if="ActiveDis">
           <div class="text-xs-center justify-center align-center layout">
             -
-            <v-text-field type="number" class="px-2" v-model=" props.item.Discount_amount"></v-text-field>.-
+            <v-edit-dialog
+              :return-value.sync="props.item.Discount_amount"
+              lazy
+              class="text-xs-center"
+            >
+              {{ props.item.Discount_amount?props.item.Discount_amount:0 }}
+              <template v-slot:input>
+                <v-text-field v-model="props.item.Discount_amount" single-line type="number"></v-text-field>
+              </template>
+            </v-edit-dialog>.-
           </div>
         </td>
         <td class="text-xs-center">{{ CalPrice(props.item) - props.item.Tax }}</td>
@@ -150,7 +169,11 @@
     </v-layout>
   </v-app>
 </template>
-
+<style>
+.text-xs-center .v-menu__activator {
+  justify-content: center;
+}
+</style>
 <script>
 import { mapMutations, mapState } from "vuex";
 import moment from "moment";
