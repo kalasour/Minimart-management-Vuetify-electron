@@ -141,7 +141,11 @@ import moment from "moment";
 import { ipcRenderer } from "electron";
 export default {
   name: "App",
-  created() {},
+  mounted() {
+    if(!this.selected){
+      this.Clear()
+    }
+  },
   data() {
     return {
       customCustomer: true,
@@ -155,6 +159,7 @@ export default {
       Paid: "",
       ActiveDis: false,
       TaxRate: 0,
+      InvoiceNumber: "",
       headers: [
         {
           width: "1%",
@@ -256,7 +261,9 @@ export default {
       new_invoice.isOpTicket = true;
       new_invoice.ActiveDis = this.ActiveDis;
       new_invoice.date = now_date;
+      new_invoice.customCustomer = this.customCustomer;
       new_invoice.Note = this.Note;
+      new_invoice.TaxRate = this.TaxRate;
       new_invoice.Paid = this.Paid;
       new_invoice.TotalTax = this.TotalTaxes();
       new_invoice.SubTotal = this.TotalPrice();
@@ -398,36 +405,27 @@ export default {
   created() {
     this.$store.commit("SetSF", "");
   },
+  props: {
+    selected: Object
+  },
   watch: {
-    // Enter: function() {
-    //   if (this.Enter == "" || this.Enter == null) return;
-    //   // console.log(this.SearchField)
-    //   var Sindex = this.Enter - 1;
-    //   if (Sindex > -1) {
-    //     var Findex = this.List.map(item => {
-    //       return item.index;
-    //     }).indexOf(this.JSONStock[Sindex].index);
-    //     // alert(Findex)
-    //     if (Findex != -1) {
-    //       // if (this.List[Findex].piece < this.List[Findex].QT)
-    //       this.List[Findex].piece++;
-    //       // else alert("Out of stock!");
-    //       this.Enter = "";
-    //       return;
-    //     }
-    //     // if (this.JSONStock[this.Enter].QT < 1) {
-    //     //   alert("Out of stock!!");
-    //     //   this.Enter = "";
-    //     //   return;
-    //     // }
-    //     this.JSONStock[Sindex].piece = 1;
-    //     this.JSONStock[Sindex].Discounted = 0;
-    //     this.List.unshift(Object.assign({}, this.JSONStock[Sindex]));
-    //   } else if (this.Enter != null) {
-    //     // alert("Not founded in stock!!");
-    //   }
-    //   this.Enter = "";
-    // }
+    selected: async function() {
+      this.Clear();
+      this.Paid = this.selected.Paid;
+      this.date = moment(this.selected.date, "MMMM Do YYYY, h:mm:ss a").format(
+        "YYYY-MM-DD"
+      );
+      this.CustomerID = this.selected.Customer.ID;
+      this.CustomerName = this.selected.Customer.Name;
+      this.Note = this.selected.Note;
+      this.InvoiceNumber = this.selected.InvoiceNumber;
+      await Object.values(this.selected.List).map(item=>{
+         this.TicketList.push(item)
+       });
+      this.ActiveDis = this.selected.ActiveDis;
+      this.TaxRate = this.selected.TaxRate;
+      this.customCustomer = this.selected.customCustomer;
+    }
   }
 };
 </script>

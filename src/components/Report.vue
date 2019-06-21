@@ -64,9 +64,16 @@
           <v-icon v-if="dateEnd!==null" @click="dateEnd = null">close</v-icon>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="1200px">
-            <EditInvoice v-bind:selected="SelectedInvoice"/>
+            <EditInvoice  v-bind:selected="SelectedInvoice"/>
             <div class="text-xs-right" dark>
               <v-btn @click="dialog=false">Close</v-btn>
+            </div>
+          </v-dialog>
+
+          <v-dialog v-model="dialogOPT" max-width="1200px">
+            <OpenTicket  v-bind:selected="SelectedInvoice"/>
+            <div class="text-xs-right" dark>
+              <v-btn @click="dialogOPT=false">Close</v-btn>
             </div>
           </v-dialog>
 
@@ -157,7 +164,8 @@
               <!-- <v-icon small class="mr-2" @click="handleClick(props.item)">assignment</v-icon> -->
               <v-icon small class="mr-2" @click="rec(props.item)">save</v-icon>
               <v-icon small class="mr-2" @click="print(props.item)">local_printshop</v-icon>
-              <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
+              <v-icon small v-if="props.item.isOpTicket" class="mr-2" @click="editTicker(props.item)">edit</v-icon>
+              <v-icon small v-else class="mr-2" @click="editItem(props.item)">edit</v-icon>
               <v-icon small @click="deleteItem(props.item)">delete</v-icon>
             </td>
           </template>
@@ -177,9 +185,11 @@ import InvoiceDetail from "./Invoice";
 import EditInvoice from './EditInvoice';
 import ItemList from "./Report_customer";
 import Vue from "vue";
+import OpenTicketVue from '../views/OpenTicket.vue';
 Vue.component("InvoiceDetail", InvoiceDetail);
 Vue.component("EditInvoice", EditInvoice);
 Vue.component("ItemList", ItemList);
+Vue.component("OpenTicket", OpenTicketVue);
 const DateFormat = "MMMM Do YYYY";
 export default {
   data: () => ({
@@ -191,6 +201,7 @@ export default {
     dialog: false,
     dialogCustomer: false,
     dialogList: false,
+    dialogOPT:false,
     headers: [
       {
         text: "Invoice No.",
@@ -213,7 +224,7 @@ export default {
     listSelected: {},
     customerSelected: {},
     dateStart: null,
-    dateEnd: null
+    dateEnd: null,
   }),
 
   computed: {
@@ -290,6 +301,12 @@ export default {
       this.editedIndex = this.Invoice.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
+    },
+    editTicker(item) {
+      this.SelectedInvoice =  Object.assign({}, item);
+      this.editedIndex = this.Invoice.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.dialogOPT = true;
     },
 
     deleteItem(item) {
