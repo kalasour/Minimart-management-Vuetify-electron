@@ -1,6 +1,6 @@
 
   <template>
-  <v-app>
+  <v-app dark>
     <v-card>
       <v-toolbar>
         <v-btn flat large @click="NewItem">
@@ -59,7 +59,11 @@
 
               <v-layout pt-2 row wrap mb-0>
                 <v-flex xs6>
-                  Invoice number : {{new Date().getFullYear()}} - {{(parseInt((Invoice[Invoice.length-1]==null)?0:Invoice[Invoice.length-1].ID)+1).toString().padStart(3, "0")}}
+                  Invoice number :
+                  <span
+                    v-if="!selected"
+                  >{{new Date().getFullYear()}} - {{(parseInt((Invoice[Invoice.length-1]==null)?0:Invoice[Invoice.length-1].ID)+1).toString().padStart(3, "0")}}</span>
+                  <span v-else>{{InvoiceNumber}}</span>
                   <v-autocomplete
                     v-if="!customCustomer"
                     v-model="CustomerID"
@@ -142,8 +146,8 @@ import { ipcRenderer } from "electron";
 export default {
   name: "App",
   mounted() {
-    if(!this.selected){
-      this.Clear()
+    if (!this.selected) {
+      this.Clear();
     }
   },
   data() {
@@ -271,11 +275,20 @@ export default {
       new_invoice.TotalDiscounted = 0;
       new_invoice.TotalOrdered = this.TotalOrdered();
       new_invoice.TotalPiece = this.TotalPiece();
-      await this.CreateInvoice(new_invoice);
+      if (!this.selected) await this.CreateInvoice(new_invoice);
+      else {
+        new_invoice.InvoiceNumber=this.InvoiceNumber
+        await Object.assign(
+        this.Invoice[
+          this.Invoice.findIndex(s => s.InvoiceNumber === this.InvoiceNumber)
+        ],
+        new_invoice
+      );
+      }
       ipcRenderer.send("printPDF", new_invoice);
       this.UpdateInvoice();
       this.UpdateStock();
-      this.Clear();
+      if(!this.selected)this.Clear();
     },
     Clear() {
       this.TicketList.splice(0, this.TicketList.length);
@@ -419,9 +432,9 @@ export default {
       this.CustomerName = this.selected.Customer.Name;
       this.Note = this.selected.Note;
       this.InvoiceNumber = this.selected.InvoiceNumber;
-      await Object.values(this.selected.List).map(item=>{
-         this.TicketList.push(item)
-       });
+      await Object.values(this.selected.List).map(item => {
+        this.TicketList.push(item);
+      });
       this.ActiveDis = this.selected.ActiveDis;
       this.TaxRate = this.selected.TaxRate;
       this.customCustomer = this.selected.customCustomer;

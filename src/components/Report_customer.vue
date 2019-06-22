@@ -7,6 +7,12 @@
           <v-btn @click="dialog=false">Close</v-btn>
         </div>
       </v-dialog>
+      <v-dialog v-model="dialogOPT" max-width="1200px">
+            <OpenTicket  v-bind:selected="SelectedInvoice"/>
+            <div class="text-xs-right" dark>
+              <v-btn @click="dialogOPT=false">Close</v-btn>
+            </div>
+          </v-dialog>
       <v-toolbar-title>Customer statement</v-toolbar-title>
       <v-divider class="mx-2" inset vertical></v-divider>
       <v-flex xs12 sm6 md4>
@@ -147,7 +153,13 @@
         <td class="justify-center align-center layout px-1">
           <!-- <v-icon small @click="deleteItem(props.item)">local_printshop</v-icon> -->
           <v-icon small class="mr-2" @click="ipc('showPDF', props.item)">search</v-icon>
-          <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
+          <v-icon
+            small
+            v-if="props.item.isOpTicket"
+            class="mr-2"
+            @click="editTicker(props.item)"
+          >edit</v-icon>
+          <v-icon small v-else class="mr-2" @click="editItem(props.item)">edit</v-icon>
           <v-icon small class="mr-2" @click="ipc('savePDF', props.item)">save</v-icon>
           <v-icon small class="mr-2" @click="ipc('printPDF', props.item)">local_printshop</v-icon>
         </td>
@@ -197,7 +209,9 @@ import { ipcRenderer } from "electron";
 import { Promise } from "q";
 import EditInvoice from "./EditInvoice";
 import Vue from "vue";
+import OpenTicketVue from '../views/OpenTicket.vue';
 Vue.component("EditInvoice", EditInvoice);
+Vue.component("OpenTicket", OpenTicketVue);
 const DateFormat = "MMMM Do YYYY, h:mm:ss a";
 export default {
   props: {
@@ -211,6 +225,7 @@ export default {
     dialog: false,
     dialogCustomer: false,
     dialogList: false,
+    dialogOPT:false,
     headers: [
       {
         text: "Invoice No.",
@@ -388,6 +403,12 @@ export default {
       this.editedIndex = this.Invoice.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
+    },
+    editTicker(item) {
+      this.SelectedInvoice =  Object.assign({}, item);
+      this.editedIndex = this.Invoice.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.dialogOPT = true;
     },
 
     deleteItem(item) {

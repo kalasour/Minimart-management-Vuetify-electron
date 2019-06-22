@@ -3,7 +3,7 @@
     <v-app id="inspire">
       <div>
         <v-toolbar flat>
-          <v-toolbar-title>Summary Sale</v-toolbar-title>
+          <v-toolbar-title>Profit Sale</v-toolbar-title>
           <v-divider class="mx-2" inset vertical></v-divider>
           <template v-if="SearchField!==''">
             <v-chip close color="blue" text-color="white" @input="clearSF">
@@ -142,6 +142,7 @@
             <td class="text-xs-center">{{ props.item.TotalPrice-props.item.TotalTax }}</td>
             <td class="text-xs-center">{{ props.item.TotalTax }}</td>
             <td class="text-xs-center">{{ props.item.TotalPrice }}</td>
+            <td class="text-xs-center">{{ calProfit(props.item) }}</td>
           </template>
           <template v-slot:footer>
             <td class="px-0 mx-0 grey darken-1">
@@ -187,6 +188,7 @@
                 </v-flex>
               </v-layout>
             </td>
+
             <td class="justify-center align-center grey darken-4 mx-0 px-0">
               <v-layout row class="justify-center align-center">
                 <v-spacer></v-spacer>
@@ -202,7 +204,13 @@
               class="text-xs-center grey darken-4"
             >{{ Invoice.filter(filterTable).map(a=>parseFloat(a.TotalTax)).reduce((a,b)=>a+b,0).toFixed(2) }}</td>
             <td class="text-xs-center grey darken-4">
-              {{ Invoice.filter(filterTable).map(item => item.TotalPrice)
+              {{ Invoice.filter(filterTable) .map(item => item.TotalPrice)
+              .reduce((a, b) => {
+              return parseFloat(a) + parseFloat(b);
+              }, 0).toFixed(2) }}
+            </td>
+            <td class="text-xs-center grey darken-4">
+              {{ Invoice.filter(filterTable).map(item => item.TotalProfit)
               .reduce((a, b) => {
               return parseFloat(a) + parseFloat(b);
               }, 0).toFixed(2) }}
@@ -255,10 +263,11 @@ export default {
         text: "Net Sale",
         value: "(TotalPrice-TotalTax)",
         align: "center",
-        width: "15%"
+        width: "10%"
       },
-      { text: "Taxes", value: "TotalTax", align: "center", width: "15%" },
-      { text: "Total", value: "TotalPrice", align: "center", width: "15%" }
+      { text: "Taxes", value: "TotalTax", align: "center", width: "10%" },
+      { text: "Total", value: "TotalPrice", align: "center", width: "10%" },
+      { text: "Profit", value: "TotalProfit", align: "center", width: "15%" }
     ],
     editedIndex: -1,
     SelectedCustomer: {},
@@ -275,7 +284,13 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     },
-    ...mapState(["SearchField", "JSONCustomers", "Customers", "Invoice"])
+    ...mapState([
+      "SearchField",
+      "JSONCustomers",
+      "Customers",
+      "Invoice",
+      "Stock"
+    ])
   },
 
   watch: {
@@ -292,6 +307,17 @@ export default {
     //   item.InvoiceNumber = moment(item.date,DateFormat).format('Y')+'-'+item.ID.padStart(3, "0");
     //   return item.InvoiceNumber
     // },
+    calProfit(invoice) {
+      var list_cost = Object.values(invoice.List).map(item => {
+        var inStock = this.Stock.find(element => element.index === item.index);
+        if (inStock == null) return 0 * item.piece;
+        else if (inStock.Cost == null) return 0 * item.piece;
+        else return parseFloat(inStock.Cost * item.piece);
+      });
+      var sum = list_cost.map(item => item).reduce((a, b) => a + b);
+      invoice.TotalProfit = (invoice.TotalPrice - sum).toFixed(2);
+      return (invoice.TotalPrice - sum).toFixed(2);
+    },
     handleClick(item) {
       this.SelectedInvoice = item;
       this.dialogInvoice = true;
@@ -318,6 +344,12 @@ export default {
         .toFixed(2);
       sum.TotalPrice = this.Invoice.filter(this.filterTable)
         .map(item => item.TotalPrice)
+        .reduce((a, b) => {
+          return parseFloat(a) + parseFloat(b);
+        }, 0)
+        .toFixed(2);
+      sum.TotalProfit = this.Invoice.filter(this.filterTable)
+        .map(item => item.TotalProfit)
         .reduce((a, b) => {
           return parseFloat(a) + parseFloat(b);
         }, 0)
@@ -354,7 +386,7 @@ export default {
             .indexOf(
               (this.SearchField == null ? "" : this.SearchField).toLowerCase()
             ) > -1) &&
-        // !element.isOpTicket &&
+        !element.isOpTicket &&
         (this.dateStart == null ||
           moment(element.date, DateFormat) >= moment(this.dateStart)) &&
         (this.dateEnd == null ||

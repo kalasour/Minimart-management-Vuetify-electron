@@ -45,6 +45,7 @@
             <th style="border: 1px solid black;" align="center">Net Sale</th>
             <th style="border: 1px solid black;" align="center">Taxes</th>
             <th style="border: 1px solid black;" align="center">Total</th>
+            <th v-if="Summarry.TotalProfit" style="border: 1px solid black;" align="center">Profit</th>
           </tr>
           <tr v-for="(n,index) in List" :key="index">
             <td align="center" style="padding-left:10px;">{{n.InvoiceNumber}}</td>
@@ -52,6 +53,7 @@
             <td align="right" style="padding-left:10px;">{{n.TotalPrice-n.TotalTax}}</td>
             <td align="right" style="padding-right:10px;">{{n.TotalTax}}</td>
             <td align="right" style="padding-right:10px;">{{n.TotalPrice}}</td>
+            <td v-if="Summarry.TotalProfit" align="right" style="padding-right:10px;">{{n.TotalProfit}}</td>
           </tr>
         </table>
       </v-flex>
@@ -71,6 +73,10 @@
             <tr>
               <th align="left" style="padding:0 10px;">Total :</th>
               <td align="right" style="padding:0 10px;">{{this.Summarry.TotalPrice}}</td>
+            </tr>
+            <tr v-if="this.Summarry.TotalProfit">
+              <th align="left" style="padding:0 10px;">Total profit:</th>
+              <td align="right" style="padding:0 10px;">{{this.Summarry.TotalProfit}}</td>
             </tr>
           </table>
           <br>
@@ -237,7 +243,7 @@
             <th style="border: 1px solid black;" align="center">Unit price</th>
             <th style="border: 1px solid black;" class="mx-3" align="center">{{' '}}Qt{{' '}}</th>
             <th style="border: 1px solid black;" align="center">Amount</th>
-            <th style="border: 1px solid black;" align="center">Tax</th>
+            <th v-if="!Invoice.isOpTicket" style="border: 1px solid black;" align="center">Tax</th>
           </tr>
           <tr v-for="(n,index) in List" :key="index">
             <td v-if="!Invoice.isOpTicket" align="left" style="padding-left:10px;">{{n.JM_ID}}</td>
@@ -245,7 +251,7 @@
             <td align="right" style="padding-right:10px;">{{n.Unit_price}}</td>
             <td align="center" style="padding-left:20px;">{{n.piece}}</td>
             <td align="right" style="padding-right:10px;">{{n.Unit_price*n.piece}}</td>
-            <td align="right" style="padding-right:10px;">{{n.Tax}}</td>
+            <td v-if="!Invoice.isOpTicket" align="right" style="padding-right:10px;">{{n.Tax}}</td>
           </tr>
         </table>
       </v-flex>
@@ -278,8 +284,12 @@
               <td align="right" style="padding:0 10px;">{{this.Invoice.TotalPrice}}</td>
             </tr>
             <tr>
-              <th align="left" style="padding:0 10px;">Amount Paid :</th>
-              <td align="right" style="padding:0 10px;">{{this.Invoice.Paid}}</td>
+              <th v-if="!Invoice.isOpTicket" align="left" style="padding:0 10px;">Amount Paid :</th>
+              <td
+                v-if="!Invoice.isOpTicket"
+                align="right"
+                style="padding:0 10px;"
+              >{{this.Invoice.Paid}}</td>
             </tr>
             <tr>
               <th align="left" style="padding:0 10px;">Balance Due :</th>

@@ -108,6 +108,7 @@ export default {
         { title: "Customers", icon: "supervisor_account", path: "/customers" },
         { title: "Report", icon: "timeline", path: "/report" },
         { title: "Summary Sale", icon: "attach_money", path: "/sum_sale" },
+        { title: "Profit Sale", icon: "assignment_returned", path: "/profit_sale" },
         { title: "Open Ticket", icon: "receipt", path: "/openTicket" },
         { title: "About", icon: "question_answer", path: "/about" }
       ],

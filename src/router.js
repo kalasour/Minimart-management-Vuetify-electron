@@ -38,6 +38,10 @@ export default new Router({
       name: 'SumSale',
       component: ()=>import('./components/SumSale.vue')
     },{
+      path: '/profit_sale',
+      name: 'ProfitSale',
+      component: ()=>import('./components/ProfitSale.vue')
+    },{
       path: '/print',
       name: 'print',
       component: ()=>import('./components/Print.vue')
