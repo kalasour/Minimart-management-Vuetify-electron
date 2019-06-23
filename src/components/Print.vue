@@ -50,7 +50,7 @@
           <tr v-for="(n,index) in List" :key="index">
             <td align="center" style="padding-left:10px;">{{n.InvoiceNumber}}</td>
             <td align="center" style="padding-left:10px;">{{n.Customer.Name}}</td>
-            <td align="right" style="padding-left:10px;">{{n.TotalPrice-n.TotalTax}}</td>
+            <td align="right" style="padding-left:10px;">{{(n.TotalPrice-n.TotalTax).toFixed(2)}}</td>
             <td align="right" style="padding-right:10px;">{{n.TotalTax}}</td>
             <td align="right" style="padding-right:10px;">{{n.TotalPrice}}</td>
             <td v-if="Summarry.TotalProfit" align="right" style="padding-right:10px;">{{n.TotalProfit}}</td>

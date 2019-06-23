@@ -139,7 +139,7 @@
               <v-btn @click="show(props.item)">{{ props.item.InvoiceNumber}}</v-btn>
             </td>
             <td class="text-xs-center">{{props.item.Customer.Name}}</td>
-            <td class="text-xs-center">{{ props.item.TotalPrice-props.item.TotalTax }}</td>
+            <td class="text-xs-center">{{ (props.item.TotalPrice-props.item.TotalTax).toFixed(2) }}</td>
             <td class="text-xs-center">{{ props.item.TotalTax }}</td>
             <td class="text-xs-center">{{ props.item.TotalPrice }}</td>
           </template>
