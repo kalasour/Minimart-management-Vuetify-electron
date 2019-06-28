@@ -27,12 +27,12 @@
         <v-img
           class="img"
           :src="require('./../assets/Logo.jpg')"
-          max-height="180"
+          max-height="100"
           position="left center"
           contain
         >
-          <h1>SUMMARY SALE</h1>
-
+          <h1 v-if="this.Summarry.TotalProfit">PROFIT SALE</h1>
+          <h1 v-else>SUMMARY SALE</h1>
           <table align="right" width="auto" border="1" cellspacing="0"></table>
         </v-img>
       </v-flex>
@@ -53,7 +53,11 @@
             <td align="right" style="padding-left:10px;">{{(n.TotalPrice-n.TotalTax).toFixed(2)}}</td>
             <td align="right" style="padding-right:10px;">{{n.TotalTax}}</td>
             <td align="right" style="padding-right:10px;">{{n.TotalPrice}}</td>
-            <td v-if="Summarry.TotalProfit" align="right" style="padding-right:10px;">{{n.TotalProfit}}</td>
+            <td
+              v-if="Summarry.TotalProfit"
+              align="right"
+              style="padding-right:10px;"
+            >{{n.TotalProfit}}</td>
           </tr>
         </table>
       </v-flex>
