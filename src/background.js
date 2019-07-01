@@ -151,7 +151,7 @@ ipcMain.on("readyToSave", (event) => {
     }]
   });
   if (savePath != null)
-    workerWindow.webContents.printToPDF({}, (error, data) => {
+    workerWindow.webContents.printToPDF({pageSize:'A4'}, (error, data) => {
       if (error) throw error
       fs.writeFile(savePath, data, (error) => {
         if (error) throw error
