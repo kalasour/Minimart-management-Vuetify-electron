@@ -23,7 +23,17 @@
       >
         <h1 v-if="Summarry.TotalProfit">PROFIT SALE</h1>
         <h1 v-else>SUMMARY SALE</h1>
-        <table align="right" width="auto" border="1" cellspacing="0"></table>
+        <h2 align="right" v-if="Summarry.dateStart==null&&Summarry.dateEnd==null">Print all</h2>
+        <table v-else align="right" width="auto" border="1" cellspacing="0">
+          <tr>
+            <th align="left" style="padding:0 10px;">From :</th>
+            <td align="right" style="padding:0 10px;">{{this.Summarry.dateStart==null?' - ':toDate(this.Summarry.dateStart)}}</td>
+          </tr>
+          <tr>
+            <th align="left" style="padding:0 10px;">To :</th>
+            <td align="right" style="padding:0 10px;">{{this.Summarry.dateEnd==null?' - ':toDate(this.Summarry.dateEnd)}}</td>
+          </tr>
+        </table>
       </v-img>
     </v-flex>
     <v-layout row wrap xs12 v-for="(i,index) in List2D" :key="index">
@@ -33,7 +43,7 @@
       </v-flex>
 
       <v-flex xs12>
-        <br>
+        <br />
         <table width="100%" style="border: 1px solid black;" cellspacing="0">
           <tr>
             <th style="border: 1px solid black;" align="center">Invoice No.</th>
@@ -58,14 +68,17 @@
         </table>
       </v-flex>
     </v-layout>
-    <v-flex v-if="(SumMod[Math.min(1,List2D.length-1)]-List2D[List2D.length-1].length)<(Summarry.TotalProfit?4:3)" xs12>
+    <v-flex
+      v-if="(SumMod[Math.min(1,List2D.length-1)]-List2D[List2D.length-1].length)<(Summarry.TotalProfit?4:3)"
+      xs12
+    >
       <!-- <p style="page-break-after: always;"></p> -->
       <p style="page-break-before: always;"></p>
     </v-flex>
     <v-flex d-flex xs12>
       <v-flex xs6></v-flex>
       <v-flex xs6>
-        <br>
+        <br />
 
         <table align="right" width="auto" border="1" cellspacing="0">
           <tr>
@@ -85,11 +98,11 @@
             <td align="right" style="padding:0 10px;">{{Summarry.TotalProfit}}</td>
           </tr>
         </table>
-        <br>
+        <br />
       </v-flex>
     </v-flex>
     <v-flex xs12>
-      <br>
+      <br />
     </v-flex>
     <!-- </v-layout> -->
   </v-container>
@@ -130,7 +143,7 @@
       </v-flex>
 
       <v-flex xs12>
-        <br>
+        <br />
         <table width="100%" style="border: 1px solid black;" cellspacing="0">
           <tr>
             <th style="border: 1px solid black;" align="center">Invoice No.</th>
@@ -158,7 +171,7 @@
     <v-flex d-flex xs12>
       <v-flex xs6></v-flex>
       <v-flex xs6>
-        <br>
+        <br />
         <table align="right" width="auto" border="1" cellspacing="0">
           <tr>
             <th align="left" style="padding:0 10px;">Discounted :</th>
@@ -185,11 +198,11 @@
             <th align="right" style="padding:0 10px;">${{this.Statement.Due}}</th>
           </tr>
         </table>
-        <br>
+        <br />
       </v-flex>
     </v-flex>
     <v-flex xs12>
-      <br>
+      <br />
       <h1>Thank you for your business !!!!!!</h1>
     </v-flex>
   </v-container>
@@ -237,7 +250,7 @@
       </v-flex>
 
       <v-flex xs12>
-        <br>
+        <br />
         <table width="100%" style="border: 1px solid black;" cellspacing="0">
           <tr>
             <th v-if="!Invoice.isOpTicket" style="border: 1px solid black;" align="center">Item</th>
@@ -265,7 +278,7 @@
     <v-flex d-flex xs12>
       <v-flex xs6></v-flex>
       <v-flex xs6>
-        <br>
+        <br />
         <table align="right" width="auto" border="1" cellspacing="0">
           <tr>
             <th align="left" style="padding:0 10px;">Subtotal :</th>
@@ -292,11 +305,8 @@
           </tr>
           <tr>
             <th v-if="!Invoice.isOpTicket" align="left" style="padding:0 10px;">Amount Paid :</th>
-            <td
-              v-if="!Invoice.isOpTicket"
-              align="right"
-              style="padding:0 10px;"
-            >{{this.Invoice.Paid}}</td>
+            <th v-else align="left" style="padding:0 10px;">Deposited :</th>
+            <td align="right" style="padding:0 10px;">{{this.Invoice.Paid}}</td>
           </tr>
           <tr>
             <th align="left" style="padding:0 10px;">Balance Due :</th>
@@ -306,11 +316,11 @@
             >${{(Math.max(0,this.Invoice.TotalPrice-this.Invoice.Paid)).toFixed(2)}}</th>
           </tr>
         </table>
-        <br>
+        <br />
       </v-flex>
     </v-flex>
     <v-flex xs12>
-      <br>
+      <br />
       <h1>Thank you for your business !!!!!!</h1>
     </v-flex>
   </v-container>

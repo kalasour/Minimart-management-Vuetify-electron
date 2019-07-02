@@ -83,7 +83,7 @@
                   ></v-text-field>
                   <v-switch v-model="customCustomer" label="Custom customer"></v-switch>
 
-                  <v-text-field v-model="Paid" type="number" label="Payment" required></v-text-field>
+                  <v-text-field v-model="Paid" type="number" label="Deposite" required></v-text-field>
                   <v-menu
                     v-model="menu"
                     :close-on-content-click="false"
