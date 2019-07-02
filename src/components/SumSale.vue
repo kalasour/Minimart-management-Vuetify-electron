@@ -308,8 +308,12 @@ export default {
     ipc(command) {
       var sum = {};
       var DateFormat = "MMMM Do YYYY";
-      sum.dateStart = moment(this.dateStart).format(DateFormat);
-      sum.dateEnd = moment(this.dateEnd).format(DateFormat);
+      sum.dateStart =
+        this.dateStart == null
+          ? null
+          : moment(this.dateStart).format(DateFormat);
+      sum.dateEnd =
+        this.dateEnd == null ? null : moment(this.dateEnd).format(DateFormat);
       sum.List = this.Invoice.filter(this.filterTable);
       sum.TotalSalenet = this.Invoice.filter(this.filterTable)
         .map(a => a.TotalPrice - a.TotalTax)
