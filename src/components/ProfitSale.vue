@@ -64,7 +64,7 @@
           <v-icon v-if="dateEnd!==null" @click="dateEnd = null">close</v-icon>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="1200px">
-            <EditInvoice v-bind:selected="SelectedInvoice"/>
+            <EditInvoice v-bind:selected="SelectedInvoice" />
             <div class="text-xs-right" dark>
               <v-btn @click="dialog=false">Close</v-btn>
             </div>
@@ -116,13 +116,13 @@
             </v-card>
           </v-dialog>
           <v-dialog v-model="dialogInvoice" max-width="1200px">
-            <InvoiceDetail v-bind:selected="SelectedInvoice"/>
+            <InvoiceDetail v-bind:selected="SelectedInvoice" />
             <div class="text-xs-right" dark>
               <v-btn @click="dialogInvoice=false">Close</v-btn>
             </div>
           </v-dialog>
           <v-dialog v-model="dialogCustomer" max-width="1200px">
-            <ItemList v-bind:selected="SelectedCustomer"/>
+            <ItemList v-bind:selected="SelectedCustomer" />
             <div class="text-xs-right" dark>
               <v-btn @click="dialogCustomer = false">Close</v-btn>
             </div>
@@ -309,7 +309,8 @@ export default {
     // },
     calProfit(invoice) {
       var list_cost = Object.values(invoice.List).map(item => {
-        var inStock = this.Stock.find(element => element.index === item.index);
+        // var inStock = this.Stock.find(element => element.index === item.index);
+        var inStock = item;
         if (inStock == null) return 0 * item.piece;
         else if (inStock.Cost == null) return 0 * item.piece;
         else return parseFloat(inStock.Cost * item.piece);
