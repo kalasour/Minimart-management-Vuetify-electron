@@ -23,13 +23,35 @@
           <v-list class="pa-1">
             <v-list-tile avatar tag="div">
               <v-list-tile-avatar>
-                <img src="https://pngimage.net/wp-content/uploads/2018/06/minimart-png-6.png">
+                <img src="https://pngimage.net/wp-content/uploads/2018/06/minimart-png-6.png" />
               </v-list-tile-avatar>
 
               <v-list-tile-content>
                 <v-list-tile-title>BIM TECH</v-list-tile-title>
               </v-list-tile-content>
               <v-list-tile-action>
+                <v-dialog v-model="dialogBackup" max-width="500px">
+                  <v-card>
+                    <v-card-title>
+                      <span class="headline">Backup</span>
+                      <v-spacer></v-spacer>
+                      <v-btn @click="refresh" :loading="refreshing" :disabled="refreshing" flat>
+                        <v-icon>refresh</v-icon>
+                      </v-btn>
+                    </v-card-title>
+                    <v-card-text>
+                      <v-container row wrap>
+                        <v-flex v-for="i in listBackup" lg12>
+                          <p>{{i}}</p>
+                        </v-flex>
+                      </v-container>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn color="darken-1" flat @click="dialogBackup=false">Done</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
                 <v-dialog v-model="dialog" max-width="500px">
                   <template v-slot:activator="{ on }">
                     <v-btn flat icon @click="editInfo()">
@@ -55,6 +77,9 @@
                           </v-flex>
                           <v-flex xs12 sm6 md4>
                             <v-text-field type="number" v-model="editedItem.Tax" label="Tax (%)"></v-text-field>
+                          </v-flex>
+                          <v-flex xs12 sm6 md4>
+                            <v-btn @click="dialog=false;dialogBackup=true;">Backup data</v-btn>
                           </v-flex>
                         </v-layout>
                       </v-container>
@@ -90,6 +115,7 @@
 </template>
 
 <script>
+import { storage } from "./firebase";
 import { mapMutations, mapState } from "vuex";
 import Searchbar from "./components/searchbar";
 import { ipcRenderer } from "electron";
@@ -108,21 +134,31 @@ export default {
         { title: "Customers", icon: "supervisor_account", path: "/customers" },
         { title: "Report", icon: "timeline", path: "/report" },
         { title: "Summary Sale", icon: "attach_money", path: "/sum_sale" },
-        { title: "Profit Sale", icon: "assignment_returned", path: "/profit_sale" },
+        {
+          title: "Profit Sale",
+          icon: "assignment_returned",
+          path: "/profit_sale"
+        },
         { title: "Open Ticket", icon: "receipt", path: "/openTicket" },
         { title: "About", icon: "question_answer", path: "/about" }
       ],
       mini: true,
       right: null,
+      listBackup: ["asdasd", "asdasds"],
       editedIndex: -1,
       editedItem: {},
       defaultItem: {},
-      dialog: false
+      dialog: false,
+      refreshing: false,
+      dialogBackup: false
     };
   },
   watch: {
     dialog(val) {
       val || this.close();
+    },
+    dialogBackup(val) {
+      val && this.refresh();
     }
   },
   computed: {
@@ -138,6 +174,26 @@ export default {
   },
   methods: {
     ...mapMutations(["initialize", "UpdateInformation"]),
+    refresh() {
+      this.refreshing = true;
+      this.listBackup = [];
+      var listRef = storage.ref().child("Backup");
+
+      // Find all the prefixes and items.
+      listRef
+        .listAll()
+        .then(res => {
+          res.prefixes.forEach(folderRef => {
+            this.listBackup.push(folderRef.name);
+          });
+          // res.items.forEach(itemRef => {});
+          this.refreshing = false;
+        })
+        .catch(error => {
+          this.listBackup.push(error);
+          this.refreshing = false;
+        });
+    },
     goto(page) {
       this.$router.push({ path: page });
     },

@@ -311,8 +311,8 @@ export default {
       var list_cost = Object.values(invoice.List).map(item => {
         // var inStock = this.Stock.find(element => element.index === item.index);
         var inStock = item;
-        if (inStock == null) return 0 * item.piece;
-        else if (inStock.Cost == null) return 0 * item.piece;
+        if (inStock == null) return 0 * item.piece;  //? amazing 0 multiple?????????
+        else if (inStock.Cost == null) return 0 * item.piece;  //? amazing 0 multiple?????????
         else return parseFloat(inStock.Cost * item.piece);
       });
       var sum = list_cost.map(item => item).reduce((a, b) => a + b);
