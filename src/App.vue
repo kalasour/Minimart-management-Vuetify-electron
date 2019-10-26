@@ -207,7 +207,8 @@ export default {
       ref
         .listAll()
         .then(res => {
-          res.items.forEach(itemRef => {
+          var doneCount = 0;
+          res.items.forEach((itemRef, index) => {
             itemRef.getDownloadURL().then(url => {
               var xhr = new XMLHttpRequest();
               xhr.responseType = "blob";
@@ -219,9 +220,20 @@ export default {
                 writeStream.on("error", function(err) {
                   console.log(err);
                 });
+
                 toStream(blob).pipe(writeStream);
+                writeStream.on("finish", function() {
+                  doneCount++;
+                  // console.log("saved");
+                  if (doneCount == res.items.length) {
+                    // console.log("reloaded");
+                    location.reload();
+                  }
+                });
               };
+
               xhr.open("GET", url);
+
               xhr.send();
             });
           });
@@ -230,7 +242,6 @@ export default {
         .catch(error => {
           this.refreshing = false;
         });
-      // location.reload();
     },
     deleting(ref) {
       alert("deleted");
