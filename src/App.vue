@@ -40,15 +40,29 @@
                       </v-btn>
                     </v-card-title>
                     <v-card-text>
-                      <v-container row wrap>
-                        <v-flex v-for="i in listBackup" lg12>
-                          <p>{{i}}</p>
+                      <v-container class="py-0" row wrap>
+                        <v-flex v-for="(i,index) in listBackup" :key="index" lg12>
+                          <v-layout row wrap>
+                            <p>{{i.name}}</p>
+                            <v-spacer></v-spacer>
+                            <v-icon @click="restoreBackup(i)">restore</v-icon>
+                            <v-icon @click="deleteBackup(i)">delete</v-icon>
+                          </v-layout>
                         </v-flex>
                       </v-container>
                     </v-card-text>
                     <v-card-actions>
                       <v-spacer></v-spacer>
                       <v-btn color="darken-1" flat @click="dialogBackup=false">Done</v-btn>
+                      <v-btn
+                        color="darken-1"
+                        :loading="refreshing"
+                        :disabled="refreshing"
+                        flat
+                        @click="backup"
+                      >
+                        <v-icon class="mr-2">backup</v-icon>Backup
+                      </v-btn>
                     </v-card-actions>
                   </v-card>
                 </v-dialog>
@@ -97,7 +111,7 @@
           </v-list>
 
           <v-list class="pt-0" dense>
-            <v-divider light></v-divider>
+            <v-divider></v-divider>
             <v-list-tile v-for="item in items" :key="item.title" @click="goto(item.path)">
               <v-list-tile-action>
                 <v-icon :large="false" color="grey lighten-1">{{ item.icon }}</v-icon>
@@ -119,6 +133,8 @@ import { storage } from "./firebase";
 import { mapMutations, mapState } from "vuex";
 import Searchbar from "./components/searchbar";
 import { ipcRenderer } from "electron";
+let Storage = require("electron-json-storage");
+const storageRef = storage.ref().child("Backup");
 export default {
   name: "App",
   components: {
@@ -128,6 +144,7 @@ export default {
     return {
       SearchField: "",
       drawer: true,
+      directoryPath: Storage.getDataPath(),
       items: [
         { title: "Home", icon: "shopping_cart", path: "/" },
         { title: "Stock", icon: "table_chart", path: "/stock" },
@@ -174,17 +191,86 @@ export default {
   },
   methods: {
     ...mapMutations(["initialize", "UpdateInformation"]),
+    deleteBackup(ref) {
+      confirm("Are you sure you want to delete this backup?") &&
+        this.deleting(ref);
+    },
+    restoreBackup(ref) {
+      confirm("Are you sure you want to restore from this backup?") &&
+        this.restoring(ref);
+    },
+
+    restoring(ref) {
+      const toStream = require("blob-to-stream");
+      const fs = require("fs");
+      this.refreshing = true;
+      ref
+        .listAll()
+        .then(res => {
+          res.items.forEach(itemRef => {
+            itemRef.getDownloadURL().then(url => {
+              var xhr = new XMLHttpRequest();
+              xhr.responseType = "blob";
+              xhr.onload = event => {
+                var blob = xhr.response;
+                var writeStream = fs.createWriteStream(
+                  `${this.directoryPath}/${itemRef.name}`
+                );
+                writeStream.on("error", function(err) {
+                  console.log(err);
+                });
+                toStream(blob).pipe(writeStream);
+              };
+              xhr.open("GET", url);
+              xhr.send();
+            });
+          });
+          this.refreshing = false;
+        })
+        .catch(error => {
+          this.refreshing = false;
+        });
+      // location.reload();
+    },
+    deleting(ref) {
+      alert("deleted");
+    },
+    backup() {
+      this.refreshing = true;
+      const path = require("path");
+      const fs = require("fs");
+      const streamToBlob = require("stream-to-blob");
+      fs.readdir(path.join(this.directoryPath), async (err, items) => {
+        if (err) {
+          console.log(err);
+        }
+        await items.forEach(async (item, index) => {
+          const stream = fs.createReadStream(`${this.directoryPath}/${item}`);
+          const blob = await streamToBlob(stream);
+          await storageRef
+            .child(`${new Date().toDateString()}/${item}`)
+            .put(blob)
+            .then(snapshot => {
+              if (index == items.length - 1) {
+                this.refresh();
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        });
+      });
+    },
     refresh() {
       this.refreshing = true;
       this.listBackup = [];
-      var listRef = storage.ref().child("Backup");
 
       // Find all the prefixes and items.
-      listRef
+      storageRef
         .listAll()
         .then(res => {
           res.prefixes.forEach(folderRef => {
-            this.listBackup.push(folderRef.name);
+            this.listBackup.push(folderRef);
           });
           // res.items.forEach(itemRef => {});
           this.refreshing = false;
