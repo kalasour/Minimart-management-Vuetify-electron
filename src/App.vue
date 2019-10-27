@@ -244,7 +244,22 @@ export default {
         });
     },
     deleting(ref) {
-      alert("deleted");
+      ref.listAll().then(res => {
+        var doneCount = 0;
+        res.items.forEach(itemRef => {
+          itemRef
+            .delete()
+            .then(() => {
+              doneCount++;
+              if (doneCount == res.items.length) {
+                this.refresh();
+              }
+            })
+            .catch(function(error) {
+              console.log(error);
+            });
+        });
+      });
     },
     backup() {
       this.refreshing = true;
