@@ -32,6 +32,10 @@ export default new Router({
       path: '/report',
       name: 'Report',
       component: ()=>import('./components/Report.vue')
+    },{
+      path: '/reportTicket',
+      name: 'ReportTicket',
+      component: ()=>import('./components/ReportTicket.vue')
     }
     ,{
       path: '/sum_sale',
