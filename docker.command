@@ -10,6 +10,6 @@ docker run --rm -ti \
 
 
 
-
+docker ps //to show running docker
 
  docker exec -it <container_id_or_name> bash
