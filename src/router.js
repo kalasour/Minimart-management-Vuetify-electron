@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
-
 Vue.use(Router)
 
 export default new Router({
@@ -25,6 +24,31 @@ export default new Router({
       path: '/stock',
       name: 'stock',
       component: ()=>import('./components/Stock.vue')
+    },{
+      path: '/customers',
+      name: 'Customers',
+      component: ()=>import('./components/Customers.vue')
+    },{
+      path: '/report',
+      name: 'Report',
+      component: ()=>import('./components/Report.vue')
+    }
+    ,{
+      path: '/sum_sale',
+      name: 'SumSale',
+      component: ()=>import('./components/SumSale.vue')
+    },{
+      path: '/profit_sale',
+      name: 'ProfitSale',
+      component: ()=>import('./components/ProfitSale.vue')
+    },{
+      path: '/print',
+      name: 'print',
+      component: ()=>import('./components/Print.vue')
+    },{
+      path: '/openTicket',
+      name: 'openTicket',
+      component: ()=>import('./views/OpenTicket.vue')
     },
     {
       path: '*',

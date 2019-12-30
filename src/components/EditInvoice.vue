@@ -1,10 +1,8 @@
 
   <template>
-  <v-app>
+  <v-app dark>
     <v-card>
       <v-toolbar>
-        <!-- <v-layout class="align-center justify-center"> -->
-        <!-- <v-flex xs10> -->
         <v-combobox
           auto-select-first
           autofocus
@@ -30,11 +28,6 @@
             </template>
           </template>
         </v-combobox>
-        <!-- </v-flex> -->
-        <!-- <v-flex xs2 align-center justify-center>
-            <v-switch v-model="ActiveDis" label="Active Discounts"></v-switch>
-          </v-flex>
-        </v-layout>-->
       </v-toolbar>
     </v-card>
 
@@ -42,17 +35,9 @@
       :rows-per-page-items="[{text:'All',value:-1}]"
       :headers="head"
       :items="List"
-      class="elevation-1"
       hide-actions
+      class="elevation-1"
     >
-      <template v-slot:pageText="props">
-        <v-layout align-center justify-space-between row>
-          <v-flex align-center justify-center class="ma-0 pa-0" xs6>
-            <v-switch v-model="ActiveDis" hide-details label="Active Discounts"></v-switch>
-          </v-flex>
-          <v-flex xs6>{{ props.pageStart }} - {{ props.pageStop }} of {{ props.itemsLength }}</v-flex>
-        </v-layout>
-      </template>
       <template v-slot:footer>
         <td></td>
         <td>
@@ -80,7 +65,7 @@
         </td>
         <td class="text-xs-center">{{ props.item.Barcode_ID }}</td>
         <td class="text-xs-left">{{ props.item.Detail }}</td>
-        <td class="text-xs-center">{{ props.item.Unit_price }}</td>
+        <td class="text-xs-left">{{ props.item.Unit_price }}</td>
         <td v-if="ActiveDis">
           <div class="text-xs-center justify-center align-center layout">
             -
@@ -124,7 +109,7 @@
 
               <v-layout pt-2 row wrap mb-0>
                 <v-flex xs6>
-                  Invoice number : {{new Date().getFullYear()}} - {{(parseInt((Invoice[Invoice.length-1]==null)?0:Invoice[Invoice.length-1].ID)+1).toString().padStart(3, "0")}}
+                  Invoice number : {{InvoiceNumber}}
                   <v-autocomplete
                     v-model="CustomerID"
                     :items="Customers"
@@ -189,25 +174,54 @@
   justify-content: center;
 }
 </style>
-
 <script>
 import { mapMutations, mapState } from "vuex";
 import moment from "moment";
 import { ipcRenderer } from "electron";
 import { constants } from "crypto";
 export default {
+  props: {
+    selected: Object
+  },
   name: "App",
   created() {},
+  computed: {
+    head() {
+      if (this.ActiveDis) return this.headers;
+      else
+        return this.headers
+          .map(item => {
+            if (
+              item.value != "Discount_per" &&
+              item.value != "Discount_amount"
+            ) {
+              return item;
+            }
+          })
+          .filter(item => item != null);
+    },
+    ...mapState([
+      "Invoice",
+      "SearchField",
+      "JSONStock",
+      "Stock",
+      "Customers",
+      "JSONInformation"
+    ])
+  },
   data() {
     return {
+      ActiveDis: false,
+      List: [],
+      OldList: [],
+      date: "",
+      Paid: "",
       menu: false,
-      date: moment(new Date()).format("YYYY-MM-DD"),
       Enter: "",
       model: null,
       Note: "",
       CustomerID: "",
-      Paid: "",
-      ActiveDis: false,
+      InvoiceNumber: "",
       headers: [
         { text: "Qty.", sortable: false, align: "center" },
         {
@@ -299,7 +313,6 @@ export default {
         text4.indexOf(searchText) > -1
       );
     },
-
     async Sale() {
       // console.log(new_invoice)
       // console.log(moment(now_date,DateFormat).format('D'))
@@ -323,31 +336,43 @@ export default {
         customer => customer.ID === this.CustomerID
       );
       new_invoice.List = { ...this.List };
-      new_invoice.ActiveDis = this.ActiveDis;
       new_invoice.date = now_date;
       new_invoice.Note = this.Note;
       new_invoice.Paid = this.Paid;
+      new_invoice.ActiveDis = this.ActiveDis;
+      new_invoice.InvoiceNumber = this.InvoiceNumber;
       new_invoice.TotalTax = this.TotalTaxes();
       new_invoice.TotalPrice = this.TotalPrice();
       new_invoice.TotalDiscounted = this.TotalDiscounted();
       new_invoice.TotalOrdered = this.TotalOrdered();
       new_invoice.TotalPiece = this.TotalPiece();
-      await this.List.map((item, index) => {
-        this.Stock[this.Stock.findIndex(s => s.index === item.index)].QT -=
-          item.piece;
+      await this.OldList.map(async (item, index) => {
+        var indexT = await this.Stock.findIndex(s => s.index === item.index);
+        // console.log(indexT, this.Stock[indexT].QT, "+", item.piece);
+        if (indexT != -1) this.Stock[indexT].QT += item.piece;
       });
-      await this.CreateInvoice(new_invoice);
+      await this.List.map(async (item, index) => {
+        var indexT = await this.Stock.findIndex(s => s.index === item.index);
+        // console.log(indexT, this.Stock[indexT].QT, "-", item.piece);
+        if (indexT != -1) this.Stock[indexT].QT -= item.piece;
+      });
+      Object.assign(
+        this.Invoice[
+          this.Invoice.findIndex(s => s.InvoiceNumber === this.InvoiceNumber)
+        ],
+        new_invoice
+      );
       ipcRenderer.send("printPDF", new_invoice);
+      this.OldList = JSON.parse(JSON.stringify(this.List));
       this.UpdateInvoice();
       this.UpdateStock();
-      this.Clear();
+      //   console.log("updated");
     },
     Clear() {
       this.List.splice(0, this.List.length);
       this.Paid = "";
       this.CustomerID = "";
       this.Note = "";
-      this.date = moment(new Date()).format("YYYY-MM-DD");
     },
     ...mapMutations([
       "initialize",
@@ -447,35 +472,23 @@ export default {
       return item.Price;
     }
   },
-  computed: {
-    head() {
-      if (this.ActiveDis) return this.headers;
-      else
-        return this.headers
-          .map(item => {
-            if (
-              item.value != "Discount_per" &&
-              item.value != "Discount_amount"
-            ) {
-              return item;
-            }
-          })
-          .filter(item => item != null);
-    },
-    ...mapState([
-      "Invoice",
-      "SearchField",
-      "JSONStock",
-      "Stock",
-      "List",
-      "Customers",
-      "JSONInformation"
-    ])
-  },
+
   created() {
     this.$store.commit("SetSF", "");
   },
   watch: {
+    selected: function() {
+      this.Paid = this.selected.Paid;
+      this.date = moment(this.selected.date, "MMMM Do YYYY, h:mm:ss a").format(
+        "YYYY-MM-DD"
+      );
+      this.CustomerID = this.selected.Customer.ID;
+      this.Note = this.selected.Note;
+      this.InvoiceNumber = this.selected.InvoiceNumber;
+      this.List = Object.values(this.selected.List);
+      this.OldList = JSON.parse(JSON.stringify(this.List));
+      this.ActiveDis = this.selected.ActiveDis;
+    },
     Enter: function() {
       if (this.Enter == "" || this.Enter == null) return;
       // console.log(this.SearchField)

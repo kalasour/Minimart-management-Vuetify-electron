@@ -1,114 +1,49 @@
 
   <template>
-  <v-app>
+  <v-app dark>
     <v-card>
       <v-toolbar>
-        <!-- <v-layout class="align-center justify-center"> -->
-        <!-- <v-flex xs10> -->
-        <v-combobox
-          auto-select-first
-          autofocus
-          v-model="model"
-          :items="Stock"
-          :label="`Search`"
-          prepend-icon="search"
-          :filter="ItemFilter"
-          @input="updateSearchField(model)"
-        >
-          <template v-slot:selection="data">
-            <v-chip :selected="data.selected" close class="chip--select-multi">{{look(data.parent)}}</v-chip>
-          </template>
-          <template v-slot:item="data">
-            <template v-if="typeof data.item !== 'object'">
-              <v-list-tile-content v-text="data.item"></v-list-tile-content>
-            </template>
-            <template v-else>
-              <v-layout dark>
-                <v-flex xs12 sm6 py2 pt-6>{{data.item.Detail}}</v-flex>
-                <v-flex xs12 sm6 py2 pt-6>Left : {{data.item.QT}} pcs.</v-flex>
-              </v-layout>
-            </template>
-          </template>
-        </v-combobox>
-        <!-- </v-flex> -->
-        <!-- <v-flex xs2 align-center justify-center>
-            <v-switch v-model="ActiveDis" label="Active Discounts"></v-switch>
-          </v-flex>
-        </v-layout>-->
+        <v-btn flat large @click="NewItem">
+          <v-icon large>add_box</v-icon>
+        </v-btn>
       </v-toolbar>
     </v-card>
 
     <v-data-table
       :rows-per-page-items="[{text:'All',value:-1}]"
       :headers="head"
-      :items="List"
+      :items="TicketList"
       class="elevation-1"
-      hide-actions
     >
-      <template v-slot:pageText="props">
-        <v-layout align-center justify-space-between row>
-          <v-flex align-center justify-center class="ma-0 pa-0" xs6>
-            <v-switch v-model="ActiveDis" hide-details label="Active Discounts"></v-switch>
-          </v-flex>
-          <v-flex xs6>{{ props.pageStart }} - {{ props.pageStop }} of {{ props.itemsLength }}</v-flex>
-        </v-layout>
-      </template>
-      <template v-slot:footer>
-        <td></td>
-        <td>
-          <v-switch v-model="ActiveDis" hide-details label="Show Discounts"></v-switch>
-        </td>
-        <td></td>
-        <td></td>
-        <td v-if="ActiveDis"></td>
-        <td v-if="ActiveDis"></td>
-        <td></td>
-        <td>
-          <p class="text-xs-center justify-center my-0">{{List.length}} items</p>
-        </td>
-        <td></td>
-      </template>
       <template v-slot:items="props">
+        <td class="text-xs-left">
+          <v-edit-dialog :return-value.sync="props.item.Detail" lazy class="text-xs-left">
+            {{ props.item.Detail }}
+            <template v-slot:input>
+              <v-text-field v-model="props.item.Detail" single-line></v-text-field>
+            </template>
+          </v-edit-dialog>
+        </td>
+        <td class="text-xs-center">
+          <v-edit-dialog :return-value.sync="props.item.Unit_price" lazy class="text-xs-center">
+            {{ props.item.Unit_price }}
+            <template v-slot:input>
+              <v-text-field v-model="props.item.Unit_price" single-line type="number"></v-text-field>
+            </template>
+          </v-edit-dialog>
+        </td>
+
         <td class="justify-center align-center layout">
           <v-icon small :disabled="props.item.piece<=1" @click="DecreasePiece(props.item)">remove</v-icon>
-          <v-card-text class="text-xs-center">{{props.item.piece}}</v-card-text>
-          <v-icon
-            small
-            :disabled="props.item.piece>=props.item.QT&&false"
-            @click="IncreasePiece(props.item)"
-          >add</v-icon>
+          <v-edit-dialog :return-value.sync="props.item.piece" lazy class="text-xs-center">
+            {{ props.item.piece }}
+            <template v-slot:input>
+              <v-text-field v-model="props.item.piece" single-line type="number"></v-text-field>
+            </template>
+          </v-edit-dialog>
+          <v-icon small @click="IncreasePiece(props.item)">add</v-icon>
         </td>
-        <td class="text-xs-center">{{ props.item.Barcode_ID }}</td>
-        <td class="text-xs-left">{{ props.item.Detail }}</td>
-        <td class="text-xs-center">{{ props.item.Unit_price }}</td>
-        <td v-if="ActiveDis">
-          <div class="text-xs-center justify-center align-center layout">
-            -
-            <v-edit-dialog :return-value.sync="props.item.Discount_per" lazy class="text-xs-center">
-              {{ props.item.Discount_per?props.item.Discount_per:0 }}
-              <template v-slot:input>
-                <v-text-field v-model="props.item.Discount_per" single-line type="number"></v-text-field>
-              </template>
-            </v-edit-dialog>%
-          </div>
-        </td>
-        <td v-if="ActiveDis">
-          <div class="text-xs-center justify-center align-center layout">
-            -
-            <v-edit-dialog
-              :return-value.sync="props.item.Discount_amount"
-              lazy
-              class="text-xs-center"
-            >
-              {{ props.item.Discount_amount?props.item.Discount_amount:0 }}
-              <template v-slot:input>
-                <v-text-field v-model="props.item.Discount_amount" single-line type="number"></v-text-field>
-              </template>
-            </v-edit-dialog>.-
-          </div>
-        </td>
-        <td class="text-xs-center">{{ CalPrice(props.item) - props.item.Tax }}</td>
-        <td class="text-xs-left">{{ props.item.Tax }}</td>
+        <td class="text-xs-center">{{ (props.item.piece * props.item.Unit_price).toFixed(2) }}</td>
         <td class="text-xs-center">
           <v-icon small @click="deleteItem(props.item)">delete</v-icon>
         </td>
@@ -124,8 +59,13 @@
 
               <v-layout pt-2 row wrap mb-0>
                 <v-flex xs6>
-                  Invoice number : {{new Date().getFullYear()}} - {{(parseInt((Invoice[Invoice.length-1]==null)?0:Invoice[Invoice.length-1].ID)+1).toString().padStart(3, "0")}}
+                  Invoice number :
+                  <span
+                    v-if="!selected"
+                  >{{new Date().getFullYear()}} - {{(parseInt((Invoice[Invoice.length-1]==null)?0:Invoice[Invoice.length-1].ID)+1).toString().padStart(3, "0")}}</span>
+                  <span v-else>{{InvoiceNumber}}</span>
                   <v-autocomplete
+                    v-if="!customCustomer"
                     v-model="CustomerID"
                     :items="Customers"
                     :label="((CustomerID==null)?'Customer':'Customer ID : '+CustomerID)"
@@ -135,7 +75,15 @@
                     chips
                     :filter="SearchFilter"
                   ></v-autocomplete>
-                  <v-text-field v-model="Paid" type="number" label="Payment" required></v-text-field>
+                  <v-text-field
+                    v-if="customCustomer"
+                    v-model="CustomerName"
+                    label="Customer name"
+                    required
+                  ></v-text-field>
+                  <v-switch v-model="customCustomer" label="Custom customer"></v-switch>
+
+                  <v-text-field v-model="Paid" type="number" label="Deposited" required></v-text-field>
                   <v-menu
                     v-model="menu"
                     :close-on-content-click="false"
@@ -161,8 +109,9 @@
                 </v-flex>
                 <v-flex xs6>
                   <v-flex mx-5>
+                    <v-text-field v-model="TaxRate" label="Tax rate (%)" type="number" required></v-text-field>
                     <v-textarea v-model="Note" label="Note"></v-textarea>
-                    <div>Subtotal : {{TotalPrice()-TotalTaxes()}} .-</div>
+                    <div>Subtotal : {{TotalPrice()}} .-</div>
                     <div>Taxes : {{TotalTaxes()}}</div>
                   </v-flex>
                 </v-flex>
@@ -173,10 +122,10 @@
           <v-card-actions class="justify-end">
             <div class="text-xs-center">
               <v-flex xs12>
-                <h1 class="headline mb-0 text-md-right">Total : {{TotalPrice()}} .-</h1>
+                <h1 class="headline mb-0 text-md-right">Total : {{FinalPrice()}} .-</h1>
               </v-flex>
-              <v-btn flat color="red" :disabled="List.length<=0" @click="Clear">Clear</v-btn>
-              <v-btn flat color="blue" :disabled="List.length<=0" @click="Sale">place order</v-btn>
+              <v-btn flat color="red" :disabled="TicketList.length<=0" @click="Clear">Clear</v-btn>
+              <v-btn flat color="blue" :disabled="TicketList.length<=0" @click="Sale">place order</v-btn>
             </div>
           </v-card-actions>
         </v-card>
@@ -194,75 +143,62 @@
 import { mapMutations, mapState } from "vuex";
 import moment from "moment";
 import { ipcRenderer } from "electron";
-import { constants } from "crypto";
 export default {
   name: "App",
-  created() {},
+  mounted() {
+    if (!this.selected) {
+      this.Clear();
+    }
+  },
   data() {
     return {
+      customCustomer: true,
       menu: false,
       date: moment(new Date()).format("YYYY-MM-DD"),
       Enter: "",
       model: null,
       Note: "",
       CustomerID: "",
+      CustomerName: "",
       Paid: "",
       ActiveDis: false,
+      TaxRate: 0,
+      InvoiceNumber: "",
       headers: [
-        { text: "Qty.", sortable: false, align: "center" },
         {
-          text: "BARCODE ID",
-          value: "Barcode_ID",
-          align: "center",
-          sortable: false
-        },
-        {
+          width: "1%",
           text: "Description",
           align: "left",
           value: "Detail",
           sortable: false
         },
         {
+          width: "1%",
           text: "Unit price",
-          align: "left",
+          align: "center",
           value: "Unit_price",
           sortable: false
         },
+        { width: "1%", text: "Qt.", sortable: false, align: "center" },
         {
-          text: "% Discount",
-          value: "Discount_per",
-          align: "center",
-          sortable: false
-        },
-        {
-          text: "Amount Discount",
-          value: "Discount_amount",
-          align: "center",
-          sortable: false
-        },
-        // {
-        //   text: "Discounted",
-        //   value: "Discount_per",
-        //   align: "center",
-        //   sortable: false
-        // },
-        {
+          width: "1%",
           text: "Line total",
           value: "Unit_price",
           align: "center",
           sortable: false
         },
-        {
-          text: "Tax",
-          align: "left",
-          value: "Tax",
-          sortable: false
-        },
-        { text: "Action", sortable: false, align: "center" }
+        { width: "1%", text: "Action", sortable: false, align: "center" }
       ]
     };
   },
   methods: {
+    NewItem() {
+      this.TicketList.unshift({
+        Detail: "_description_",
+        Unit_price: 0,
+        piece: 1
+      });
+    },
     look(data) {
       // data.item = "";
       // this.model=null
@@ -304,48 +240,62 @@ export default {
       // console.log(new_invoice)
       // console.log(moment(now_date,DateFormat).format('D'))
 
-      if (this.CustomerID == "" || this.Paid == "") {
+      if (this.Paid == "") {
         alert("Please put amount to pay.");
         return;
       }
-      var IndFind = await this.Customers.findIndex(
-        customer => customer.ID === this.CustomerID
-      );
-      if (IndFind == -1) {
-        alert("Not found this customer ID!!");
-        return;
-      }
-
       var DateFormat = "MMMM Do YYYY";
       var now_date = moment(this.date).format(DateFormat);
       var new_invoice = {};
-      new_invoice.Customer = await this.Customers.find(
-        customer => customer.ID === this.CustomerID
-      );
-      new_invoice.List = { ...this.List };
+      if (!this.customCustomer) {
+        var IndFind = await this.Customers.findIndex(
+          customer => customer.ID === this.CustomerID
+        );
+        if (IndFind == -1) {
+          alert("Not found this customer ID!!");
+          return;
+        }
+        new_invoice.Customer = await this.Customers.find(
+          customer => customer.ID === this.CustomerID
+        );
+      } else {
+        new_invoice.Customer = { Name: this.CustomerName };
+      }
+      new_invoice.List = { ...this.TicketList };
+      new_invoice.isOpTicket = true;
       new_invoice.ActiveDis = this.ActiveDis;
       new_invoice.date = now_date;
+      new_invoice.customCustomer = this.customCustomer;
       new_invoice.Note = this.Note;
+      new_invoice.TaxRate = this.TaxRate;
       new_invoice.Paid = this.Paid;
       new_invoice.TotalTax = this.TotalTaxes();
-      new_invoice.TotalPrice = this.TotalPrice();
-      new_invoice.TotalDiscounted = this.TotalDiscounted();
+      new_invoice.SubTotal = this.TotalPrice();
+      new_invoice.TotalPrice = this.FinalPrice();
+      new_invoice.TotalDiscounted = 0;
       new_invoice.TotalOrdered = this.TotalOrdered();
       new_invoice.TotalPiece = this.TotalPiece();
-      await this.List.map((item, index) => {
-        this.Stock[this.Stock.findIndex(s => s.index === item.index)].QT -=
-          item.piece;
-      });
-      await this.CreateInvoice(new_invoice);
+      if (!this.selected) await this.CreateInvoice(new_invoice);
+      else {
+        new_invoice.InvoiceNumber=this.InvoiceNumber
+        await Object.assign(
+        this.Invoice[
+          this.Invoice.findIndex(s => s.InvoiceNumber === this.InvoiceNumber)
+        ],
+        new_invoice
+      );
+      }
       ipcRenderer.send("printPDF", new_invoice);
       this.UpdateInvoice();
       this.UpdateStock();
-      this.Clear();
+      if(!this.selected)this.Clear();
     },
     Clear() {
-      this.List.splice(0, this.List.length);
+      this.TicketList.splice(0, this.TicketList.length);
       this.Paid = "";
       this.CustomerID = "";
+      this.CustomerName = "";
+      this.TaxRate = 0;
       this.Note = "";
       this.date = moment(new Date()).format("YYYY-MM-DD");
     },
@@ -355,8 +305,13 @@ export default {
       "CreateInvoice",
       "UpdateInvoice"
     ]),
+    FinalPrice: function() {
+      return (
+        parseFloat(this.TotalPrice()) + parseFloat(this.TotalTaxes())
+      ).toFixed(2);
+    },
     TotalPrice: function() {
-      return this.List.map(item => {
+      return this.TicketList.map(item => {
         return this.CalPrice(item);
       })
         .reduce((total, num) => {
@@ -365,25 +320,13 @@ export default {
         .toFixed(2);
     },
     TotalTaxes: function() {
-      return this.List.map(item => {
-        return item.Tax;
-      })
-        .reduce((total, num) => {
-          return parseFloat(total) + parseFloat(num);
-        }, 0)
-        .toFixed(2);
-    },
-    TotalDiscounted: function() {
-      return this.List.map(item => {
-        return item.Discounted;
-      })
-        .reduce((total, num) => {
-          return parseFloat(total) + parseFloat(num);
-        }, 0)
-        .toFixed(2);
+      return (
+        (parseFloat(this.TotalPrice()) / 100) *
+        (this.TaxRate == "" ? 0 : this.TaxRate)
+      ).toFixed(2);
     },
     TotalOrdered: function() {
-      return this.List.map(item => {
+      return this.TicketList.map(item => {
         return item;
       })
         .reduce((total, num) => {
@@ -392,7 +335,7 @@ export default {
         .toFixed(0);
     },
     TotalPiece: function() {
-      return this.List.map(item => {
+      return this.TicketList.map(item => {
         return item.piece;
       })
         .reduce((total, num) => {
@@ -404,9 +347,9 @@ export default {
       item.piece++;
     },
     deleteItem(item) {
-      const index = this.List.indexOf(item);
+      const index = this.TicketList.indexOf(item);
       confirm("Are you sure you want to delete this item?") &&
-        this.List.splice(index, 1);
+        this.TicketList.splice(index, 1);
     },
     DecreasePiece(item) {
       item.piece--;
@@ -467,7 +410,7 @@ export default {
       "SearchField",
       "JSONStock",
       "Stock",
-      "List",
+      "TicketList",
       "Customers",
       "JSONInformation"
     ])
@@ -475,36 +418,26 @@ export default {
   created() {
     this.$store.commit("SetSF", "");
   },
+  props: {
+    selected: Object
+  },
   watch: {
-    Enter: function() {
-      if (this.Enter == "" || this.Enter == null) return;
-      // console.log(this.SearchField)
-      var Sindex = this.Enter - 1;
-      if (Sindex > -1) {
-        var Findex = this.List.map(item => {
-          return item.index;
-        }).indexOf(this.JSONStock[Sindex].index);
-        // alert(Findex)
-        if (Findex != -1) {
-          // if (this.List[Findex].piece < this.List[Findex].QT)
-          this.List[Findex].piece++;
-          // else alert("Out of stock!");
-          this.Enter = "";
-          return;
-        }
-        // if (this.JSONStock[this.Enter].QT < 1) {
-        //   alert("Out of stock!!");
-        //   this.Enter = "";
-        //   return;
-        // }
-
-        this.JSONStock[Sindex].piece = 1;
-        this.JSONStock[Sindex].Discounted = 0;
-        this.List.unshift(Object.assign({}, this.JSONStock[Sindex]));
-      } else if (this.Enter != null) {
-        // alert("Not founded in stock!!");
-      }
-      this.Enter = "";
+    selected: async function() {
+      this.Clear();
+      this.Paid = this.selected.Paid;
+      this.date = moment(this.selected.date, "MMMM Do YYYY, h:mm:ss a").format(
+        "YYYY-MM-DD"
+      );
+      this.CustomerID = this.selected.Customer.ID;
+      this.CustomerName = this.selected.Customer.Name;
+      this.Note = this.selected.Note;
+      this.InvoiceNumber = this.selected.InvoiceNumber;
+      await Object.values(this.selected.List).map(item => {
+        this.TicketList.push(item);
+      });
+      this.ActiveDis = this.selected.ActiveDis;
+      this.TaxRate = this.selected.TaxRate;
+      this.customCustomer = this.selected.customCustomer;
     }
   }
 };
