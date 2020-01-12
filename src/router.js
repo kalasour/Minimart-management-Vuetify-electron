@@ -42,6 +42,10 @@ export default new Router({
       name: 'SumSale',
       component: ()=>import('./components/SumSale.vue')
     },{
+      path: '/sum_ticket',
+      name: 'SumTicket',
+      component: ()=>import('./components/SumTicket.vue')
+    },{
       path: '/profit_sale',
       name: 'ProfitSale',
       component: ()=>import('./components/ProfitSale.vue')

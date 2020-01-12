@@ -152,6 +152,7 @@ export default {
         { title: "Report", icon: "timeline", path: "/report" },
         { title: "Report Ticket", icon: "timeline", path: "/reportTicket" },
         { title: "Summary Sale", icon: "attach_money", path: "/sum_sale" },
+        { title: "Summary Open Ticket", icon: "attach_money", path: "/sum_ticket" },
         {
           title: "Profit Sale",
           icon: "assignment_returned",
