@@ -5,18 +5,20 @@
         <v-toolbar flat>
           <v-toolbar-title>Stock</v-toolbar-title>
           <v-divider class="mx-2" inset vertical></v-divider>
-          <template v-if="SearchField!==''">
+          <template v-if="SearchField !== ''">
             <v-chip close color="blue" text-color="white" @input="clearSF">
               <v-avatar>
                 <v-icon>search</v-icon>
               </v-avatar>
-              {{SearchField}}
+              {{ SearchField }}
             </v-chip>
           </template>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on }">
-              <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
+              <v-btn color="primary" dark class="mb-2" v-on="on"
+                >New Item</v-btn
+              >
             </template>
             <v-card>
               <v-card-title>
@@ -27,13 +29,22 @@
                 <v-container grid-list-md>
                   <v-layout wrap>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.Detail" label="Detail"></v-text-field>
+                      <v-text-field
+                        v-model="editedItem.Detail"
+                        label="Detail"
+                      ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.Barcode_ID" label="BARCODE ID"></v-text-field>
+                      <v-text-field
+                        v-model="editedItem.Barcode_ID"
+                        label="BARCODE ID"
+                      ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.BE_ID" label="BE ID"></v-text-field>
+                      <v-text-field
+                        v-model="editedItem.BE_ID"
+                        label="BE ID"
+                      ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
                       <v-text-field
@@ -50,10 +61,17 @@
                       ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.JM_ID" label="JM ID"></v-text-field>
+                      <v-text-field
+                        v-model="editedItem.JM_ID"
+                        label="JM ID"
+                      ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
-                      <v-text-field v-model="editedItem.QT" type="number" label="Quantities"></v-text-field>
+                      <v-text-field
+                        v-model="editedItem.QT"
+                        type="number"
+                        label="Quantities"
+                      ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
                       <v-text-field
@@ -63,13 +81,23 @@
                       ></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md4>
-                      <v-checkbox v-model="editedItem.TaxActive" color="#880E4F" label="Tax active"></v-checkbox>
+                      <v-checkbox
+                        v-model="editedItem.TaxActive"
+                        color="#880E4F"
+                        label="Tax active"
+                      ></v-checkbox>
                     </v-flex>
-                     <v-flex xs12 sm6 md4>
+                    <v-flex xs12 sm6 md4>
                       <v-text-field
                         v-model="editedItem.Cost"
                         type="number"
                         label="Cost"
+                      ></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm6 md4>
+                      <v-text-field
+                        v-model="editedItem.code"
+                        label="Code"
                       ></v-text-field>
                     </v-flex>
                   </v-layout>
@@ -85,7 +113,7 @@
           </v-dialog>
         </v-toolbar>
         <v-data-table
-          :rows-per-page-items="[{text:'All',value:-1}]"
+          :rows-per-page-items="[{ text: 'All', value: -1 }]"
           :headers="headers"
           :items="Stock.filter(filterTable)"
           class="elevation-1"
@@ -105,11 +133,12 @@
               <v-icon small v-else>check_box_outline_blank</v-icon>
             </td>
             <td class="justify-center align-center layout px-0">
-              <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
+              <v-icon small class="mr-2" @click="editItem(props.item)"
+                >edit</v-icon
+              >
               <v-icon small @click="deleteItem(props.item)">delete</v-icon>
             </td>
           </template>
-           
         </v-data-table>
       </div>
     </v-app>
@@ -126,41 +155,41 @@ export default {
       {
         text: "Detail",
         align: "left",
-        value: "Detail"
+        value: "Detail",
       },
       { text: "BARCODE ID", value: "Barcode_ID", align: "center" },
       { text: "BE ID", value: "BE_ID", align: "center" },
       {
         text: "Discount(amount)",
         value: "Discount_amount",
-        align: "center"
+        align: "center",
       },
       { text: "Discount(%)", value: "Discount_per", align: "center" },
       { text: "JM ID", value: "JM_ID", align: "center" },
       { text: "Quantities", value: "QT", align: "center" },
       { text: "price/unit", value: "Unit_price", align: "center" },
       { text: "Tax active?", value: "TaxActive", align: "center" },
-      { text: "Action", sortable: false, align: "center" }
+      { text: "Action", sortable: false, align: "center" },
     ],
     editedIndex: -1,
     editedItem: {},
-    defaultItem: {}
+    defaultItem: {},
   }),
 
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     },
-    ...mapState(["SearchField", "JSONStock", "Stock"])
+    ...mapState(["SearchField", "JSONStock", "Stock"]),
   },
 
   watch: {
     dialog(val) {
       val || this.close();
-    }
+    },
   },
   created() {
-    this.clearSF()
+    this.clearSF();
     // this.initialize();
   },
 
@@ -254,10 +283,9 @@ export default {
         this.UpdateStock();
       }
       // }
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style>
-</style>
+<style></style>

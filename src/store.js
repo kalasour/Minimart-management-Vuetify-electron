@@ -16,7 +16,9 @@ export default new Vuex.Store({
     Customers: [],
     Stock: [],
     List: [],
-    TicketList: []
+    TicketList: [],
+    InvoiceGroupList: [],
+    isDevelopment: process.env.NODE_ENV !== "production",
   },
 
   actions: {},
@@ -36,19 +38,27 @@ export default new Vuex.Store({
         state.JSONCustomers = data.Customers;
         state.JSONInformation = data.Information;
         state.JSONInvoice = data.Invoice;
+        if (data.InvoiceGroup != undefined)
+          Vue.set(state, "InvoiceGroupList", data.InvoiceGroup.list);
         if (state.JSONStock !== null)
-          Object.keys(state.JSONStock).map(key => {
+          Object.keys(state.JSONStock).map((key) => {
+            if (
+              state.JSONStock[key].code == "" ||
+              state.JSONStock[key].code == null ||
+              state.JSONStock[key].code == undefined
+            )
+              state.JSONStock[key].code = state.JSONStock[key].Detail;
             state.Stock.push(state.JSONStock[key]);
           });
 
         if (state.JSONCustomers !== null)
-          Object.keys(state.JSONCustomers).map(key => {
+          Object.keys(state.JSONCustomers).map((key) => {
             state.JSONCustomers[key].ID = key;
             state.Customers.push(state.JSONCustomers[key]);
           });
 
         if (state.JSONInvoice !== null)
-          Object.keys(state.JSONInvoice).map(key => {
+          Object.keys(state.JSONInvoice).map((key) => {
             state.JSONInvoice[key].ID = key;
             state.Invoice.push(state.JSONInvoice[key]);
           });
@@ -68,13 +78,13 @@ export default new Vuex.Store({
     async UpdateCustomers(state) {
       state.JSONCustomers = {};
 
-      await state.Customers.map(item => {
+      await state.Customers.map((item) => {
         state.JSONCustomers[item.ID] = item;
       });
       storage.set("Customers", state.JSONCustomers);
     },
     async CreateInvoice(state, new_invoice) {
-      const year = moment(new Date(), "MMMM Do YYYY, h:mm:ss a").format("Y")
+      const year = moment(new Date(), "MMMM Do YYYY, h:mm:ss a").format("Y");
       if (state.Invoice.length == 0) {
         new_invoice.ID = "1";
         new_invoice.InvoiceNumber =
@@ -98,7 +108,7 @@ export default new Vuex.Store({
     },
     async UpdateInvoice(state) {
       state.JSONInvoice = {};
-      await state.Invoice.map(item => {
+      await state.Invoice.map((item) => {
         item.Credit = Math.max(
           0,
           parseFloat(item.Paid) - parseFloat(item.TotalPrice)
@@ -106,6 +116,20 @@ export default new Vuex.Store({
         state.JSONInvoice[item.ID] = item;
       });
       storage.set("Invoice", state.JSONInvoice);
-    }
-  }
+    },
+    async UpdateInvoiceGroup(state) {
+      let obj = {
+        list: state.InvoiceGroupList.map((item, index) => {
+          item.ID = index;
+          return item;
+        }),
+      };
+
+      storage.set("InvoiceGroup", obj);
+    },
+    async CreateInvoiceGroup(state, newInvoiceGroup) {
+      state.InvoiceGroupList.push(newInvoiceGroup);
+      this.commit("UpdateInvoiceGroup");
+    },
+  },
 });

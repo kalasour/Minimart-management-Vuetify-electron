@@ -1,6 +1,6 @@
 <template>
   <v-app dark>
-    <v-toolbar v-if="this.$route.path!=='/print'">
+    <v-toolbar v-if="this.$route.path !== '/print'">
       <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
       <v-toolbar-title>Minimart management</v-toolbar-title>
       <v-spacer></v-spacer>
@@ -12,18 +12,20 @@
         <router-view></router-view>
       </v-container>
       <v-navigation-drawer
-        v-if="this.$route.path!=='/print'"
+        v-if="this.$route.path !== '/print'"
         :mini-variant="mini"
         v-model="drawer"
         absolute
         stateless
         width="250"
       >
-        <div @mouseover="mini=false" @mouseout="mini=true" absolute>
+        <div @mouseover="mini = false" @mouseout="mini = true" absolute>
           <v-list class="pa-1">
             <v-list-tile avatar tag="div">
               <v-list-tile-avatar>
-                <img src="https://pngimage.net/wp-content/uploads/2018/06/minimart-png-6.png" />
+                <img
+                  src="https://pngimage.net/wp-content/uploads/2018/06/minimart-png-6.png"
+                />
               </v-list-tile-avatar>
 
               <v-list-tile-content>
@@ -35,15 +37,24 @@
                     <v-card-title>
                       <span class="headline">Backup</span>
                       <v-spacer></v-spacer>
-                      <v-btn @click="refresh" :loading="refreshing" :disabled="refreshing" flat>
+                      <v-btn
+                        @click="refresh"
+                        :loading="refreshing"
+                        :disabled="refreshing"
+                        flat
+                      >
                         <v-icon>refresh</v-icon>
                       </v-btn>
                     </v-card-title>
                     <v-card-text>
                       <v-container class="py-0" row wrap>
-                        <v-flex v-for="(i,index) in listBackup" :key="index" lg12>
+                        <v-flex
+                          v-for="(i, index) in listBackup"
+                          :key="index"
+                          lg12
+                        >
                           <v-layout row wrap>
-                            <p>{{i.name}}</p>
+                            <p>{{ i.name }}</p>
                             <v-spacer></v-spacer>
                             <v-icon @click="restoreBackup(i)">restore</v-icon>
                             <v-icon @click="deleteBackup(i)">delete</v-icon>
@@ -53,7 +64,9 @@
                     </v-card-text>
                     <v-card-actions>
                       <v-spacer></v-spacer>
-                      <v-btn color="darken-1" flat @click="dialogBackup=false">Done</v-btn>
+                      <v-btn color="darken-1" flat @click="dialogBackup = false"
+                        >Done</v-btn
+                      >
                       <v-btn
                         color="darken-1"
                         :loading="refreshing"
@@ -81,19 +94,38 @@
                       <v-container grid-list-md>
                         <v-layout wrap>
                           <v-flex xs12 sm6 md4>
-                            <v-text-field v-model="editedItem.Name" label="Minimart name"></v-text-field>
+                            <v-text-field
+                              v-model="editedItem.Name"
+                              label="Minimart name"
+                            ></v-text-field>
                           </v-flex>
                           <v-flex xs12 sm6 md4>
-                            <v-text-field v-model="editedItem.Address" label="Adress"></v-text-field>
+                            <v-text-field
+                              v-model="editedItem.Address"
+                              label="Adress"
+                            ></v-text-field>
                           </v-flex>
                           <v-flex xs12 sm6 md4>
-                            <v-text-field v-model="editedItem.Contact" label="Contact"></v-text-field>
+                            <v-text-field
+                              v-model="editedItem.Contact"
+                              label="Contact"
+                            ></v-text-field>
                           </v-flex>
                           <v-flex xs12 sm6 md4>
-                            <v-text-field type="number" v-model="editedItem.Tax" label="Tax (%)"></v-text-field>
+                            <v-text-field
+                              type="number"
+                              v-model="editedItem.Tax"
+                              label="Tax (%)"
+                            ></v-text-field>
                           </v-flex>
                           <v-flex xs12 sm6 md4>
-                            <v-btn @click="dialog=false;dialogBackup=true;">Backup data</v-btn>
+                            <v-btn
+                              @click="
+                                dialog = false;
+                                dialogBackup = true;
+                              "
+                              >Backup data</v-btn
+                            >
                           </v-flex>
                         </v-layout>
                       </v-container>
@@ -101,8 +133,12 @@
 
                     <v-card-actions>
                       <v-spacer></v-spacer>
-                      <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
-                      <v-btn color="blue darken-1" flat @click="save">Save</v-btn>
+                      <v-btn color="blue darken-1" flat @click="close"
+                        >Cancel</v-btn
+                      >
+                      <v-btn color="blue darken-1" flat @click="save"
+                        >Save</v-btn
+                      >
                     </v-card-actions>
                   </v-card>
                 </v-dialog>
@@ -112,9 +148,15 @@
 
           <v-list class="pt-0" dense>
             <v-divider></v-divider>
-            <v-list-tile v-for="item in items" :key="item.title" @click="goto(item.path)">
+            <v-list-tile
+              v-for="item in items"
+              :key="item.title"
+              @click="goto(item.path)"
+            >
               <v-list-tile-action>
-                <v-icon :large="false" color="grey lighten-1">{{ item.icon }}</v-icon>
+                <v-icon :large="false" color="grey lighten-1">{{
+                  item.icon
+                }}</v-icon>
               </v-list-tile-action>
 
               <v-list-tile-content>
@@ -138,7 +180,7 @@ const storageRef = storage.ref().child("Backup");
 export default {
   name: "App",
   components: {
-    Searchbar
+    Searchbar,
   },
   data() {
     return {
@@ -150,16 +192,21 @@ export default {
         { title: "Stock", icon: "table_chart", path: "/stock" },
         { title: "Customers", icon: "supervisor_account", path: "/customers" },
         { title: "Report", icon: "timeline", path: "/report" },
+        { title: "Order List", icon: "timeline", path: "/order_list" },
         { title: "Report Ticket", icon: "timeline", path: "/reportTicket" },
         { title: "Summary Sale", icon: "attach_money", path: "/sum_sale" },
-        { title: "Summary Open Ticket", icon: "attach_money", path: "/sum_ticket" },
+        {
+          title: "Summary Open Ticket",
+          icon: "attach_money",
+          path: "/sum_ticket",
+        },
         {
           title: "Profit Sale",
           icon: "assignment_returned",
-          path: "/profit_sale"
+          path: "/profit_sale",
         },
         { title: "Open Ticket", icon: "receipt", path: "/openTicket" },
-        { title: "About", icon: "question_answer", path: "/about" }
+        { title: "About", icon: "question_answer", path: "/about" },
       ],
       mini: true,
       right: null,
@@ -169,7 +216,7 @@ export default {
       defaultItem: {},
       dialog: false,
       refreshing: false,
-      dialogBackup: false
+      dialogBackup: false,
     };
   },
   watch: {
@@ -178,15 +225,15 @@ export default {
     },
     dialogBackup(val) {
       val && this.refresh();
-    }
+    },
   },
   computed: {
     // JSONInformation:{},
-    ...mapState(["JSONInformation"])
+    ...mapState(["JSONInformation"]),
   },
   created() {
     this.initialize();
-    ipcRenderer.on("toPrint", async event => {
+    ipcRenderer.on("toPrint", async (event) => {
       this.$router.push({ path: "/print" });
     });
     ipcRenderer.send("toPrint");
@@ -208,13 +255,13 @@ export default {
       this.refreshing = true;
       ref
         .listAll()
-        .then(res => {
+        .then((res) => {
           var doneCount = 0;
           res.items.forEach((itemRef, index) => {
-            itemRef.getDownloadURL().then(url => {
+            itemRef.getDownloadURL().then((url) => {
               var xhr = new XMLHttpRequest();
               xhr.responseType = "blob";
-              xhr.onload = event => {
+              xhr.onload = (event) => {
                 var blob = xhr.response;
                 var writeStream = fs.createWriteStream(
                   `${this.directoryPath}/${itemRef.name}`
@@ -241,14 +288,14 @@ export default {
           });
           this.refreshing = false;
         })
-        .catch(error => {
+        .catch((error) => {
           this.refreshing = false;
         });
     },
     deleting(ref) {
-      ref.listAll().then(res => {
+      ref.listAll().then((res) => {
         var doneCount = 0;
-        res.items.forEach(itemRef => {
+        res.items.forEach((itemRef) => {
           itemRef
             .delete()
             .then(() => {
@@ -278,12 +325,12 @@ export default {
           await storageRef
             .child(`${new Date().toDateString()}/${item}`)
             .put(blob)
-            .then(snapshot => {
+            .then((snapshot) => {
               if (index == items.length - 1) {
                 this.refresh();
               }
             })
-            .catch(err => {
+            .catch((err) => {
               console.log(err);
             });
         });
@@ -296,14 +343,14 @@ export default {
       // Find all the prefixes and items.
       storageRef
         .listAll()
-        .then(res => {
-          res.prefixes.forEach(folderRef => {
+        .then((res) => {
+          res.prefixes.forEach((folderRef) => {
             this.listBackup.push(folderRef);
           });
           // res.items.forEach(itemRef => {});
           this.refreshing = false;
         })
-        .catch(error => {
+        .catch((error) => {
           this.listBackup.push(error);
           this.refreshing = false;
         });
@@ -328,7 +375,7 @@ export default {
       ipcRenderer.send("Refresh");
       this.UpdateInformation(this.editedItem);
       this.close();
-    }
-  }
+    },
+  },
 };
 </script>

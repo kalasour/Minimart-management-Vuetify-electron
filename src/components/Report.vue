@@ -1,94 +1,108 @@
 <template>
-  <div id="app">
-    <v-app id="inspire">
-      <div>
-        <v-toolbar flat>
-          <v-toolbar-title>Report</v-toolbar-title>
-          <v-divider class="mx-2" inset vertical></v-divider>
-          <template v-if="SearchField!==''">
-            <v-chip close color="blue" text-color="white" @input="clearSF">
-              <v-avatar>
-                <v-icon>search</v-icon>
-              </v-avatar>
-              {{SearchField}}
-            </v-chip>
+  <div>
+    <v-toolbar flat>
+      <v-toolbar-title>Report</v-toolbar-title>
+      <v-divider class="mx-2" inset vertical></v-divider>
+      <template v-if="SearchField !== ''">
+        <v-chip close color="blue" text-color="white" @input="clearSF">
+          <v-avatar>
+            <v-icon>search</v-icon>
+          </v-avatar>
+          {{ SearchField }}
+        </v-chip>
+      </template>
+      <v-flex xs12 sm6 md4>
+        <v-menu
+          v-model="menu"
+          :close-on-content-click="false"
+          :nudge-right="40"
+          lazy
+          transition="scale-transition"
+          offset-y
+          full-width
+          min-width="290px"
+        >
+          <template v-slot:activator="{ on }">
+            <v-text-field
+              v-model="dateStart"
+              label="Start date"
+              prepend-icon="event"
+              readonly
+              v-on="on"
+            ></v-text-field>
           </template>
-          <v-flex xs12 sm6 md4>
-            <v-menu
-              v-model="menu"
-              :close-on-content-click="false"
-              :nudge-right="40"
-              lazy
-              transition="scale-transition"
-              offset-y
-              full-width
-              min-width="290px"
+
+          <v-date-picker
+            v-model="dateStart"
+            @input="menu = false"
+          ></v-date-picker>
+        </v-menu>
+      </v-flex>
+      <v-icon v-if="dateStart !== null" @click="dateStart = null">close</v-icon>
+      <v-flex xs12 sm6 md4>
+        <v-menu
+          v-model="menu2"
+          :close-on-content-click="false"
+          :nudge-right="40"
+          lazy
+          transition="scale-transition"
+          offset-y
+          full-width
+          min-width="290px"
+        >
+          <template v-slot:activator="{ on }">
+            <v-text-field
+              v-model="dateEnd"
+              label="End date"
+              prepend-icon="event"
+              readonly
+              v-on="on"
+            ></v-text-field>
+          </template>
+          <v-date-picker
+            v-model="dateEnd"
+            @input="menu2 = false"
+          ></v-date-picker>
+        </v-menu>
+      </v-flex>
+      <v-icon v-if="dateEnd !== null" @click="dateEnd = null">close</v-icon>
+      <v-spacer></v-spacer>
+      <div v-if="isGroupingInvoice">
+        <v-btn @click="groupedInvoice" color="primary">done</v-btn>
+        <v-btn @click="clearSelectedInvoices" color="secondary"
+          ><v-icon>close</v-icon></v-btn
+        >
+      </div>
+      <v-btn v-else @click="isGroupingInvoice = true" color="primary"
+        >Group invoice</v-btn
+      >
+      <v-dialog v-model="dialog" max-width="1200px">
+        <EditInvoice v-bind:selected="SelectedInvoice" />
+        <div class="text-xs-right" dark>
+          <v-btn @click="dialog = false">Close</v-btn>
+        </div>
+      </v-dialog>
+
+      <v-dialog v-model="dialogOPT" max-width="1200px">
+        <OpenTicket v-bind:selected="SelectedInvoice" />
+        <div class="text-xs-right" dark>
+          <v-btn @click="dialogOPT = false">Close</v-btn>
+        </div>
+      </v-dialog>
+
+      <v-dialog v-model="dialogList" max-width="500">
+        <v-card>
+          <v-card-text class="text-xs-center"><h3>Note</h3></v-card-text>
+          <v-card-text>
+            <span
+              class="grey--text"
+              v-if="itemSelected.Note == '' || itemSelected.Note == null"
+              >Empty note!</span
             >
-              <template v-slot:activator="{ on }">
-                <v-text-field
-                  v-model="dateStart"
-                  label="Start date"
-                  prepend-icon="event"
-                  readonly
-                  v-on="on"
-                ></v-text-field>
-              </template>
+            <span v-else>{{ itemSelected.Note }}</span>
+          </v-card-text>
 
-              <v-date-picker v-model="dateStart" @input="menu = false"></v-date-picker>
-            </v-menu>
-          </v-flex>
-          <v-icon v-if="dateStart!==null" @click="dateStart = null">close</v-icon>
-          <v-flex xs12 sm6 md4>
-            <v-menu
-              v-model="menu2"
-              :close-on-content-click="false"
-              :nudge-right="40"
-              lazy
-              transition="scale-transition"
-              offset-y
-              full-width
-              min-width="290px"
-            >
-              <template v-slot:activator="{ on }">
-                <v-text-field
-                  v-model="dateEnd"
-                  label="End date"
-                  prepend-icon="event"
-                  readonly
-                  v-on="on"
-                ></v-text-field>
-              </template>
-              <v-date-picker v-model="dateEnd" @input="menu2 = false"></v-date-picker>
-            </v-menu>
-          </v-flex>
-          <v-icon v-if="dateEnd!==null" @click="dateEnd = null">close</v-icon>
-          <v-spacer></v-spacer>
-          <v-dialog v-model="dialog" max-width="1200px">
-            <EditInvoice  v-bind:selected="SelectedInvoice"/>
-            <div class="text-xs-right" dark>
-              <v-btn @click="dialog=false">Close</v-btn>
-            </div>
-          </v-dialog>
-
-          <v-dialog v-model="dialogOPT" max-width="1200px">
-            <OpenTicket  v-bind:selected="SelectedInvoice"/>
-            <div class="text-xs-right" dark>
-              <v-btn @click="dialogOPT=false">Close</v-btn>
-            </div>
-          </v-dialog>
-
-          <v-dialog v-model="dialogList" max-width="500">
-            <v-card>
-              <v-card-text  class="text-xs-center"><h3>Note</h3></v-card-text>
-              <v-card-text>
-                <span
-                  class="grey--text"
-                  v-if="itemSelected.Note==''||itemSelected.Note==null"
-                >Empty note!</span>
-                <span v-else>{{itemSelected.Note}}</span>
-              </v-card-text>
-
-              <!-- <v-list>
+          <!-- <v-list>
                 <v-card-text class="text-xs-center">
                   <h3>List of items</h3>
                 </v-card-text>
@@ -113,66 +127,96 @@
                   </v-list-tile>
                 </v-list-group>
               </v-list>-->
-              <v-card-actions>
-                <v-spacer></v-spacer>
+          <v-card-actions>
+            <v-spacer></v-spacer>
 
-                <v-btn color="green darken-1" flat="flat" @click="dialogList = false">Close</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <v-dialog v-model="dialogInvoice" max-width="1200px">
-            <InvoiceDetail v-bind:selected="SelectedInvoice"/>
-            <div class="text-xs-right" dark>
-              <v-btn @click="dialogInvoice=false">Close</v-btn>
-            </div>
-          </v-dialog>
-          <v-dialog v-model="dialogCustomer" max-width="1200px">
-            <ItemList v-bind:selected="SelectedCustomer"/>
-            <div class="text-xs-right" dark>
-              <v-btn @click="dialogCustomer = false">Close</v-btn>
-            </div>
-          </v-dialog>
-        </v-toolbar>
-        <v-data-table :rows-per-page-items="[{text:'All',value:-1}]" :headers="headers" :items="Invoice.filter(filterTable)" class="elevation-1">
-          <template v-slot:items="props">
-            <td>{{ props.item.InvoiceNumber}}</td>
-            <td class="text-xs-center">
-              <v-btn @click="show(props.item)">{{props.item.Customer.Name}}</v-btn>
-            </td>
-            <td class="text-xs-center">{{ props.item.date }}</td>
-            <td class="text-xs-center">{{ props.item.TotalPiece }}</td>
-            <!-- <td class="text-xs-center">{{ props.item.Paid }}</td> -->
-            <td class="justify-center">
-              <div class="text-xs-center" v-if="parseFloat(props.item.Paid)>=props.item.TotalPrice">
-                <span class="green--text">Paid</span>
-                <v-icon small color="green" class="mr-2">verified_user</v-icon>
-              </div>
-              <div class="text-xs-center" v-else>
-                <span class="red--text">Due</span>
-                <v-icon small color="red" class="mr-2">clear</v-icon>
-              </div>
-            </td>
-            <td class="text-xs-center">
-              <v-btn
-                :disabled="(props.item.Note==''||props.item.Note==null)"
-                @click="clickList(props.item)"
-              >Note</v-btn>
-            </td>
-            <!-- <td class="text-xs-center">{{ props.item.Note }}</td> -->
-            <td class="justify-center align-center layout px-1">
-              <!-- <v-icon small @click="deleteItem(props.item)">local_printshop</v-icon> -->
-              <!-- <v-icon small class="mr-2" @click="handleClick(props.item)">assignment</v-icon> -->
-              <v-icon small class="mr-2" @click="rec(props.item)">save</v-icon>
-              <v-icon small class="mr-2" @click="print(props.item)">local_printshop</v-icon>
-              <v-icon small v-if="props.item.isOpTicket" class="mr-2" @click="editTicker(props.item)">edit</v-icon>
-              <v-icon small v-else class="mr-2" @click="editItem(props.item)">edit</v-icon>
-              <v-icon small @click="deleteItem(props.item)">delete</v-icon>
-            </td>
-          </template>
-           
-        </v-data-table>
-      </div>
-    </v-app>
+            <v-btn
+              color="green darken-1"
+              flat="flat"
+              @click="dialogList = false"
+              >Close</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="dialogInvoice" max-width="1200px">
+        <InvoiceDetail v-bind:selected="SelectedInvoice" />
+        <div class="text-xs-right" dark>
+          <v-btn @click="dialogInvoice = false">Close</v-btn>
+        </div>
+      </v-dialog>
+      <v-dialog v-model="dialogCustomer" max-width="1200px">
+        <ItemList v-bind:selected="SelectedCustomer" />
+        <div class="text-xs-right" dark>
+          <v-btn @click="dialogCustomer = false">Close</v-btn>
+        </div>
+      </v-dialog>
+    </v-toolbar>
+    <v-data-table
+      :rows-per-page-items="[{ text: 'All', value: -1 }]"
+      :headers="headers"
+      :items="Invoice.filter(filterTable)"
+      class="elevation-1"
+    >
+      <template v-slot:items="props">
+        <td v-if="isGroupingInvoice" class="justify-center align-center layout">
+          <v-checkbox
+            class="mb-0"
+            v-model="props.item.selected"
+            color="primary"
+          ></v-checkbox>
+        </td>
+        <td>{{ props.item.InvoiceNumber }}</td>
+        <td class="text-xs-center">
+          <v-btn @click="show(props.item)">{{
+            props.item.Customer.Name
+          }}</v-btn>
+        </td>
+        <td class="text-xs-center">{{ props.item.date }}</td>
+        <td class="text-xs-center">{{ props.item.TotalPiece }}</td>
+        <!-- <td class="text-xs-center">{{ props.item.Paid }}</td> -->
+        <td class="justify-center">
+          <div
+            class="text-xs-center"
+            v-if="parseFloat(props.item.Paid) >= props.item.TotalPrice"
+          >
+            <span class="green--text">Paid</span>
+            <v-icon small color="green" class="mr-2">verified_user</v-icon>
+          </div>
+          <div class="text-xs-center" v-else>
+            <span class="red--text">Due</span>
+            <v-icon small color="red" class="mr-2">clear</v-icon>
+          </div>
+        </td>
+        <td class="text-xs-center">
+          <v-btn
+            :disabled="props.item.Note == '' || props.item.Note == null"
+            @click="clickList(props.item)"
+            >Note</v-btn
+          >
+        </td>
+        <!-- <td class="text-xs-center">{{ props.item.Note }}</td> -->
+        <td class="justify-center align-center layout px-1">
+          <!-- <v-icon small @click="deleteItem(props.item)">local_printshop</v-icon> -->
+          <!-- <v-icon small class="mr-2" @click="handleClick(props.item)">assignment</v-icon> -->
+          <v-icon small class="mr-2" @click="rec(props.item)">save</v-icon>
+          <v-icon small class="mr-2" @click="print(props.item)"
+            >local_printshop</v-icon
+          >
+          <v-icon
+            small
+            v-if="props.item.isOpTicket"
+            class="mr-2"
+            @click="editTicker(props.item)"
+            >edit</v-icon
+          >
+          <v-icon small v-else class="mr-2" @click="editItem(props.item)"
+            >edit</v-icon
+          >
+          <v-icon small @click="deleteItem(props.item)">delete</v-icon>
+        </td>
+      </template>
+    </v-data-table>
   </div>
 </template>
 
@@ -182,39 +226,46 @@ import moment from "moment";
 import { mapMutations, mapState } from "vuex";
 import { ipcRenderer } from "electron";
 import InvoiceDetail from "./Invoice";
-import EditInvoice from './EditInvoice';
+import EditInvoice from "./EditInvoice";
 import ItemList from "./Report_customer";
 import Vue from "vue";
-import OpenTicketVue from '../views/OpenTicket.vue';
+import OpenTicketVue from "../views/OpenTicket.vue";
 Vue.component("InvoiceDetail", InvoiceDetail);
 Vue.component("EditInvoice", EditInvoice);
 Vue.component("ItemList", ItemList);
 Vue.component("OpenTicket", OpenTicketVue);
 const DateFormat = "MMMM Do YYYY";
 export default {
+  props: {
+    selected: {
+      type: Array,
+      default: () => [],
+    },
+  },
   data: () => ({
     SelectedInvoice: {},
     dialogInvoice: false,
+    isGroupingInvoice: false,
     menu: false,
     modal: false,
     menu2: false,
     dialog: false,
     dialogCustomer: false,
     dialogList: false,
-    dialogOPT:false,
-    headers: [
+    dialogOPT: false,
+    headersItem: [
       {
         text: "Invoice No.",
         value: "InvoiceNumber",
         align: "left",
-        sortable: true
+        sortable: true,
       },
       { text: "Customer Name", value: "Customer.Name", align: "center" },
       { text: "Date", sortable: false, align: "center" },
       { text: "Total Amount", sortable: false, align: "center" },
       { text: "Payment Status", sortable: false, align: "center" },
       { text: "Note", sortable: false, align: "center" },
-      { text: "Action", sortable: false, align: "center" }
+      { text: "Action", sortable: false, align: "center" },
     ],
     editedIndex: -1,
     SelectedCustomer: {},
@@ -228,16 +279,32 @@ export default {
   }),
 
   computed: {
+    headers() {
+      return this.isGroupingInvoice
+        ? [{ text: "#", value: "selected", align: "center" }].concat(
+            this.headersItem
+          )
+        : this.headersItem;
+    },
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     },
-    ...mapState(["SearchField", "JSONCustomers", "Customers", "Invoice"])
+    ...mapState([
+      "SearchField",
+      "JSONCustomers",
+      "Customers",
+      "Invoice",
+      "isDevelopment",
+    ]),
+    selectedInvoices() {
+      return this.Invoice.filter((invoice) => invoice.selected);
+    },
   },
 
   watch: {
     dialog(val) {
       val || this.close();
-    }
+    },
   },
   created() {
     // this.initialize();
@@ -248,6 +315,25 @@ export default {
     //   item.InvoiceNumber = moment(item.date,DateFormat).format('Y')+'-'+item.ID.padStart(3, "0");
     //   return item.InvoiceNumber
     // },
+    groupedInvoice() {
+      if (this.selectedInvoices.length == 0) {
+        alert("please select least 1 invoice.");
+        return;
+      }
+      var DateFormat = "MMMM Do YYYY";
+      var now_date = moment(this.date).format(DateFormat);
+      this.CreateInvoiceGroup({
+        invoices: this.selectedInvoices,
+        date: now_date,
+      });
+      this.clearSelectedInvoices();
+    },
+    clearSelectedInvoices() {
+      this.Invoice.forEach((item) => {
+        delete item.selected;
+      });
+      this.isGroupingInvoice = false;
+    },
     handleClick(item) {
       this.SelectedInvoice = item;
       this.dialogInvoice = true;
@@ -267,7 +353,7 @@ export default {
       this.dialogList = true;
     },
     clickCustomer(lastCustomer) {
-      this.SelectedCustomer=lastCustomer
+      this.SelectedCustomer = lastCustomer;
       this.customerSelected = lastCustomer;
       this.dialogCustomer = true;
     },
@@ -278,32 +364,36 @@ export default {
     look(data) {
       console.log(data);
     },
-    ...mapMutations(["initialize", "UpdateInvoice"]),
-    filterTable(element) {
+    ...mapMutations(["initialize", "UpdateInvoice", "CreateInvoiceGroup"]),
+    filterTable(element, index) {
       return (
         ((element.InvoiceNumber == null ? "" : element.InvoiceNumber)
           .toLowerCase()
           .indexOf(
             (this.SearchField == null ? "" : this.SearchField).toLowerCase()
-          ) > -1||(element.Customer.Name == null ? "" : element.Customer.Name)
-          .toLowerCase()
-          .indexOf(
-            (this.SearchField == null ? "" : this.SearchField).toLowerCase()
-          ) > -1) &&
+          ) > -1 ||
+          (element.Customer.Name == null ? "" : element.Customer.Name)
+            .toLowerCase()
+            .indexOf(
+              (this.SearchField == null ? "" : this.SearchField).toLowerCase()
+            ) > -1) &&
         (this.dateStart == null ||
           moment(element.date, DateFormat) >= moment(this.dateStart)) &&
         (this.dateEnd == null ||
-          moment(element.date, DateFormat) <= moment(this.dateEnd))
+          moment(element.date, DateFormat) <= moment(this.dateEnd)) &&
+        (!this.isDevelopment || index < 10) &&
+        (this.selected.length == 0 ||
+          this.selected.map((invoice) => invoice.ID).includes(element.ID))
       );
     },
     editItem(item) {
-      this.SelectedInvoice =  Object.assign({}, item);
+      this.SelectedInvoice = Object.assign({}, item);
       this.editedIndex = this.Invoice.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
     editTicker(item) {
-      this.SelectedInvoice =  Object.assign({}, item);
+      this.SelectedInvoice = Object.assign({}, item);
       this.editedIndex = this.Invoice.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogOPT = true;
@@ -349,10 +439,9 @@ export default {
           this.UpdateInvoice();
         }
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style>
-</style>
+<style></style>
