@@ -46,7 +46,7 @@
               style="border: 1px solid black;"
               align="center"
             >
-              Cost
+              Unit Cost
             </th>
             <th style="border: 1px solid black;" align="center">Amount</th>
             <th style="border: 1px solid black;" align="center">
@@ -128,7 +128,6 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
 import moment from "moment";
 import vue from "vue";
 export default {
@@ -146,7 +145,9 @@ export default {
   },
   data: () => ({}),
   computed: {
-    ...mapState(["Invoice"]),
+    Invoice() {
+      return this.InvoicesGroup.invoices;
+    },
     List2D() {
       var temp = [];
       if (this.List == null || this.List == undefined) {
@@ -179,7 +180,9 @@ export default {
           .map((invoice) => invoice.ID)
           .includes(invoice.ID)
       )
-        .map((invoice) => Object.values(invoice.List))
+        .map((invoice) => {
+          return Object.values(invoice.List);
+        })
         .reduce((prev, curr) => {
           return [...prev, ...curr];
         })
@@ -190,9 +193,19 @@ export default {
           return item;
         })
         .map((item) => {
-          const index = temp.map((item) => item.code).indexOf(item.code);
+          const index = temp
+            .map((item) => item.Barcode_ID)
+            .indexOf(item.Barcode_ID);
           if (index == -1) {
-            temp.push(JSON.parse(JSON.stringify(item)));
+            let clonedItem = JSON.parse(JSON.stringify(item));
+            if (
+              item.Cost != "" &&
+              item.Cost != null &&
+              item.Cost != undefined
+            ) {
+              clonedItem.Unit_price = parseFloat(clonedItem.Cost);
+            }
+            temp.push(clonedItem);
           } else {
             temp[index].piece =
               parseInt(temp[index].piece) + parseInt(item.piece);
@@ -202,20 +215,20 @@ export default {
     },
     TotalPrice() {
       return (
-        this.List.map((invoice) => invoice.Unit_price * invoice.piece).reduce(
-          (a, b) => parseFloat(a) + parseFloat(b)
-        ) +
+        this.List.map((item) => {
+          return item.Unit_price * item.piece;
+        }).reduce((a, b) => parseFloat(a) + parseFloat(b)) +
         parseFloat(this.TotalTax) +
         parseFloat(this.TotalDiscounted)
       ).toFixed(2);
     },
     TotalTax() {
-      return this.List.map((invoice) => invoice.Tax * invoice.piece)
+      return this.List.map((item) => item.Tax * item.piece)
         .reduce((a, b) => parseFloat(a) + parseFloat(b))
         .toFixed(2);
     },
     TotalDiscounted() {
-      return this.List.map((invoice) => invoice.Discounted * invoice.piece)
+      return this.List.map((item) => item.Discounted * item.piece)
         .reduce((a, b) => parseFloat(a) + parseFloat(b))
         .toFixed(2);
     },

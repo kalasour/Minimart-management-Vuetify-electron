@@ -63,6 +63,44 @@ export default {
   },
   methods: {
     ...mapMutations(["UpdateInvoiceGroup"]),
+    List(invoiceGroup) {
+      var temp = [];
+      this.Invoice.filter((invoice) =>
+        invoiceGroup.invoices.map((invoice) => invoice.ID).includes(invoice.ID)
+      )
+        .map((invoice) => {
+          return Object.values(invoice.List);
+        })
+        .reduce((prev, curr) => {
+          return [...prev, ...curr];
+        })
+        .map((item) => {
+          if (item.code == "" || item.code == null || item.code == undefined) {
+            item.code = item.Detail;
+          }
+          return item;
+        })
+        .map((item) => {
+          const index = temp
+            .map((item) => item.Barcode_ID)
+            .indexOf(item.Barcode_ID);
+          if (index == -1) {
+            let clonedItem = JSON.parse(JSON.stringify(item));
+            if (
+              item.Cost != "" &&
+              item.Cost != null &&
+              item.Cost != undefined
+            ) {
+              clonedItem.Unit_price = parseFloat(clonedItem.Cost);
+            }
+            temp.push(clonedItem);
+          } else {
+            temp[index].piece =
+              parseInt(temp[index].piece) + parseInt(item.piece);
+          }
+        });
+      return temp;
+    },
     deleteItem(invoiceGroup) {
       const index = this.InvoiceGroupList.indexOf(invoiceGroup);
       confirm("Are you sure you want to delete this item?") &&
@@ -83,9 +121,26 @@ export default {
         .reduce((a, b) => a + b);
     },
     totalPrice(invoiceGroup) {
-      return this.getInvoiceFrom(invoiceGroup)
-        .map((invoice) => parseFloat(invoice.TotalPrice))
-        .reduce((a, b) => a + b)
+      return (
+        this.List(invoiceGroup)
+          .map((item) => {
+            return item.Unit_price * item.piece;
+          })
+          .reduce((a, b) => parseFloat(a) + parseFloat(b)) +
+        parseFloat(this.TotalTax(invoiceGroup)) +
+        parseFloat(this.TotalDiscounted(invoiceGroup))
+      ).toFixed(2);
+    },
+    TotalTax(invoiceGroup) {
+      return this.List(invoiceGroup)
+        .map((item) => item.Tax * item.piece)
+        .reduce((a, b) => parseFloat(a) + parseFloat(b))
+        .toFixed(2);
+    },
+    TotalDiscounted(invoiceGroup) {
+      return this.List(invoiceGroup)
+        .map((item) => item.Discounted * item.piece)
+        .reduce((a, b) => parseFloat(a) + parseFloat(b))
         .toFixed(2);
     },
     openInvoiceList(invoiceGroup) {
@@ -94,15 +149,17 @@ export default {
     },
     print(invoiceGroup) {
       invoiceGroup.showCost = this.ActiveCost;
-      console.log(invoiceGroup);
+      invoiceGroup.invoices = this.getInvoiceFrom(invoiceGroup);
       ipcRenderer.send("PrintInvoicesGroup", invoiceGroup);
     },
     rec(invoiceGroup) {
       invoiceGroup.showCost = this.ActiveCost;
+      invoiceGroup.invoices = this.getInvoiceFrom(invoiceGroup);
       ipcRenderer.send("SaveInvoicesGroup", invoiceGroup);
     },
     view(invoiceGroup) {
       invoiceGroup.showCost = this.ActiveCost;
+      invoiceGroup.invoices = this.getInvoiceFrom(invoiceGroup);
       ipcRenderer.send("ViewInvoicesGroup", invoiceGroup);
     },
   },
