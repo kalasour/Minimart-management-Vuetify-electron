@@ -16,8 +16,10 @@ export default new Vuex.Store({
     Customers: [],
     Stock: [],
     List: [],
+    orderTempList: [],
     TicketList: [],
     InvoiceGroupList: [],
+    OrderList: [],
     isDevelopment: process.env.NODE_ENV !== "production",
   },
 
@@ -40,6 +42,8 @@ export default new Vuex.Store({
         state.JSONInvoice = data.Invoice;
         if (data.InvoiceGroup != undefined)
           Vue.set(state, "InvoiceGroupList", data.InvoiceGroup.list);
+        if (data.Order != undefined)
+          Vue.set(state, "OrderList", data.Order.list);
         if (state.JSONStock !== null)
           Object.keys(state.JSONStock).map((key) => {
             if (
@@ -127,9 +131,29 @@ export default new Vuex.Store({
 
       storage.set("InvoiceGroup", obj);
     },
+    async UpdateAllOrder(state) {
+      let obj = {
+        list: state.OrderList.map((item, index) => {
+          item.ID = index;
+          return item;
+        }),
+      };
+
+      storage.set("Order", obj);
+    },
     async CreateInvoiceGroup(state, newInvoiceGroup) {
       state.InvoiceGroupList.push(newInvoiceGroup);
       this.commit("UpdateInvoiceGroup");
+    },
+    async CreateOrder(state, newOrder) {
+      state.OrderList.push(newOrder);
+      this.commit("UpdateAllOrder");
+    },
+    async UpdateOrder(state, newOrder) {
+      state.OrderList[
+        state.OrderList.map((order) => order.ID).indexOf(newOrder.ID)
+      ] = newOrder;
+      this.commit("UpdateAllOrder");
     },
   },
 });

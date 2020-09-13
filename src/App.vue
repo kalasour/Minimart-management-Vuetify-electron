@@ -5,7 +5,7 @@
       <v-toolbar-title>Minimart management</v-toolbar-title>
       <v-spacer></v-spacer>
 
-      <Searchbar></Searchbar>
+      <Searchbar v-if="this.$route.path !== '/order_list'"></Searchbar>
     </v-toolbar>
     <v-content>
       <v-container>
@@ -192,7 +192,7 @@ export default {
         { title: "Stock", icon: "table_chart", path: "/stock" },
         { title: "Customers", icon: "supervisor_account", path: "/customers" },
         { title: "Report", icon: "timeline", path: "/report" },
-        { title: "Order List", icon: "timeline", path: "/order_list" },
+        { title: "Report Order", icon: "timeline", path: "/order_list" },
         { title: "Report Ticket", icon: "timeline", path: "/reportTicket" },
         { title: "Summary Sale", icon: "attach_money", path: "/sum_sale" },
         {
@@ -206,6 +206,7 @@ export default {
           path: "/profit_sale",
         },
         { title: "Open Ticket", icon: "receipt", path: "/openTicket" },
+        { title: "Open Order", icon: "receipt", path: "/order" },
         { title: "About", icon: "question_answer", path: "/about" },
       ],
       mini: true,

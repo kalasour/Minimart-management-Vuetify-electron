@@ -8,22 +8,18 @@
         position="left center"
         contain
       >
-        <h1>Order List</h1>
-        <div>
-          <table align="right" width="auto" border="1" cellspacing="0">
-            <tr>
-              <th align="left" style="padding:0 10px;">Date:</th>
-              <td align="right" style="padding:0 10px;">
-                {{ toDate(this.InvoicesGroup.date) }}
-              </td>
-            </tr>
-            <tr>
-              <th align="left" style="padding:0 10px;">Balance Due :</th>
-              <td align="right" style="padding:0 10px;">
-                ${{ Math.max(0, this.TotalPrice).toFixed(2) }}
-              </td>
-            </tr>
-          </table>
+        <br />
+        <table align="right" width="auto" border="1" cellspacing="0">
+          <tr>
+            <th align="left" style="padding:0 10px;">Date:</th>
+            <td align="right" style="padding:0 10px;">
+              {{ toDate(this.InvoicesGroup.date) }}
+            </td>
+          </tr>
+        </table>
+
+        <div id="header">
+          <h1 class="pa-0 ma-0" id="header-text">Order List</h1>
         </div>
       </v-img>
     </v-flex>
@@ -48,8 +44,18 @@
             >
               Unit Cost
             </th>
-            <th style="border: 1px solid black;" align="center">Amount</th>
-            <th style="border: 1px solid black;" align="center">
+            <th
+              v-if="InvoicesGroup.showCost"
+              style="border: 1px solid black;"
+              align="center"
+            >
+              Amount
+            </th>
+            <th
+              v-if="InvoicesGroup.showCost"
+              style="border: 1px solid black;"
+              align="center"
+            >
               Tax
             </th>
           </tr>
@@ -64,10 +70,18 @@
               {{ n.Unit_price }}
             </td>
 
-            <td align="right" style="padding-right:10px;">
+            <td
+              v-if="InvoicesGroup.showCost"
+              align="right"
+              style="padding-right:10px;"
+            >
               {{ n.Unit_price * n.piece }}
             </td>
-            <td align="right" style="padding-right:10px;">
+            <td
+              v-if="InvoicesGroup.showCost"
+              align="right"
+              style="padding-right:10px;"
+            >
               {{ n.Tax }}
             </td>
           </tr>
@@ -84,8 +98,24 @@
         <br />
         <table align="right" width="auto" border="1" cellspacing="0">
           <tr>
-            <th align="left" style="padding:0 10px;">Subtotal :</th>
+            <th align="left" style="padding:0 10px;">Total qt :</th>
             <td align="right" style="padding:0 10px;">
+              {{ TotalPiece }}
+            </td>
+          </tr>
+          <tr>
+            <th
+              v-if="InvoicesGroup.showCost"
+              align="left"
+              style="padding:0 10px;"
+            >
+              Subtotal :
+            </th>
+            <td
+              v-if="InvoicesGroup.showCost"
+              align="right"
+              style="padding:0 10px;"
+            >
               {{
                 (
                   this.TotalPrice -
@@ -96,22 +126,34 @@
             </td>
           </tr>
           <tr>
-            <th align="left" style="padding:0 10px;">
-              Discounted :
+            <th
+              v-if="InvoicesGroup.showCost"
+              align="left"
+              style="padding:0 10px;"
+            >
+              Taxes :
             </th>
-            <td align="right" style="padding:0 10px;">
-              - {{ parseFloat(this.TotalDiscounted).toFixed(2) }}
-            </td>
-          </tr>
-          <tr>
-            <th align="left" style="padding:0 10px;">Taxes :</th>
-            <td align="right" style="padding:0 10px;">
+            <td
+              v-if="InvoicesGroup.showCost"
+              align="right"
+              style="padding:0 10px;"
+            >
               {{ this.TotalTax }}
             </td>
           </tr>
           <tr>
-            <th align="left" style="padding:0 10px;">Total :</th>
-            <td align="right" style="padding:0 10px;">
+            <th
+              v-if="InvoicesGroup.showCost"
+              align="left"
+              style="padding:0 10px;"
+            >
+              Total :
+            </th>
+            <td
+              v-if="InvoicesGroup.showCost"
+              align="right"
+              style="padding:0 10px;"
+            >
               {{ this.TotalPrice }}
             </td>
           </tr>
@@ -122,7 +164,6 @@
     </v-flex>
     <v-flex xs12>
       <br />
-      <h1>Thank you for your business !!!!!!</h1>
     </v-flex>
   </v-container>
 </template>
@@ -193,22 +234,24 @@ export default {
           return item;
         })
         .map((item) => {
-          const index = temp
-            .map((item) => item.Barcode_ID)
-            .indexOf(item.Barcode_ID);
+          let clonedItem = JSON.parse(JSON.stringify(item));
+          if (
+            clonedItem.Cost != "" &&
+            clonedItem.Cost != null &&
+            clonedItem.Cost != undefined
+          ) {
+            clonedItem.Unit_price = parseFloat(clonedItem.Cost);
+          }
+          const index = temp.findIndex(
+            (ele) =>
+              ele.Barcode_ID == clonedItem.Barcode_ID &&
+              ele.Unit_price == clonedItem.Unit_price
+          );
           if (index == -1) {
-            let clonedItem = JSON.parse(JSON.stringify(item));
-            if (
-              item.Cost != "" &&
-              item.Cost != null &&
-              item.Cost != undefined
-            ) {
-              clonedItem.Unit_price = parseFloat(clonedItem.Cost);
-            }
             temp.push(clonedItem);
           } else {
             temp[index].piece =
-              parseInt(temp[index].piece) + parseInt(item.piece);
+              parseInt(temp[index].piece) + parseInt(clonedItem.piece);
           }
         });
       return temp;
@@ -223,9 +266,19 @@ export default {
       ).toFixed(2);
     },
     TotalTax() {
-      return this.List.map((item) => item.Tax * item.piece)
+      return this.List.map((item) => {
+        return item.Tax;
+      })
         .reduce((a, b) => parseFloat(a) + parseFloat(b))
         .toFixed(2);
+    },
+    TotalAmount() {
+      return this.List.map((item) => item.piece)
+        .reduce((a, b) => parseFloat(a) + parseFloat(b))
+        .toFixed(2);
+    },
+    TotalPiece() {
+      return this.List.map((item) => item.piece).reduce((a, b) => a + b);
     },
     TotalDiscounted() {
       return this.List.map((item) => item.Discounted * item.piece)
@@ -245,6 +298,15 @@ export default {
 </script>
 
 <style>
+#header {
+  position: absolute;
+  left: 50%;
+  top: 70%;
+}
+#header-text {
+  position: relative;
+  left: -50%;
+}
 .light {
   align-items: flex-end;
   background-color: white;

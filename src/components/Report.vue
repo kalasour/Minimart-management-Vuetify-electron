@@ -68,10 +68,16 @@
       <v-icon v-if="dateEnd !== null" @click="dateEnd = null">close</v-icon>
       <v-spacer></v-spacer>
       <div v-if="isGroupingInvoice">
-        <v-btn @click="groupedInvoice" color="primary">done</v-btn>
-        <v-btn @click="clearSelectedInvoices" color="secondary"
-          ><v-icon>close</v-icon></v-btn
+        <v-icon class="mr-2" @click="groupedInvoice('ViewInvoicesGroup')"
+          >search</v-icon
         >
+        <v-icon class="mr-2" @click="groupedInvoice('PrintInvoicesGroup')"
+          >local_printshop</v-icon
+        >
+        <v-icon class="mr-2" @click="groupedInvoice('SaveInvoicesGroup')"
+          >save</v-icon
+        >
+        <v-icon @click="clearSelectedInvoices">close</v-icon>
       </div>
       <v-btn v-else @click="isGroupingInvoice = true" color="primary"
         >Group invoice</v-btn
@@ -315,17 +321,23 @@ export default {
     //   item.InvoiceNumber = moment(item.date,DateFormat).format('Y')+'-'+item.ID.padStart(3, "0");
     //   return item.InvoiceNumber
     // },
-    groupedInvoice() {
+    groupedInvoice(action) {
       if (this.selectedInvoices.length == 0) {
         alert("please select least 1 invoice.");
         return;
       }
       var DateFormat = "MMMM Do YYYY";
       var now_date = moment(this.date).format(DateFormat);
-      this.CreateInvoiceGroup({
+      // this.CreateInvoiceGroup({
+      //   invoices: this.selectedInvoices,
+      //   date: now_date,
+      // });
+      let invoiceGroup = {
         invoices: this.selectedInvoices,
         date: now_date,
-      });
+      };
+      invoiceGroup.showCost = true;
+      ipcRenderer.send(action, invoiceGroup);
       this.clearSelectedInvoices();
     },
     clearSelectedInvoices() {
