@@ -49,7 +49,7 @@
                     <v-card-text>
                       <v-container class="py-0" row wrap>
                         <v-flex
-                          v-for="(i, index) in listBackup"
+                          v-for="(i, index) in listBackupSort"
                           :key="index"
                           lg12
                         >
@@ -231,6 +231,12 @@ export default {
   computed: {
     // JSONInformation:{},
     ...mapState(["JSONInformation"]),
+    listBackupSort() {
+      [].sort;
+      return this.listBackup.sort((a, b) => {
+        return new Date(b.name) - new Date(a.name);
+      });
+    },
   },
   created() {
     this.initialize();
