@@ -268,6 +268,13 @@ export default {
       //   })
       // );
       if (con) {
+        if (
+          this.editedIndex.code == "" ||
+          this.editedIndex.code == null ||
+          this.editedIndex.code == undefined
+        )
+          this.editedIndex.code = this.editedIndex.Detail;
+
         if (this.editedIndex > -1) {
           Object.assign(this.Stock[this.editedIndex], this.editedItem);
         } else {
@@ -277,6 +284,7 @@ export default {
               parseInt(this.Stock[this.Stock.length - 1].index) + 1
             ).toString();
           }
+
           this.Stock.push(this.editedItem);
         }
         this.close();
