@@ -5,6 +5,7 @@ import {
   createProtocol,
   installVueDevtools,
 } from "vue-cli-plugin-electron-builder/lib";
+import { printActionEnum } from "./SDK/NuntSDK";
 const os = require("os");
 const fs = require("fs");
 const path = require("path");
@@ -204,6 +205,16 @@ ipcMain.on("ViewInvoicesGroup", (event, content) => {
 ipcMain.on("SaveInvoicesGroup", (event, content) => {
   workerWindow.show();
   workerWindow.webContents.send("SaveInvoicesGroup", content);
+});
+
+ipcMain.on("printManager", (event, content) => {
+  workerWindow.show();
+  switch (content.action) {
+    case (printActionEnum.print, printActionEnum.view):
+      workerWindow.focus();
+      break;
+  }
+  workerWindow.webContents.send("printManager", content);
 });
 
 // when worker window is ready

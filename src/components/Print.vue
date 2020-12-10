@@ -6,6 +6,7 @@
     ma-0
     >Please setting store information</v-container
   >
+  <Invoice3inch v-else-if="type == typeEnum.invoice3inch" />
   <InvoicesGroup
     v-else-if="type == typeEnum.invoicesGroup"
     v-bind:InvoicesGroup="inputData"
@@ -513,14 +514,17 @@
 <script>
 // import 'bootstrap/dist/css/bootstrap.min.css';
 require("bootstrap");
+import Invoice3inch from "./print/3inch/Invoice";
 import InvoicesGroup from "./print/InvoicesGroup";
 import { mapMutations, mapState } from "vuex";
 const ipcRenderer = require("electron").ipcRenderer;
 import moment from "moment";
 import Vue from "vue";
+import { printPageEnum, printActionEnum } from "../SDK/NuntSDK";
 export default {
   components: {
     InvoicesGroup: InvoicesGroup,
+    Invoice3inch: Invoice3inch,
   },
   watch: {
     List: function() {
@@ -564,6 +568,7 @@ export default {
   data: () => ({
     typeEnum: {
       invoicesGroup: "invoicesGroup",
+      invoice3inch: "invoice3inch",
     },
     type: "",
     Invoice: [],
@@ -693,6 +698,25 @@ export default {
       setTimeout(() => {
         ipcRenderer.send("readyToSave");
       }, 500);
+    });
+
+    ipcRenderer.on("printManager", (event, input) => {
+      this.resetState();
+      this.type = input.printPage;
+      this.inputData = input;
+
+      switch (input.action) {
+        case printActionEnum.print:
+          setTimeout(() => {
+            ipcRenderer.send("readyToPrintPDF");
+          }, 500);
+          break;
+        case printActionEnum.save:
+          setTimeout(() => {
+            ipcRenderer.send("readyToSave");
+          }, 500);
+          break;
+      }
     });
   },
 };
