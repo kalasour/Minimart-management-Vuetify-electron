@@ -269,11 +269,11 @@ export default {
       // );
       if (con) {
         if (
-          this.editedIndex.code == "" ||
-          this.editedIndex.code == null ||
-          this.editedIndex.code == undefined
+          this.editedItem.code == "" ||
+          this.editedItem.code == null ||
+          this.editedItem.code == undefined
         )
-          this.editedIndex.code = this.editedIndex.Detail;
+          this.editedItem.code = this.editedItem.Detail;
 
         if (this.editedIndex > -1) {
           Object.assign(this.Stock[this.editedIndex], this.editedItem);

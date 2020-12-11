@@ -267,7 +267,7 @@ export default {
     },
     TotalTax() {
       return this.List.map((item) => {
-        return item.Tax;
+        return parseFloat(item.Tax);
       })
         .reduce((a, b) => parseFloat(a) + parseFloat(b))
         .toFixed(2);
