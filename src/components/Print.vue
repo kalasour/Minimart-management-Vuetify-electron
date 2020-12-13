@@ -6,9 +6,30 @@
     ma-0
     >Please setting store information</v-container
   >
-  <Invoice3inch v-else-if="type == typeEnum.invoice3inch" />
+  <Invoice3inch
+    v-else-if="printPage == printPageEnum.invoice3inch"
+    v-bind:list="this.List"
+    v-bind:customer="this.Invoice.Customer.Name"
+    v-bind:isOpTicket="this.Invoice.isOpTicket"
+    v-bind:invoiceId="this.Invoice.InvoiceNumber"
+    v-bind:date="toDate(this.Invoice.date)"
+    v-bind:balanceDue="
+      Math.max(0, this.Invoice.TotalPrice - this.Invoice.Paid).toFixed(2)
+    "
+    v-bind:Subtotal="
+      (
+        this.Invoice.TotalPrice -
+        this.Invoice.TotalTax +
+        parseFloat(this.Invoice.TotalDiscounted)
+      ).toFixed(2)
+    "
+    v-bind:Discounted="parseFloat(this.Invoice.TotalDiscounted).toFixed(2)"
+    v-bind:TotalTax="this.Invoice.TotalTax"
+    v-bind:TotalPrice="this.Invoice.TotalPrice"
+    v-bind:AmountPaid="this.Invoice.Paid"
+  />
   <InvoicesGroup
-    v-else-if="type == typeEnum.invoicesGroup"
+    v-else-if="printPage == printPageEnum.invoicesGroup"
     v-bind:InvoicesGroup="inputData"
     v-bind:SumMod="SumMod"
   />
@@ -555,7 +576,7 @@ export default {
       return moment(date, "MMMM Do YYYY, h:mm:ss a").format("MMMM YYYY");
     },
     resetState() {
-      this.type = "";
+      this.printPage = "";
       this.Invoice = [];
       this.List = [];
       this.Statement = [];
@@ -566,11 +587,11 @@ export default {
   },
 
   data: () => ({
-    typeEnum: {
+    printPageEnum: {
       invoicesGroup: "invoicesGroup",
       invoice3inch: "invoice3inch",
     },
-    type: "",
+    printPage: "",
     Invoice: [],
     List: [],
     Statement: [],
@@ -677,7 +698,7 @@ export default {
     });
     ipcRenderer.on("PrintInvoicesGroup", (event, InvoicesGroup) => {
       this.resetState();
-      this.type = this.typeEnum.invoicesGroup;
+      this.printPage = this.printPageEnum.invoicesGroup;
       this.SumMod = [43, 48];
       this.inputData = InvoicesGroup;
       setTimeout(() => {
@@ -686,13 +707,13 @@ export default {
     });
     ipcRenderer.on("ViewInvoicesGroup", (event, InvoicesGroup) => {
       this.resetState();
-      this.type = this.typeEnum.invoicesGroup;
+      this.printPage = this.printPageEnum.invoicesGroup;
       this.SumMod = [43, 48];
       this.inputData = InvoicesGroup;
     });
     ipcRenderer.on("SaveInvoicesGroup", (event, InvoicesGroup) => {
       this.resetState();
-      this.type = this.typeEnum.invoicesGroup;
+      this.printPage = this.printPageEnum.invoicesGroup;
       this.SumMod = [43, 48];
       this.inputData = InvoicesGroup;
       setTimeout(() => {
@@ -702,8 +723,15 @@ export default {
 
     ipcRenderer.on("printManager", (event, input) => {
       this.resetState();
-      this.type = input.printPage;
+      this.printPage = input.printPage;
       this.inputData = input;
+
+      switch (input.printPage) {
+        case printPageEnum.invoice3inch:
+          this.Invoice = input;
+          this.List = Object.values(this.Invoice.List);
+          break;
+      }
 
       switch (input.action) {
         case printActionEnum.print:

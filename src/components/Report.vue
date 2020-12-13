@@ -67,6 +67,11 @@
       </v-flex>
       <v-icon v-if="dateEnd !== null" @click="dateEnd = null">close</v-icon>
       <v-spacer></v-spacer>
+      <v-switch
+        v-model="is3inch"
+        hide-details
+        label="Reciept printer"
+      ></v-switch>
       <div v-if="isGroupingInvoice">
         <v-icon class="mr-2" @click="groupedInvoice('ViewInvoicesGroup')"
           >search</v-icon
@@ -236,6 +241,7 @@ import EditInvoice from "./EditInvoice";
 import ItemList from "./Report_customer";
 import Vue from "vue";
 import OpenTicketVue from "../views/OpenTicket.vue";
+import { printPageEnum, printActionEnum } from "../SDK/NuntSDK";
 Vue.component("InvoiceDetail", InvoiceDetail);
 Vue.component("EditInvoice", EditInvoice);
 Vue.component("ItemList", ItemList);
@@ -256,6 +262,7 @@ export default {
     modal: false,
     menu2: false,
     dialog: false,
+    is3inch: false,
     dialogCustomer: false,
     dialogList: false,
     dialogOPT: false,
@@ -351,13 +358,25 @@ export default {
       this.dialogInvoice = true;
     },
     print(invoice) {
-      ipcRenderer.send("printPDF", invoice);
+      if (this.is3inch) {
+        invoice.printPage = printPageEnum.invoice3inch;
+        invoice.action = printActionEnum.print;
+        ipcRenderer.send("printManager", invoice);
+      } else ipcRenderer.send("printPDF", invoice);
     },
     show(invoice) {
-      ipcRenderer.send("showPDF", invoice);
+      if (this.is3inch) {
+        invoice.printPage = printPageEnum.invoice3inch;
+        invoice.action = printActionEnum.view;
+        ipcRenderer.send("printManager", invoice);
+      } else ipcRenderer.send("showPDF", invoice);
     },
     rec(invoice) {
-      ipcRenderer.send("savePDF", invoice);
+      if (this.is3inch) {
+        invoice.printPage = printPageEnum.invoice3inch;
+        invoice.action = printActionEnum.save;
+        ipcRenderer.send("printManager", invoice);
+      } else ipcRenderer.send("savePDF", invoice);
     },
     clickList(item) {
       this.itemSelected = item;
