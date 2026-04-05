@@ -1,10 +1,7 @@
 "use strict";
 
 import { app, protocol, BrowserWindow, ipcMain, shell, dialog } from "electron";
-import {
-  createProtocol,
-  installVueDevtools,
-} from "vue-cli-plugin-electron-builder/lib";
+import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { printActionEnum } from "./SDK/NuntSDK";
 const os = require("os");
 const fs = require("fs");
@@ -81,15 +78,12 @@ app.on("activate", () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on("ready", async () => {
-  if (isDevelopment && !process.env.IS_TEST) {
-    // Install Vue Devtools
-    try {
-      await installVueDevtools();
-    } catch (e) {
-      console.error("Vue Devtools failed to install:", e.toString());
-    }
-  }
+app.on("ready", () => {
+  // Vue DevTools auto-install removed: vue-cli-plugin-electron-builder downloads the
+  // extension from an old Chrome Web Store URL; the response is often not a valid .crx
+  // anymore, which throws "Invalid header: Does not start with Cr24" as an unhandled
+  // rejection (the plugin does not catch unzip failures). Use Electron DevTools as usual;
+  // optionally load Vue DevTools from a local build or a maintained installer if you need it.
   createWindow();
 });
 
